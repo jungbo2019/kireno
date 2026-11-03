@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KIRENO 픽셀 아트 실시간 작업 관제실 (Live Pixel Studio)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .pixelated {
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+        }
+        .canvas-grid {
+            background-size: 16px 16px;
+            background-image: 
+                linear-gradient(to right, rgba(0, 0, 0, 0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
+        }
+    </style>
+</head>
+<body class="bg-[#18181b] text-white min-h-screen flex flex-col font-sans">
+    <!-- 상단 네비게이션 헤더 -->
+    <header class="bg-[#27272a] border-b border-[#3f3f46] px-6 py-4 flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+            <span class="w-8 h-8 rounded bg-[#d97706] text-black font-black flex items-center justify-center font-serif text-sm">器</span>
+            <div>
+                <h1 class="font-bold text-lg text-white flex items-center gap-2">
+                    KIRENO 실시간 픽셀 스프라이트 작업 관제실
+                    <span class="px-2 py-0.5 text-xs bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-full flex items-center gap-1">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> 라이브 진행 중
+                    </span>
+                </h1>
+                <p class="text-xs text-zinc-400">1번 첨부(KINE 금발 전사) 캐릭터의 5번(8방향 걷기 마네킹) 스프라이트 시트 실시간 변환 공정</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-3">
+            <a href="/" target="_blank" class="text-xs px-3 py-1.5 bg-[#3f3f46] hover:bg-[#52525b] rounded text-zinc-200 transition">
+                쇼룸 바로가기 <i class="fa-solid fa-arrow-up-right-from-square text-[10px] ml-1"></i>
+            </a>
+        </div>
+    </header>
+
+    <!-- 메인 대시보드 그리드 -->
+    <main class="flex-1 p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 max-w-7xl mx-auto w-full">
+        <!-- 좌측: 실시간 렌더링 캔버스 및 애니메이션 재생기 -->
+        <div class="lg:col-span-8 flex flex-col gap-6">
+            <div class="bg-[#27272a] rounded-xl border border-[#3f3f46] p-5">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="font-bold text-sm text-zinc-200 flex items-center gap-2">
+                        <i class="fa-solid fa-film text-amber-400"></i> 실시간 걷기 애니메이션 타임라인 모니터
+                    </h2>
+                    <div class="flex items-center gap-2 text-xs">
+                        <span class="text-zinc-400">재생 속도:</span>
+                        <span class="px-2 py-0.5 rounded bg-black/40 text-amber-300 font-mono">110ms / Frame</span>
+                    </div>
+                </div>
+
+                <!-- 캔버스 스테이지 -->
+                <div class="canvas-grid bg-[#2e342a] rounded-lg border border-[#3f3f46] p-8 flex items-center justify-center min-h-[320px] relative overflow-hidden">
+                    <!-- 중앙 4배 확대 스프라이트 -->
+                    <div class="flex flex-col items-center gap-4">
+                        <div class="w-36 h-48 bg-black/30 rounded-lg border border-white/10 flex items-center justify-center p-2 relative shadow-2xl">
+                            <img src="/static/live_studio/char1_walk_cycle.gif" alt="실시간 걷기 애니메이션" class="pixelated w-full h-full object-contain">
+                            <span class="absolute bottom-2 right-2 text-[9px] bg-black/70 text-zinc-300 px-1.5 py-0.5 rounded font-mono">x4 ZOOM</span>
+                        </div>
+                        <span class="text-xs text-zinc-300 font-medium bg-black/50 px-3 py-1 rounded-full border border-white/10">
+                            1번 캐릭터: 8프레임 등각 투영(Isometric) 걷기 사이클
+                        </span>
+                    </div>
+                </div>
+
+                <!-- 8프레임 필름 스트립 -->
+                <div class="mt-4 pt-4 border-t border-[#3f3f46]">
+                    <div class="flex items-center justify-between text-xs text-zinc-400 mb-2">
+                        <span>프레임 스트립 (Frame 1 ~ 8)</span>
+                        <span class="text-amber-400">Row 1: 대각선 전방 보행</span>
+                    </div>
+                    <div class="grid grid-cols-8 gap-2">
+                        {% for i in range(1, 9) %}
+                        <div class="bg-black/40 rounded border border-white/10 p-1 flex flex-col items-center group hover:border-amber-400 transition cursor-pointer">
+                            <div class="w-full h-16 flex items-center justify-center">
+                                <img src="/static/live_studio/char1_walk_f{{ i }}.png" alt="Frame {{ i }}" class="pixelated max-h-full object-contain">
+                            </div>
+                            <span class="text-[9px] text-zinc-400 mt-1 font-mono">F{{ i }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- 변환 공정 및 파이프라인 단계 -->
+            <div class="bg-[#27272a] rounded-xl border border-[#3f3f46] p-5">
+                <h3 class="font-bold text-sm text-zinc-200 mb-3 flex items-center gap-2">
+                    <i class="fa-solid fa-layer-group text-blue-400"></i> 포토샵 레이어 분해 구조
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-3 text-xs">
+                    <div class="bg-black/30 p-3 rounded border border-white/5">
+                        <span class="text-[10px] text-zinc-500 block mb-1">Layer 01</span>
+                        <strong class="text-amber-300 block">5번 마네킹 골격 가이드</strong>
+                        <p class="text-zinc-400 text-[11px] mt-1">8방향 보행 투시 기준선</p>
+                    </div>
+                    <div class="bg-black/30 p-3 rounded border border-white/5">
+                        <span class="text-[10px] text-zinc-500 block mb-1">Layer 02</span>
+                        <strong class="text-sky-300 block">하체/부츠/바지 애니메이션</strong>
+                        <p class="text-zinc-400 text-[11px] mt-1">무릎 각도 및 보폭 스윙 계산</p>
+                    </div>
+                    <div class="bg-black/30 p-3 rounded border border-white/5">
+                        <span class="text-[10px] text-zinc-500 block mb-1">Layer 03</span>
+                        <strong class="text-emerald-300 block">상체 흉갑/벨트/어깨 갑주</strong>
+                        <p class="text-zinc-400 text-[11px] mt-1">상체 바운스(Bobbing) 연동</p>
+                    </div>
+                    <div class="bg-black/30 p-3 rounded border border-white/5">
+                        <span class="text-[10px] text-zinc-500 block mb-1">Layer 04</span>
+                        <strong class="text-purple-300 block">금발 포니테일 헤어 스웨이</strong>
+                        <p class="text-zinc-400 text-[11px] mt-1">발걸음에 따른 머리카락 흩날림</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 우측: 원본 참조 데이터 및 포토샵 연동 안내 -->
+        <div class="lg:col-span-4 flex flex-col gap-6">
+            <!-- 1번 첨부 원본 참조 -->
+            <div class="bg-[#27272a] rounded-xl border border-[#3f3f46] p-5">
+                <h3 class="font-bold text-sm text-zinc-200 mb-3 flex items-center gap-2">
+                    <i class="fa-solid fa-palette text-rose-400"></i> 원본 1번 캐릭터 분석
+                </h3>
+                <div class="bg-black/30 p-3 rounded border border-white/5 flex gap-4 items-center mb-4">
+                    <img src="/static/live_studio/p1_head.png" class="w-16 h-16 object-contain bg-[#52634f] rounded p-1 pixelated">
+                    <div>
+                        <span class="text-xs font-bold text-zinc-200 block">KINE 스타일 금발 여전사</span>
+                        <span class="text-[10px] text-zinc-400">금발 포니테일 · 이마 붉은 점 · 흉갑</span>
+                    </div>
+                </div>
+
+                <div class="space-y-2 text-xs text-zinc-300">
+                    <div class="flex justify-between py-1 border-b border-white/5">
+                        <span class="text-zinc-400">목표 규격</span>
+                        <span class="font-mono text-amber-300">64x96 px (정밀 2D)</span>
+                    </div>
+                    <div class="flex justify-between py-1 border-b border-white/5">
+                        <span class="text-zinc-400">방향 수</span>
+                        <span class="font-mono text-zinc-200">8방향 (총 64프레임)</span>
+                    </div>
+                    <div class="flex justify-between py-1 border-b border-white/5">
+                        <span class="text-zinc-400">현재 공정</span>
+                        <span class="font-mono text-emerald-400">1단계: 대각선 8프레임 완료</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 포토샵 파일 다운로드 및 열기 -->
+            <div class="bg-[#27272a] rounded-xl border border-[#3f3f46] p-5">
+                <h3 class="font-bold text-sm text-zinc-200 mb-2 flex items-center gap-2">
+                    <i class="fa-brands fa-adobe text-cyan-400"></i> 포토샵에서 직접 열기
+                </h3>
+                <p class="text-xs text-zinc-400 leading-relaxed mb-4">
+                    지금 컴퓨터에 생성된 포토샵 원본 파일을 열어 레이어별로 직접 수정하거나 타임라인에서 재생하실 수 있습니다.
+                </p>
+                <div class="bg-black/40 p-3 rounded text-[11px] font-mono text-amber-300 mb-4 break-all border border-white/5">
+                    E:/kireno/char1_walk_cycle.psd
+                </div>
+                <div class="text-[11px] text-zinc-400 space-y-1">
+                    <p>💡 <strong>포토샵 단축키 안내:</strong></p>
+                    <p>• <code>스페이스바</code>: 걷기 애니메이션 재생 / 일시정지</p>
+                    <p>• <code>B (연필 1px)</code>: 픽셀 직접 수정</p>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}KIRENO 관리자 관제센터{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+    <style>
+        body { font-family: 'Pretendard', sans-serif; background-color: #F8F9FA; color: #111111; letter-spacing: -0.02em; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col md:flex-row antialiased">
+
+    <!-- Sidebar Navigation -->
+    <aside class="w-full md:w-64 bg-black text-white flex-shrink-0 flex flex-col justify-between p-6">
+        <div>
+            <!-- Admin Brand -->
+            <div class="flex items-center space-x-3 pb-6 border-b border-stone-800 mb-6">
+                <span class="text-xl font-black tracking-widest text-white">KIRENO</span>
+                <span class="text-[10px] bg-stone-800 text-stone-300 px-2 py-0.5 rounded font-mono">MISSION CTRL</span>
+            </div>
+
+            <!-- Nav Links -->
+            <nav class="space-y-1 text-xs font-semibold">
+                <a href="/admin/chat" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-emerald-400 bg-stone-900 hover:bg-stone-800 transition-colors">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span>1:1 고객 실시간 상담</span>
+                </a>
+                <a href="/admin/mission-control" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-stone-300 hover:bg-stone-900 transition-colors">
+                    <i class="fa-solid fa-satellite-dish w-4"></i>
+                    <span>실시간 관제센터</span>
+                </a>
+                <a href="/admin/inspect" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-amber-300 hover:bg-stone-900 transition-colors">
+                    <i class="fa-solid fa-eye w-4"></i>
+                    <span>비주얼 전문 검수 세션</span>
+                </a>
+                <a href="/admin/guides" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-amber-400 bg-stone-900 hover:bg-stone-800 transition-colors border border-amber-500/30">
+                    <i class="fa-solid fa-arrows-spin w-4 text-amber-400"></i>
+                    <span>판매·통관·사후처리 & 광고 마스터북</span>
+                </a>
+                <a href="/admin/operations" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-stone-300 hover:bg-stone-900 hover:text-white transition-colors">
+                    <i class="fa-solid fa-calculator w-4 text-amber-400"></i>
+                    <span>1인 직수입 마스터 운영 관제</span>
+                </a>
+                <a href="/admin" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-stone-300 hover:bg-stone-900 hover:text-white transition-colors">
+                    <i class="fa-solid fa-chart-pie w-4"></i>
+                    <span>대시보드</span>
+                </a>
+                <a href="/admin/cms" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-stone-300 hover:bg-stone-900 hover:text-white transition-colors">
+                    <i class="fa-solid fa-pen-to-square w-4"></i>
+                    <span>사이트 문구·설정 관리 (CMS)</span>
+                </a>
+                <a href="/admin/products" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-stone-300 hover:bg-stone-900 hover:text-white transition-colors">
+                    <i class="fa-solid fa-boxes-stacked w-4"></i>
+                    <span>상품 관리 (네이버 스마트스토어 연동)</span>
+                </a>
+                <a href="/admin/inquiries" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-stone-300 hover:bg-stone-900 hover:text-white transition-colors">
+                    <i class="fa-solid fa-envelope-open-text w-4"></i>
+                    <span>도매/대량 문의</span>
+                </a>
+                <a href="/admin/logs" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-stone-300 hover:bg-stone-900 hover:text-white transition-colors">
+                    <i class="fa-solid fa-shield-halved w-4"></i>
+                    <span>보안 및 시스템 로그</span>
+                </a>
+            </nav>
+        </div>
+
+        <!-- Footer Actions -->
+        <div class="pt-6 border-t border-stone-800 space-y-2 text-xs">
+            <a href="/" target="_blank" class="flex items-center justify-between text-stone-400 hover:text-white transition-colors">
+                <span>쇼룸 사이트 바로가기</span>
+                <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+            </a>
+            <a href="/admin/logout" class="flex items-center space-x-2 text-red-400 hover:text-red-300 transition-colors pt-2">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                <span>로그아웃</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <div class="flex-grow flex flex-col min-w-0">
+        <!-- Top Bar -->
+        <header class="bg-white border-b border-stone-200 h-16 px-6 flex items-center justify-between">
+            <div class="flex items-center space-x-2 text-xs text-stone-500">
+                <span>통합 관제 시스템</span>
+                <span>/</span>
+                <span class="font-bold text-stone-900">{% block breadcrumb %}홈{% endblock %}</span>
+            </div>
+            <div class="flex items-center space-x-4 text-xs">
+                <span class="text-stone-500 font-mono">1:1 Chat Engine: <span class="text-green-600 font-bold">ONLINE (Port 5001)</span></span>
+            </div>
+        </header>
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="px-6 pt-4">
+                    {% for category, message in messages %}
+                        <div class="p-4 mb-2 text-xs rounded-lg border {% if category == 'success' %}bg-green-50 text-green-800 border-green-200{% elif category == 'error' %}bg-red-50 text-red-800 border-red-200{% else %}bg-blue-50 text-blue-800 border-blue-200{% endif %} flex justify-between items-center">
+                            <span>{{ message }}</span>
+                            <button onclick="this.parentElement.remove()" class="font-bold ml-4">✕</button>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <!-- Body Content -->
+        <main class="p-6 flex-grow">
+            {% block admin_content %}{% endblock %}
+        </main>
+    </div>
+
+</body>
+</html>

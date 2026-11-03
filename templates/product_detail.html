@@ -1,0 +1,268 @@
+{% extends "base.html" %}
+
+{% block title %}{{ product.name }} | {{ product.category }} - KIRENO 키레노 공식 쇼룸{% endblock %}
+{% block meta_description %}{{ product.name }} ({{ product.dimensions }}). {{ product.description }} 공식 판매가 {{ "{:,}".format(product.price) }}원. 일본 직공수 및 인천세관 정식 통관, 1인 대표 전수 육안검수.{% endblock %}
+{% block meta_keywords %}{{ product.name }}, {{ product.category }}, 키레노, KIRENO, 일본 도자기 화분, 재팬디 오브제, 시가라키 화분{% endblock %}
+{% block canonical %}{{ request.host_url.rstrip('/') }}/product/{{ product.id }}{% endblock %}
+{% block og_type %}product{% endblock %}
+{% block og_title %}{{ product.name }} ({{ "{:,}".format(product.price) }}원) | KIRENO 키레노{% endblock %}
+{% block og_description %}{{ product.description }} [규격: {{ product.dimensions }} / 상태: {{ product.stock_status }}]{% endblock %}
+{% block og_image %}{{ request.host_url.rstrip('/') }}{{ product.image_url }}{% endblock %}
+{% block og_url %}{{ request.host_url.rstrip('/') }}/product/{{ product.id }}{% endblock %}
+{% block twitter_title %}{{ product.name }} | KIRENO 키레노{% endblock %}
+{% block twitter_description %}{{ product.description }}{% endblock %}
+{% block twitter_image %}{{ request.host_url.rstrip('/') }}{{ product.image_url }}{% endblock %}
+
+{% block head %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "키레노 공식 쇼룸 홈",
+          "item": "{{ request.host_url.rstrip('/') }}/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "{{ product.category }}",
+          "item": "{{ request.host_url.rstrip('/') }}/#collection"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": {{ product.name | tojson }},
+          "item": "{{ request.host_url.rstrip('/') }}/product/{{ product.id }}"
+        }
+      ]
+    },
+    {
+      "@type": "Product",
+      "@id": "{{ request.host_url.rstrip('/') }}/product/{{ product.id }}#product",
+      "name": {{ product.name | tojson }},
+      "image": [
+        "{{ request.host_url.rstrip('/') }}{{ product.image_url }}"
+      ],
+      "description": {{ product.description | tojson }},
+      "sku": "KRN-PROD-{{ product.id }}",
+      "category": {{ product.category | tojson }},
+      "brand": {
+        "@type": "Brand",
+        "name": "KIRENO 키레노"
+      },
+      "offers": {
+        "@type": "Offer",
+        "url": "{{ product.smartstore_url or (request.host_url.rstrip('/') ~ '/product/' ~ product.id) }}",
+        "priceCurrency": "KRW",
+        "price": "{{ product.price }}",
+        "availability": "{% if product.stock_status == '품절' %}https://schema.org/OutOfStock{% else %}https://schema.org/InStock{% endif %}",
+        "itemCondition": "https://schema.org/NewCondition",
+        "seller": {
+          "@type": "Organization",
+          "name": "KIRENO 키레노"
+        }
+      }
+    }
+  ]
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<!-- 개별 작품 홍보 유입 고객용 안심 통관·검수 & 공식 결제 보증 배너 -->
+<div class="bg-kireno-black text-white border-b border-kireno-charcoal">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-wrap items-center justify-between gap-3 text-xs">
+        <div class="flex items-center gap-2.5">
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-kireno-olive text-white font-bold">
+                <span class="w-1.5 h-1.5 rounded-full bg-white"></span>
+                인천세관 정식 통관 · 1인 대표 전수 검수
+            </span>
+            <span class="font-serif font-bold text-stone-200">모엔드(MOEND) 직영 아틀리에 · 배송 파손 시 <span class="text-kireno-clay underline">100% 무상 보증</span></span>
+        </div>
+        <div class="flex items-center gap-2">
+            <button onclick="openPolicyModal('guarantee')" class="text-stone-300 hover:text-kireno-clay font-semibold underline">파손보증 규정 확인</button>
+            <span class="text-stone-600">|</span>
+            <button onclick="openOrderTrackingModal()" class="text-kireno-clay hover:text-white font-bold">실시간 통관·배송 조회 →</button>
+        </div>
+    </div>
+</div>
+<section class="py-10 lg:py-16 bg-white">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- 상단 브레드크럼 네비게이션 -->
+        <nav aria-label="Breadcrumb" class="flex flex-wrap items-center justify-between gap-2 pb-6 mb-8 border-b border-kireno-border text-xs text-kireno-gray">
+            <div class="flex items-center space-x-2">
+                <a href="/" class="hover:text-kireno-black font-semibold">키레노 쇼룸 홈</a>
+                <span>/</span>
+                <a href="/#collection" class="hover:text-kireno-black">{{ product.category }}</a>
+                <span>/</span>
+                <span class="text-kireno-black font-bold truncate max-w-[240px] sm:max-w-md">{{ product.name }}</span>
+            </div>
+            <a href="/#collection" class="inline-flex items-center space-x-1.5 text-kireno-charcoal hover:text-kireno-clay font-semibold">
+                <i class="fa-solid fa-arrow-left text-[10px]"></i>
+                <span>전체 88종 컬렉션으로 돌아가기</span>
+            </a>
+        </nav>
+
+        <!-- 메인 상세 그리드 -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+            <!-- 좌측: 작품 이미지 -->
+            <div class="lg:col-span-6 bg-kireno-sand/50 rounded-2xl border border-kireno-border p-6 sm:p-10 relative flex items-center justify-center aspect-square">
+                <span class="absolute top-4 left-4 bg-kireno-black text-white text-xs font-bold px-3 py-1 rounded tracking-wider">
+                    {{ product.badge or '일본직공수' }}
+                </span>
+                <span class="absolute top-4 right-4 text-xs font-bold px-3 py-1 rounded-full {% if product.stock_status == '즉시출고' %}bg-white text-kireno-olive border border-kireno-olive/30{% else %}bg-kireno-charcoal text-white{% endif %}">
+                    {{ product.stock_status }}
+                </span>
+                <img src="{{ product.image_url }}" alt="{{ product.name }}" class="w-full h-full object-contain max-h-[440px]">
+            </div>
+
+            <!-- 우측: 작품 상세 정보 및 구매/상담 액션 -->
+            <div class="lg:col-span-6 space-y-6">
+                <div>
+                    <div class="flex items-center space-x-2 mb-2">
+                        <span class="text-xs font-bold text-kireno-clay">{{ product.category }}</span>
+                        <span class="text-kireno-border">|</span>
+                        <span class="text-xs text-kireno-gray font-mono">작품 고유번호 #{{ product.id }}</span>
+                    </div>
+                    <h1 class="font-serif text-2xl sm:text-3xl font-bold text-kireno-black leading-snug">
+                        {{ product.name }}
+                    </h1>
+                </div>
+
+                <div class="bg-kireno-sand rounded-xl p-5 border border-kireno-border flex items-baseline justify-between">
+                    <span class="text-xs font-semibold text-kireno-gray">네이버 스마트스토어 공식 판매가</span>
+                    <span class="text-2xl sm:text-3xl font-black text-kireno-black">{{ "{:,}".format(product.price) }}원</span>
+                </div>
+
+                <p class="text-sm text-kireno-charcoal leading-relaxed">
+                    {{ product.description }}
+                </p>
+
+                <!-- 상세 제원 표 -->
+                <div class="border-t border-b border-kireno-border py-4 space-y-3 text-xs">
+                    <div class="grid grid-cols-3 gap-2">
+                        <span class="text-kireno-gray font-medium">실측 규격 및 중량</span>
+                        <span class="col-span-2 font-mono font-bold text-kireno-black">{{ product.dimensions }}</span>
+                    </div>
+                    <div class="grid grid-cols-3 gap-2">
+                        <span class="text-kireno-gray font-medium">산지 및 제작 기법</span>
+                        <span class="col-span-2 font-semibold text-kireno-charcoal">{{ product.origin_region or '일본 교토·시가라키 공방 수공예 직공수' }}</span>
+                    </div>
+                    <div class="grid grid-cols-3 gap-2">
+                        <span class="text-kireno-gray font-medium">통관 및 검수 보증</span>
+                        <span class="col-span-2 text-kireno-olive font-semibold">인천세관 정식 수입통관 · 1인 대표 전수 육안검수 · 파손 100% 무상보증</span>
+                    </div>
+                </div>
+
+                <!-- 결제 직전 구매 확신을 주는 4단계 안심 통관·검수 & 파손 100% 보증 타임라인 -->
+                <div class="p-4 rounded-xl bg-kireno-sand border border-kireno-border space-y-3">
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                        <span class="text-xs font-bold text-kireno-black flex items-center gap-1.5">
+                            <i class="fa-solid fa-shield-halved text-kireno-olive"></i>
+                            <span>모엔드(MOEND) 1인 대표 전수검수 · 안심 출고 타임라인</span>
+                        </span>
+                        <span class="text-[11px] font-bold text-kireno-olive bg-white px-2.5 py-0.5 rounded border border-kireno-olive/30">배송 파손 시 100% 무상 재발송/환불</span>
+                    </div>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center text-xs">
+                        <div class="bg-white p-2.5 rounded-lg border border-kireno-border">
+                            <span class="font-serif font-bold text-kireno-clay block">01. 일본 현지 발주</span>
+                            <span class="text-kireno-gray text-[11px]">주문 즉시 공방 사입</span>
+                        </div>
+                        <div class="bg-white p-2.5 rounded-lg border border-kireno-border">
+                            <span class="font-serif font-bold text-kireno-clay block">02. 인천세관 통관</span>
+                            <span class="text-kireno-gray text-[11px]">정식 수입신고 반입</span>
+                        </div>
+                        <div class="bg-white p-2.5 rounded-lg border border-kireno-border">
+                            <span class="font-serif font-bold text-kireno-clay block">03. 1인 대표 검수</span>
+                            <span class="text-kireno-gray text-[11px]">유약·균열 정밀 확인</span>
+                        </div>
+                        <div class="bg-white p-2.5 rounded-lg border border-kireno-border">
+                            <span class="font-serif font-bold text-kireno-olive block">04. 우체국 안전택배</span>
+                            <span class="text-kireno-gray text-[11px]">2중 에어셀 맞춤포장</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 액션 버튼 -->
+                <div class="space-y-3 pt-2">
+                    {% if product.stock_status == '품절' %}
+                    <button onclick="openLiveChat('{{ product.name }} (재입고 및 맞춤 발주 문의)')" class="w-full bg-kireno-charcoal hover:bg-kireno-black text-white font-bold py-4 px-6 rounded-xl text-sm flex items-center justify-center space-x-2 transition-colors">
+                        <i class="fa-regular fa-bell text-kireno-clay"></i>
+                        <span>품절 — 일본 가마 재입고 알림 및 1:1 상담 신청</span>
+                    </button>
+                    {% elif product.smartstore_url %}
+                    <a href="{{ product.smartstore_url }}" target="_blank" rel="noopener" class="w-full bg-kireno-black hover:bg-kireno-charcoal text-white font-bold py-4 px-6 rounded-xl text-sm flex items-center justify-center space-x-2 transition-colors shadow-sm">
+                        <span>네이버 스마트스토어 공식 안전결제 바로 구매</span>
+                        <i class="fa-solid fa-arrow-up-right-from-square text-xs text-kireno-clay"></i>
+                    </a>
+                    {% endif %}
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <button onclick="openLiveChat('{{ product.name }}')" class="w-full bg-kireno-sand hover:bg-stone-200 text-kireno-black border border-kireno-border font-bold py-3.5 px-4 rounded-xl text-xs flex items-center justify-center space-x-2 transition-colors">
+                            <i class="fa-regular fa-comments text-kireno-clay"></i>
+                            <span>이 작품 1:1 도예 상담하기</span>
+                        </button>
+                        <button onclick="copyProductPermalink()" id="copyLinkBtn" class="w-full bg-white hover:bg-kireno-sand text-kireno-charcoal border border-kireno-border font-bold py-3.5 px-4 rounded-xl text-xs flex items-center justify-center space-x-2 transition-colors">
+                            <i class="fa-solid fa-link text-kireno-clay"></i>
+                            <span>작품 고유 주소(URL) 복사</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 함께 배치하면 조화로운 4종 연계 추천 작품 (크롤링 가능 내부 링크) -->
+        <div class="mt-16 pt-12 border-t border-kireno-border">
+            <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-6">
+                <div>
+                    <span class="text-xs font-bold text-kireno-clay tracking-wider block mb-1">함께 두었을 때 더욱 깊은 여백을 만드는 조합</span>
+                    <h2 class="font-serif text-xl font-bold text-kireno-black">이 작품과 어울리는 연계 추천 작품 4선</h2>
+                </div>
+                <a href="/#collection" class="text-xs font-semibold text-kireno-gray hover:text-kireno-black mt-2 sm:mt-0">전체 88종 컬렉션 모두 보기 →</a>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                {% for entry in related_products %}
+                {% set rp = entry.prod %}
+                <a href="/product/{{ rp.id }}" class="kinetic-card group rounded-2xl border border-kireno-border bg-white p-4 flex flex-col justify-between">
+                    <div>
+                        <span class="inline-block text-[10px] font-bold px-2.5 py-0.5 rounded bg-kireno-sand text-kireno-charcoal border border-kireno-border mb-3">
+                            {{ entry.relation }}
+                        </span>
+                        <div class="aspect-square rounded-xl bg-white border border-kireno-border p-3 mb-3 flex items-center justify-center overflow-hidden">
+                            <img src="{{ rp.image_url }}" alt="{{ rp.name }}" loading="lazy" class="w-full h-full object-contain group-hover:scale-105 transition-transform">
+                        </div>
+                        <span class="text-[11px] text-kireno-gray block">{{ rp.category }}</span>
+                        <h3 class="text-xs font-bold text-kireno-black line-clamp-2 mt-0.5 group-hover:text-kireno-clay transition-colors">{{ rp.name }}</h3>
+                    </div>
+                    <div class="pt-3 mt-3 border-t border-kireno-border flex items-center justify-between">
+                        <span class="text-sm font-black text-kireno-black">{{ "{:,}".format(rp.price) }}원</span>
+                        <span class="text-[11px] font-semibold text-kireno-clay">상세 보기 →</span>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function copyProductPermalink() {
+        const url = window.location.href;
+        navigator.clipboard.writeText(url).then(() => {
+            const btn = document.getElementById('copyLinkBtn');
+            btn.innerHTML = '<i class="fa-solid fa-check text-kireno-olive"></i><span>고유 주소 복사 완료!</span>';
+            setTimeout(() => {
+                btn.innerHTML = '<i class="fa-solid fa-link text-kireno-clay"></i><span>작품 고유 주소(URL) 복사</span>';
+            }, 2000);
+        });
+    }
+</script>
+{% endblock %}

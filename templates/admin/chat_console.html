@@ -1,0 +1,146 @@
+{% extends "admin/base_admin.html" %}
+
+{% block breadcrumb %}1:1 고객 실시간 상담 관제{% endblock %}
+
+{% block admin_content %}
+<div class="space-y-6">
+    <div class="flex justify-between items-center">
+        <div>
+            <div class="flex items-center space-x-2 text-xs text-green-600 font-bold mb-1">
+                <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                <span>REAL-TIME LIVE CONSULTATION CONSOLE</span>
+            </div>
+            <h1 class="text-xl font-black text-stone-900">고객 1:1 실시간 화분 상담 및 주문 응대</h1>
+            <p class="text-xs text-stone-500 mt-1">고객이 쇼룸에서 보낸 실시간 메시지를 확인하고 즉시 실시간 답변을 전송할 수 있습니다.</p>
+        </div>
+    </div>
+
+    <!-- Chat Console Layout (Two columns: Sessions list | Active Chat Room) -->
+    <div class="bg-white rounded-2xl border border-stone-200 shadow-sm overflow-hidden grid grid-cols-1 md:grid-cols-12 min-h-[580px]">
+        <!-- Col 1: Sessions List -->
+        <div class="md:col-span-4 border-r border-stone-200 flex flex-col">
+            <div class="p-4 border-b border-stone-200 bg-stone-50 flex items-center justify-between">
+                <span class="text-xs font-bold text-stone-700">활성 고객 세션 ({{ sessions|length }})</span>
+                <button onclick="location.reload()" class="text-stone-400 hover:text-black text-xs" title="새로고침">
+                    <i class="fa-solid fa-rotate-right"></i>
+                </button>
+            </div>
+            <div class="flex-grow overflow-y-auto divide-y divide-stone-100 text-xs">
+                {% for sess in sessions %}
+                <button onclick="selectSession('{{ sess }}')" class="sess-btn w-full text-left p-4 hover:bg-stone-50 transition-colors flex flex-col space-y-1" id="sess_btn_{{ sess }}">
+                    <div class="flex items-center justify-between">
+                        <span class="font-bold text-stone-900 font-mono">{{ sess }}</span>
+                        <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                    </div>
+                    <span class="text-[11px] text-stone-400">실시간 상담 세션</span>
+                </button>
+                {% else %}
+                <div class="p-8 text-center text-stone-400 text-xs">
+                    접수된 고객 채팅이 없습니다.
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Col 2: Active Chat Room -->
+        <div class="md:col-span-8 flex flex-col justify-between bg-stone-50">
+            <!-- Room Header -->
+            <div class="p-4 border-b border-stone-200 bg-white flex items-center justify-between">
+                <div>
+                    <span class="text-xs text-stone-400 block font-mono" id="activeSessTitle">세션을 선택해주세요</span>
+                    <span class="font-bold text-sm text-stone-900" id="activeProductTitle">문의 상품: -</span>
+                </div>
+                <span class="text-[10px] text-green-600 bg-green-50 px-2 py-1 rounded font-bold">1:1 실시간 연동 활성</span>
+            </div>
+
+            <!-- Messages Stream Area -->
+            <div class="flex-grow p-6 overflow-y-auto space-y-3" id="adminChatMessages">
+                <div class="text-center text-stone-400 text-xs mt-12">
+                    좌측 목록에서 고객 세션을 클릭하시면 실시간 대화창이 열립니다.
+                </div>
+            </div>
+
+            <!-- Reply Box -->
+            <form onsubmit="submitAdminReply(event)" class="p-4 bg-white border-t border-stone-200 flex items-center space-x-2">
+                <input type="text" id="adminReplyInput" placeholder="고객에게 보낼 실시간 답변을 입력하세요..." required class="flex-grow px-4 py-2.5 text-xs rounded-xl border border-stone-300 focus:outline-none focus:border-black">
+                <button type="submit" class="bg-black text-white px-5 py-2.5 rounded-xl text-xs font-bold hover:bg-stone-800 transition-colors">
+                    답변 전송
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    let activeSession = null;
+
+    function selectSession(sessId) {
+        activeSession = sessId;
+        document.querySelectorAll('.sess-btn').forEach(b => b.classList.remove('bg-stone-100', 'font-bold'));
+        const activeBtn = document.getElementById('sess_btn_' + sessId);
+        if (activeBtn) activeBtn.classList.add('bg-stone-100', 'font-bold');
+
+        document.getElementById('activeSessTitle').textContent = '세션 ID: ' + sessId;
+        fetchSessionMessages();
+    }
+
+    function fetchSessionMessages() {
+        if (!activeSession) return;
+        fetch(`/api/admin/chat/session-messages?session_id=${activeSession}`)
+            .then(r => r.json())
+            .then(data => {
+                const container = document.getElementById('adminChatMessages');
+                let html = '';
+                let lastProduct = '-';
+                data.messages.forEach(msg => {
+                    const isUser = msg.sender === 'user';
+                    if (msg.product_name) lastProduct = msg.product_name;
+                    html += `
+                        <div class="flex flex-col ${isUser ? 'items-start' : 'items-end'}">
+                            <span class="text-[10px] text-stone-400 mb-0.5">${isUser ? '고객' : '관리자 (키레노)'}</span>
+                            <div class="p-3 rounded-2xl max-w-[70%] text-xs ${isUser ? 'bg-white border border-stone-200 text-stone-900 shadow-sm' : 'bg-black text-white'}">
+                                ${msg.message}
+                            </div>
+                            <span class="text-[9px] text-stone-400 mt-0.5 font-mono">${(msg.created_at || '').substring(11, 16)}</span>
+                        </div>
+                    `;
+                });
+                container.innerHTML = html || '<div class="text-center text-stone-400 text-xs">메시지가 없습니다.</div>';
+                document.getElementById('activeProductTitle').textContent = '문의 상품: ' + lastProduct;
+                container.scrollTop = container.scrollHeight;
+            });
+    }
+
+    function submitAdminReply(e) {
+        e.preventDefault();
+        if (!activeSession) {
+            alert('먼저 좌측에서 응대할 고객 세션을 선택해주세요.');
+            return;
+        }
+        const input = document.getElementById('adminReplyInput');
+        const msg = input.value.trim();
+        if (!msg) return;
+
+        fetch('/api/admin/chat/reply', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ session_id: activeSession, message: msg })
+        })
+        .then(r => r.json())
+        .then(data => {
+            input.value = '';
+            fetchSessionMessages();
+        });
+    }
+
+    // Poll active session every 2 seconds
+    setInterval(() => {
+        if (activeSession) fetchSessionMessages();
+    }, 2000);
+
+    // Auto-select first session if available
+    {% if sessions %}
+        selectSession('{{ sessions[0] }}');
+    {% endif %}
+</script>
+{% endblock %}

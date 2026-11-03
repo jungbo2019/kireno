@@ -1,0 +1,59 @@
+{% extends "admin/base_admin.html" %}
+
+{% block breadcrumb %}고객 및 도매 문의 관리{% endblock %}
+
+{% block admin_content %}
+<div class="space-y-6">
+    <div>
+        <h2 class="text-lg font-bold text-stone-900">고객 및 B2B 도매 문의 (총 {{ inquiries|length }}건)</h2>
+        <p class="text-xs text-stone-500">웹사이트를 통해 접수된 플로리스트, 가드닝 스튜디오 및 고객 문의 내역입니다.</p>
+    </div>
+
+    <div class="bg-white rounded-xl border border-stone-200 shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+                <thead class="bg-stone-50 text-stone-500 font-bold border-b border-stone-200">
+                    <tr>
+                        <th class="px-6 py-3.5">접수일시</th>
+                        <th class="px-6 py-3.5">성함 / 업체명</th>
+                        <th class="px-6 py-3.5">연락처 / 이메일</th>
+                        <th class="px-6 py-3.5">문의구분</th>
+                        <th class="px-6 py-3.5">문의 상세 내용</th>
+                        <th class="px-6 py-3.5">처리 상태</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-stone-100">
+                    {% for inq in inquiries %}
+                    <tr class="hover:bg-stone-50">
+                        <td class="px-6 py-4 text-stone-500 font-mono">{{ inq.created_at[:16] }}</td>
+                        <td class="px-6 py-4 font-bold text-stone-900">{{ inq.name }}</td>
+                        <td class="px-6 py-4">
+                            <span class="block text-stone-800 font-semibold">{{ inq.phone }}</span>
+                            {% if inq.email %}<span class="text-[11px] text-stone-400 font-mono">{{ inq.email }}</span>{% endif %}
+                        </td>
+                        <td class="px-6 py-4 text-stone-700 font-semibold">{{ inq.subject }}</td>
+                        <td class="px-6 py-4 text-stone-600 max-w-xs break-words leading-relaxed">{{ inq.message }}</td>
+                        <td class="px-6 py-4">
+                            <form method="POST" action="/admin/inquiries/status" class="inline">
+                                <input type="hidden" name="inquiry_id" value="{{ inq.id }}">
+                                <select name="status" onchange="this.form.submit()" class="text-xs px-2.5 py-1 rounded border border-stone-300 font-bold bg-white cursor-pointer {% if inq.status == '접수완료' %}text-amber-800 bg-amber-50 border-amber-200{% elif inq.status == '상담진행중' %}text-blue-800 bg-blue-50 border-blue-200{% else %}text-green-800 bg-green-50 border-green-200{% endif %}">
+                                    <option value="접수완료" {% if inq.status == '접수완료' %}selected{% endif %}>접수완료</option>
+                                    <option value="상담진행중" {% if inq.status == '상담진행중' %}selected{% endif %}>상담진행중</option>
+                                    <option value="처리완료" {% if inq.status == '처리완료' %}selected{% endif %}>처리완료</option>
+                                </select>
+                            </form>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="px-6 py-12 text-center text-stone-400">
+                            접수된 문의 내역이 없습니다.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

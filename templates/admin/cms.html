@@ -1,0 +1,122 @@
+{% extends "admin/base_admin.html" %}
+
+{% block breadcrumb %}사이트 문구·SEO·사업자 설정 관리 (CMS){% endblock %}
+
+{% block admin_content %}
+<div class="max-w-4xl bg-white p-8 rounded-xl border border-stone-200 shadow-sm">
+    <div class="mb-8 pb-4 border-b border-stone-200">
+        <h2 class="text-lg font-bold text-stone-900">실시간 쇼룸 문구 · 검색엔진 최적화(SEO) · 전자상거래 사업자 설정</h2>
+        <p class="text-xs text-stone-500 mt-1">이곳에서 변경한 문구와 SEO 메타데이터, 하단 사업자 고지 정보는 쇼룸 전 페이지에 즉시 반영됩니다.</p>
+    </div>
+
+    <form method="POST" action="/admin/cms" class="space-y-6 text-xs">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <label class="block font-bold text-stone-800 mb-1.5">브랜드 명칭</label>
+                <input type="text" name="brand_name" value="{{ settings.brand_name }}" required class="w-full px-3.5 py-2.5 rounded-lg border border-stone-300 focus:outline-none focus:border-black font-semibold">
+            </div>
+            <div>
+                <label class="block font-bold text-stone-800 mb-1.5">테마 컬러 프리셋</label>
+                <select name="theme_color" class="w-full px-3.5 py-2.5 rounded-lg border border-stone-300 focus:outline-none focus:border-black bg-white">
+                    <option value="earth" {% if settings.theme_color == 'earth' %}selected{% endif %}>어스톤 & 테라코타 클레이 (기본)</option>
+                    <option value="mono" {% if settings.theme_color == 'mono' %}selected{% endif %}>미니멀 블랙 & 화이트</option>
+                    <option value="olive" {% if settings.theme_color == 'olive' %}selected{% endif %}>뮤트 올리브 그린</option>
+                </select>
+            </div>
+        </div>
+
+        <div>
+            <label class="block font-bold text-stone-800 mb-1.5">최상단 1:1 상담 안내 띠 배너 문구</label>
+            <input type="text" name="announcement" value="{{ settings.announcement }}" required class="w-full px-3.5 py-2.5 rounded-lg border border-stone-300 focus:outline-none focus:border-black">
+        </div>
+
+        <div class="grid grid-cols-1 gap-6 pt-4 border-t border-stone-100">
+            <div>
+                <label class="block font-bold text-stone-800 mb-1.5">메인 대제목 (Hero Title)</label>
+                <input type="text" name="hero_title" value="{{ settings.hero_title }}" required class="w-full px-3.5 py-2.5 rounded-lg border border-stone-300 focus:outline-none focus:border-black font-bold text-sm">
+            </div>
+            <div>
+                <label class="block font-bold text-stone-800 mb-1.5">메인 서브설명 (Hero Subtitle)</label>
+                <input type="text" name="hero_subtitle" value="{{ settings.hero_subtitle }}" required class="w-full px-3.5 py-2.5 rounded-lg border border-stone-300 focus:outline-none focus:border-black">
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-stone-100">
+            <div>
+                <label class="block font-bold text-stone-800 mb-1.5">공식 네이버 스마트스토어 메인 주소</label>
+                <input type="url" name="smartstore_url" value="{{ settings.smartstore_url or 'https://smartstore.naver.com/kireno' }}" class="w-full px-3.5 py-2.5 rounded-lg border border-stone-300 focus:outline-none focus:border-black font-mono">
+            </div>
+            <div>
+                <label class="block font-bold text-stone-800 mb-1.5">공식 인스타그램 링크</label>
+                <input type="url" name="instagram_url" value="{{ settings.instagram_url }}" required class="w-full px-3.5 py-2.5 rounded-lg border border-stone-300 focus:outline-none focus:border-black font-mono">
+            </div>
+            <div>
+                <label class="block font-bold text-stone-800 mb-1.5">대표 연락처</label>
+                <input type="text" name="contact_phone" value="{{ settings.contact_phone }}" class="w-full px-3.5 py-2.5 rounded-lg border border-stone-300 focus:outline-none focus:border-black font-mono">
+            </div>
+            <div>
+                <label class="block font-bold text-stone-800 mb-1.5">공식 이메일</label>
+                <input type="email" name="contact_email" value="{{ settings.contact_email }}" class="w-full px-3.5 py-2.5 rounded-lg border border-stone-300 focus:outline-none focus:border-black font-mono">
+            </div>
+        </div>
+
+        <!-- SEO 온라인 노출 설정 영역 -->
+        <div class="pt-6 border-t border-stone-200 space-y-4">
+            <h3 class="text-sm font-bold text-stone-900">검색엔진 최적화(SEO) & 소셜 공유(Open Graph) 설정</h3>
+            <div>
+                <label class="block font-bold text-stone-800 mb-1.5">검색엔진 요약 설명 (meta description & og:description)</label>
+                <textarea name="seo_description" rows="2" class="w-full px-3.5 py-2.5 rounded-lg border border-stone-300 focus:outline-none focus:border-black">{{ settings.seo_description or '일본 교토·시가라키 장인의 수공예 도자기 화분, 재팬디 패브릭 액자, 와비사비 원목 인센스 홀더 공식 쇼룸. 인천세관 정식 수입통관 및 1인 대표 전수 육안검수 보장.' }}</textarea>
+            </div>
+            <div>
+                <label class="block font-bold text-stone-800 mb-1.5">검색 키워드 태그 (meta keywords)</label>
+                <input type="text" name="seo_keywords" value="{{ settings.seo_keywords or '키레노, KIRENO, 일본 도자기 화분, 시가라키 화분, 괴근식물 화분, 재팬디 인테리어, 패브릭 액자, 원목 인센스 홀더, 달항아리 오브제, 수제 토분' }}" class="w-full px-3.5 py-2.5 rounded-lg border border-stone-300 focus:outline-none focus:border-black">
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block font-bold text-stone-800 mb-1.5">네이버 서치어드바이저 인증코드 (naver-site-verification)</label>
+                    <input type="text" name="naver_verification" value="{{ settings.naver_verification or 'kireno_naver_search_advisor_ready' }}" class="w-full px-3.5 py-2.5 rounded-lg border border-stone-300 focus:outline-none focus:border-black font-mono">
+                </div>
+                <div>
+                    <label class="block font-bold text-stone-800 mb-1.5">구글 서치콘솔 인증코드 (google-site-verification)</label>
+                    <input type="text" name="google_verification" value="{{ settings.google_verification or 'kireno_google_search_console_ready' }}" class="w-full px-3.5 py-2.5 rounded-lg border border-stone-300 focus:outline-none focus:border-black font-mono">
+                </div>
+            </div>
+        </div>
+
+        <!-- 전자상거래 사업자 법적 고지 설정 영역 -->
+        <div class="pt-6 border-t border-stone-200 space-y-4">
+            <h3 class="text-sm font-bold text-stone-900">하단 푸터(Footer) 전자상거래 사업자 표기 정보</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block font-bold text-stone-800 mb-1.5">대표자 성명 (개인정보보호책임자)</label>
+                    <input type="text" name="ceo_name" value="{{ settings.ceo_name or '우상준' }}" class="w-full px-3.5 py-2.5 rounded-lg border border-stone-300 focus:outline-none focus:border-black">
+                </div>
+                <div>
+                    <label class="block font-bold text-stone-800 mb-1.5">사업자등록번호</label>
+                    <input type="text" name="biz_reg_num" value="{{ settings.biz_reg_num or '740-02-03832' }}" class="w-full px-3.5 py-2.5 rounded-lg border border-stone-300 focus:outline-none focus:border-black font-mono">
+                </div>
+                <div>
+                    <label class="block font-bold text-stone-800 mb-1.5">통신판매업신고번호</label>
+                    <input type="text" name="mail_order_num" value="{{ settings.mail_order_num or '2026-서울구로-1158 호' }}" class="w-full px-3.5 py-2.5 rounded-lg border border-stone-300 focus:outline-none focus:border-black">
+                </div>
+                <div>
+                    <label class="block font-bold text-stone-800 mb-1.5">사업장 및 검수실 소재지</label>
+                    <input type="text" name="biz_address" value="{{ settings.biz_address or '대한민국 · 일본 교토/시가라키 공방 직공수 아뜰리에' }}" class="w-full px-3.5 py-2.5 rounded-lg border border-stone-300 focus:outline-none focus:border-black">
+                </div>
+            </div>
+        </div>
+
+        <div class="pt-4 border-t border-stone-100">
+            <label class="block font-bold text-stone-800 mb-1.5">하단 공지 / 도예 제작 안내문</label>
+            <textarea name="notice_text" rows="3" class="w-full px-3.5 py-2.5 rounded-lg border border-stone-300 focus:outline-none focus:border-black">{{ settings.notice_text }}</textarea>
+        </div>
+
+        <div class="pt-6 border-t border-stone-200 flex justify-end">
+            <button type="submit" class="bg-black text-white px-6 py-3 rounded-lg font-bold hover:bg-stone-800 transition-colors flex items-center space-x-2">
+                <i class="fa-solid fa-floppy-disk"></i>
+                <span>설정 실시간 저장하기</span>
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

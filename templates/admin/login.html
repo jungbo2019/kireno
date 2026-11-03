@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KIRENO 관리자 로그인</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+    <style>body { font-family: 'Pretendard', sans-serif; }</style>
+</head>
+<body class="bg-stone-50 min-h-screen flex items-center justify-center p-4">
+    <div class="max-w-md w-full bg-white p-8 rounded-2xl border border-stone-200 shadow-xl">
+        <div class="text-center mb-8">
+            <h1 class="text-2xl font-black tracking-widest text-black mb-1">KIRENO</h1>
+            <p class="text-xs text-stone-500 font-medium">통합 관제 및 사이트 관리자 로그인</p>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="p-3 mb-4 text-xs rounded-lg border {% if category == 'success' %}bg-green-50 text-green-800 border-green-200{% elif category == 'error' %}bg-red-50 text-red-800 border-red-200{% else %}bg-amber-50 text-amber-800 border-amber-200{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="/admin/login" class="space-y-4 text-xs">
+            <div>
+                <label class="block font-bold text-stone-800 mb-1">관리자 아이디</label>
+                <input type="text" name="username" required autocomplete="username" placeholder="아이디를 입력해 주세요" class="w-full px-3.5 py-2.5 rounded-lg border border-stone-300 focus:outline-none focus:border-black font-semibold">
+            </div>
+            <div>
+                <label class="block font-bold text-stone-800 mb-1">비밀번호</label>
+                <input type="password" name="password" required autocomplete="current-password" placeholder="비밀번호를 입력해 주세요" class="w-full px-3.5 py-2.5 rounded-lg border border-stone-300 focus:outline-none focus:border-black font-semibold">
+            </div>
+            <button type="submit" class="w-full bg-black text-white font-bold py-3 rounded-lg hover:bg-stone-800 transition-colors">
+                관리자 시스템 접속
+            </button>
+        </form>
+
+        <div class="mt-6 pt-4 border-t border-stone-100 text-center text-xs">
+            <a href="/" class="text-stone-500 hover:text-black">← 쇼룸 메인 홈으로 돌아가기</a>
+        </div>
+    </div>
+</body>
+</html>

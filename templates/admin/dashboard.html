@@ -1,0 +1,138 @@
+{% extends "admin/base_admin.html" %}
+
+{% block breadcrumb %}대시보드{% endblock %}
+
+{% block admin_content %}
+<div class="space-y-6">
+    <!-- 최상단: 판매 전 과정 · 사후처리(CS) · 광고 실행 마스터북 바로가기 배너 -->
+    <div class="bg-[#111111] text-white p-6 rounded-2xl border border-stone-800 shadow-lg flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
+        <div class="space-y-1">
+            <span class="inline-block px-2.5 py-0.5 rounded-full bg-[#C4A482]/20 text-[#C4A482] border border-[#C4A482]/40 text-[11px] font-black">
+                모엔드(MOEND) 1인 대표 실전 운영 지휘소
+            </span>
+            <h2 class="text-lg sm:text-xl font-black text-white">
+                판매 6단계 과정 · 고객 안내 문자 · 파손/품절 사후처리 · 88종 광고 원고 생성기
+            </h2>
+            <p class="text-xs text-stone-300">
+                주문이 들어왔을 때의 처리 순서부터, 사후 CS 응대 문구 복사, 매출 0원을 깨는 스레드/인스타/스마트스토어 광고 전략까지 한 화면에 정리되어 있습니다.
+            </p>
+        </div>
+        <a href="/admin/guides" class="shrink-0 px-5 py-3 rounded-xl bg-[#C4A482] hover:bg-[#b39270] text-[#111111] text-xs font-black transition flex items-center gap-2 shadow-md">
+            <span>판매·사후처리·광고 마스터북 열기</span>
+            <i class="fa-solid fa-arrow-right"></i>
+        </a>
+    </div>
+
+    <!-- Stat Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="bg-white p-5 rounded-xl border border-stone-200 shadow-sm">
+            <span class="text-xs text-stone-500 font-semibold block mb-1">등록 화분 상품</span>
+            <div class="flex items-baseline justify-between">
+                <span class="text-2xl font-black text-stone-900">{{ total_products }}개</span>
+                <a href="/admin/products" class="text-xs text-blue-600 hover:underline">관리 →</a>
+            </div>
+        </div>
+
+        <div class="bg-white p-5 rounded-xl border border-stone-200 shadow-sm">
+            <span class="text-xs text-stone-500 font-semibold block mb-1">총 고객/도매 문의</span>
+            <div class="flex items-baseline justify-between">
+                <span class="text-2xl font-black text-stone-900">{{ total_inquiries }}건</span>
+                <span class="text-xs font-bold text-amber-600">미답변 {{ pending_inquiries }}건</span>
+            </div>
+        </div>
+
+        <div class="bg-white p-5 rounded-xl border border-stone-200 shadow-sm">
+            <span class="text-xs text-stone-500 font-semibold block mb-1">스마트스토어 구매 클릭</span>
+            <div class="flex items-baseline justify-between">
+                <span class="text-2xl font-black text-stone-900">{{ total_clicks }}회</span>
+                <span class="text-xs text-green-600 font-semibold">전환 추적 가동중</span>
+            </div>
+        </div>
+
+        <div class="bg-white p-5 rounded-xl border border-stone-200 shadow-sm">
+            <span class="text-xs text-stone-500 font-semibold block mb-1">서버 연속 가동</span>
+            <div class="flex items-baseline justify-between">
+                <span class="text-2xl font-black text-stone-900">{{ uptime_hours }}시간</span>
+                <span class="text-xs text-stone-400">정상 운영</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Management Banners -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Card 1: CMS Quick Edit -->
+        <div class="bg-white p-6 rounded-xl border border-stone-200 shadow-sm flex flex-col justify-between">
+            <div>
+                <div class="flex items-center space-x-2 mb-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
+                    <h3 class="font-bold text-sm text-stone-900">사이트 실시간 문구 & 배너 수정</h3>
+                </div>
+                <p class="text-xs text-stone-500 leading-relaxed mb-4">
+                    홈페이지 상단 공지 바, 메인 슬로건, 인스타그램 및 스마트스토어 링크를 언제든지 관리자 화면에서 즉시 변경할 수 있습니다.
+                </p>
+            </div>
+            <a href="/admin/cms" class="bg-stone-900 text-white text-xs font-bold px-4 py-2.5 rounded-lg hover:bg-stone-800 transition-colors inline-block text-center">
+                문구 및 배너 수정하러 가기 →
+            </a>
+        </div>
+
+        <!-- Card 2: Product & Stock Edit -->
+        <div class="bg-white p-6 rounded-xl border border-stone-200 shadow-sm flex flex-col justify-between">
+            <div>
+                <div class="flex items-center space-x-2 mb-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-green-500"></span>
+                    <h3 class="font-bold text-sm text-stone-900">수제 화분 상품 및 재고 상태 변경</h3>
+                </div>
+                <p class="text-xs text-stone-500 leading-relaxed mb-4">
+                    새로운 도자 화분을 등록하거나, 재고 상태(즉시출고/주문제작/품절)를 한 번의 클릭으로 토글할 수 있습니다.
+                </p>
+            </div>
+            <a href="/admin/products" class="bg-stone-900 text-white text-xs font-bold px-4 py-2.5 rounded-lg hover:bg-stone-800 transition-colors inline-block text-center">
+                화분 상품 관리하러 가기 →
+            </a>
+        </div>
+    </div>
+
+    <!-- Recent Inquiries Table -->
+    <div class="bg-white rounded-xl border border-stone-200 shadow-sm overflow-hidden">
+        <div class="px-6 py-4 border-b border-stone-200 flex justify-between items-center">
+            <h3 class="font-bold text-sm text-stone-900">최근 접수된 고객 및 도매 문의</h3>
+            <a href="/admin/inquiries" class="text-xs text-stone-500 hover:text-stone-900 font-semibold">전체보기 →</a>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+                <thead class="bg-stone-50 text-stone-500 font-bold border-b border-stone-200">
+                    <tr>
+                        <th class="px-6 py-3">접수일시</th>
+                        <th class="px-6 py-3">성함 / 업체명</th>
+                        <th class="px-6 py-3">연락처</th>
+                        <th class="px-6 py-3">문의구분</th>
+                        <th class="px-6 py-3">상태</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-stone-100">
+                    {% for inq in recent_inquiries %}
+                    <tr class="hover:bg-stone-50">
+                        <td class="px-6 py-3.5 text-stone-500 font-mono">{{ inq.created_at[:16] }}</td>
+                        <td class="px-6 py-3.5 font-bold text-stone-900">{{ inq.name }}</td>
+                        <td class="px-6 py-3.5 text-stone-600">{{ inq.phone }}</td>
+                        <td class="px-6 py-3.5 text-stone-700">{{ inq.subject }}</td>
+                        <td class="px-6 py-3.5">
+                            <span class="px-2 py-0.5 rounded text-[10px] font-bold {% if inq.status == '접수완료' %}bg-amber-100 text-amber-800{% else %}bg-green-100 text-green-800{% endif %}">
+                                {{ inq.status }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" class="px-6 py-8 text-center text-stone-400">
+                            아직 접수된 문의 내역이 없습니다.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

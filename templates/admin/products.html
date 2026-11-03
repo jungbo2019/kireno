@@ -1,0 +1,394 @@
+{% extends "admin/base_admin.html" %}
+
+{% block breadcrumb %}화분 상품 및 재고 관리{% endblock %}
+
+{% block admin_content %}
+<div class="space-y-6">
+    <!-- Top Action Header -->
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+        <div>
+            <h2 class="text-lg font-bold text-stone-900">네이버 스마트스토어 연동 전체 상품 라인업 (총 {{ products|length }}개)</h2>
+            <p class="text-xs text-stone-500">네이버 스마트스토어 및 일본 현지 온라인 소싱처(라쿠텐/야후/공방) 원문 링크가 완벽 연동되어 있습니다.</p>
+        </div>
+        <div class="flex items-center space-x-2">
+            <button onclick="document.getElementById('addProductModal').classList.remove('hidden')" class="bg-black text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-stone-800 transition-colors flex items-center space-x-1.5 shadow-sm">
+                <i class="fa-solid fa-plus"></i>
+                <span>새 화분 상품 등록</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Quick Stock Status Filter Pills -->
+    <div class="flex flex-wrap items-center gap-2">
+        <button onclick="filterAdminStock('all')" id="filterBtnAll" class="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-stone-900 text-white transition-all shadow-sm">
+            전체 상품 ({{ products|length }})
+        </button>
+        <button onclick="filterAdminStock('즉시출고')" id="filterBtnInStock" class="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-300 hover:bg-emerald-100 transition-all">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block mr-1"></span> 즉시출고 가능
+        </button>
+        <button onclick="filterAdminStock('품절')" id="filterBtnSoldOut" class="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-red-50 text-red-800 border border-red-300 hover:bg-red-100 transition-all">
+            <span class="w-2 h-2 rounded-full bg-red-500 inline-block mr-1"></span> 품절 (본사이트 재고없음)
+        </button>
+    </div>
+
+    <!-- Product Table -->
+    <div class="bg-white rounded-xl border border-stone-200 shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs" id="adminProductsTable">
+                <thead class="bg-stone-50 text-stone-500 font-bold border-b border-stone-200">
+                    <tr>
+                        <th class="px-4 py-3.5">이미지</th>
+                        <th class="px-6 py-3.5">상품명 / 카테고리</th>
+                        <th class="px-4 py-3.5">규격(외경x높이)</th>
+                        <th class="px-4 py-3.5">정가 / 할인가</th>
+                        <th class="px-4 py-3.5">일본 직구 사입가(JPY) & 발주 링크</th>
+                        <th class="px-4 py-3.5">재고 상태</th>
+                        <th class="px-4 py-3.5">1:1 상담</th>
+                        <th class="px-4 py-3.5 text-right">관리</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-stone-100">
+                    {% for prod in products %}
+                    <tr class="hover:bg-stone-50 transition-colors product-row" data-stock="{{ prod.stock_status }}">
+                        <td class="px-4 py-3">
+                            <div class="w-14 h-14 rounded-xl border border-stone-200 bg-white flex items-center justify-center p-1 overflow-hidden shadow-sm relative">
+                                <img src="{{ prod.image_url }}" alt="{{ prod.name }}" class="w-full h-full object-contain hover:scale-110 transition-transform">
+                                {% if prod.stock_status == '품절' %}
+                                <span class="absolute inset-0 bg-red-900/60 text-white font-black text-[9px] flex items-center justify-center backdrop-blur-[1px]">
+                                    품절
+                                </span>
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td class="px-6 py-3">
+                            <span class="font-bold text-stone-900 block leading-snug">{{ prod.name }}</span>
+                            <div class="flex items-center space-x-1.5 mt-0.5">
+                                <span class="text-[11px] text-stone-500 font-medium">[{{ prod.category }}]</span>
+                                {% if prod.badge %}
+                                <span class="bg-stone-900 text-white text-[9px] font-bold px-1.5 py-0.5 rounded">{{ prod.badge }}</span>
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td class="px-4 py-3 text-stone-600 font-mono text-[11px] whitespace-nowrap">{{ prod.dimensions }}</td>
+                        <td class="px-4 py-3 whitespace-nowrap">
+                            <span class="font-black text-stone-900 text-sm block">{{ "{:,}".format(prod.price) }}원</span>
+                            <span class="text-[10px] text-emerald-700 font-bold">네이버 공식가</span>
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap">
+                            {% if prod.japan_source_url %}
+                            <div class="space-y-1">
+                                <div class="flex items-center gap-1.5">
+                                    <span class="font-mono font-black text-rose-700 text-xs">¥{{ "{:,}".format(prod.cost_jpy|default((prod.price * 0.044)|int)) }}</span>
+                                    <span class="text-[10px] text-stone-500 font-bold">(약 {{ "{:,}".format(((prod.cost_jpy|default((prod.price * 0.044)|int)) * 9.05)|int) }}원)</span>
+                                </div>
+                                <a href="{{ prod.japan_source_url }}" target="_blank" class="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-lg border border-rose-300 bg-rose-600 hover:bg-rose-700 text-white font-bold text-[11px] transition shadow-xs" title="일본 현지 사이트 실시간 확인 및 발주">
+                                    <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+                                    <span>[일본 직구 즉시 사입 ↗]</span>
+                                </a>
+                                <div class="text-[10px] text-stone-400 font-medium truncate max-w-[140px]">{{ prod.source_site_name or '라쿠텐 재팬' }}</div>
+                            </div>
+                            {% else %}
+                            <span class="text-stone-300 text-[11px]">-</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap">
+                            <form method="POST" action="/admin/products" class="inline">
+                                <input type="hidden" name="action" value="toggle_stock">
+                                <input type="hidden" name="product_id" value="{{ prod.id }}">
+                                <select name="stock_status" onchange="this.form.submit()" class="text-xs px-2.5 py-1.5 rounded-lg border font-bold cursor-pointer transition-colors {% if prod.stock_status == '즉시출고' %}text-emerald-800 bg-emerald-50 border-emerald-300{% elif prod.stock_status == '주문제작' %}text-amber-800 bg-amber-50 border-amber-300{% else %}text-red-800 bg-red-100 border-red-300 font-black animate-pulse{% endif %}">
+                                    <option value="즉시출고" {% if prod.stock_status == '즉시출고' %}selected{% endif %}>즉시출고</option>
+                                    <option value="주문제작" {% if prod.stock_status == '주문제작' %}selected{% endif %}>주문제작</option>
+                                    <option value="품절" {% if prod.stock_status == '품절' %}selected{% endif %}>🚨 품절 (재고없음)</option>
+                                </select>
+                            </form>
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap">
+                            <span class="text-emerald-700 font-semibold flex items-center space-x-1 text-[11px]">
+                                <i class="fa-solid fa-comments text-xs"></i>
+                                <span>1:1 채팅</span>
+                            </span>
+                        </td>
+                        <td class="px-4 py-3 text-right space-x-1 whitespace-nowrap">
+                            <button type="button" 
+                                    onclick="openEditModal({{ prod.id }})"
+                                    class="px-2.5 py-1.5 bg-stone-900 hover:bg-black text-white font-bold rounded-lg text-xs transition inline-flex items-center space-x-1 shadow-sm">
+                                <i class="fa-solid fa-pen-to-square text-[11px]"></i>
+                                <span>직접 수정</span>
+                            </button>
+                            <form method="POST" action="/admin/products" onsubmit="return confirm('정말 [{{ prod.name }}] 상품을 삭제하시겠습니까?');" class="inline">
+                                <input type="hidden" name="action" value="delete">
+                                <input type="hidden" name="product_id" value="{{ prod.id }}">
+                                <button type="submit" class="px-2 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 font-bold rounded-lg text-xs border border-red-200 transition">삭제</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Add Product Modal -->
+<div id="addProductModal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl">
+        <div class="flex justify-between items-center pb-4 border-b border-stone-200 mb-4">
+            <h3 class="font-bold text-sm text-stone-900">새 도자 화분 상품 등록</h3>
+            <button onclick="document.getElementById('addProductModal').classList.add('hidden')" class="text-stone-400 hover:text-black">✕</button>
+        </div>
+        <form method="POST" action="/admin/products" class="space-y-4 text-xs">
+            <input type="hidden" name="action" value="add">
+            <div>
+                <label class="block font-bold text-stone-800 mb-1">화분 상품명 *</label>
+                <input type="text" name="name" required placeholder="예: 구름 토분 18호 (대형)" class="w-full px-3 py-2 rounded-lg border border-stone-300">
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="block font-bold text-stone-800 mb-1">카테고리</label>
+                    <select name="category" class="w-full px-3 py-2 rounded-lg border border-stone-300 bg-white">
+                        <option value="구름토분">구름 토분 (시그니처)</option>
+                        <option value="가르니에">가르니에 수제 토분</option>
+                        <option value="시가라키">시가라키 도자</option>
+                        <option value="스톤웨어">스톤웨어</option>
+                        <option value="미니팟">괴근·다육 미니팟</option>
+                        <option value="오브제">오브제 & 툴킷</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block font-bold text-stone-800 mb-1">규격 (외경x높이)</label>
+                    <input type="text" name="dimensions" placeholder="예: Ø 18cm x H 17cm" class="w-full px-3 py-2 rounded-lg border border-stone-300">
+                </div>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="block font-bold text-stone-800 mb-1">정가 (원) *</label>
+                    <input type="number" name="price" required placeholder="55000" class="w-full px-3 py-2 rounded-lg border border-stone-300">
+                </div>
+                <div>
+                    <label class="block font-bold text-stone-800 mb-1">할인가 (원)</label>
+                    <input type="number" name="sale_price" placeholder="선택사항" class="w-full px-3 py-2 rounded-lg border border-stone-300">
+                </div>
+            </div>
+            <div>
+                <label class="block font-bold text-stone-800 mb-1">상품 설명</label>
+                <textarea name="description" rows="2" placeholder="미세 기공을 통한 뛰어난 통기성..." class="w-full px-3 py-2 rounded-lg border border-stone-300"></textarea>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="block font-bold text-stone-800 mb-1">배지 라벨</label>
+                    <input type="text" name="badge" placeholder="예: BEST, NEW, HANDMADE" class="w-full px-3 py-2 rounded-lg border border-stone-300">
+                </div>
+                <div>
+                    <label class="block font-bold text-stone-800 mb-1">재고 상태</label>
+                    <select name="stock_status" class="w-full px-3 py-2 rounded-lg border border-stone-300 bg-white">
+                        <option value="즉시출고">즉시출고</option>
+                        <option value="주문제작">주문제작</option>
+                        <option value="품절">품절</option>
+                    </select>
+                </div>
+            </div>
+            <div>
+                <label class="block font-bold text-stone-800 mb-1">이미지 경로</label>
+                <input type="text" name="image_url" value="/static/images/pot_cloud_sig.jpg" class="w-full px-3 py-2 rounded-lg border border-stone-300 font-mono">
+            </div>
+
+            <div class="pt-4 border-t border-stone-200 flex justify-end space-x-2">
+                <button type="button" onclick="document.getElementById('addProductModal').classList.add('hidden')" class="px-4 py-2 border border-stone-300 rounded-lg text-stone-600">취소</button>
+                <button type="submit" class="px-5 py-2 bg-black text-white rounded-lg font-bold">상품 등록 완료</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Edit Product Modal (전부 직접 수정 가능) -->
+<div id="editProductModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl overflow-y-auto max-h-[90vh]">
+        <div class="flex justify-between items-center pb-4 border-b border-stone-200 mb-4">
+            <div>
+                <h3 class="font-bold text-sm text-stone-900">도자기 상품 정보 전체 직접 수정</h3>
+                <p class="text-[11px] text-stone-400">상품명, 가격, 규격, 카테고리, 뱃지, 이미지를 실시간으로 수정합니다.</p>
+            </div>
+            <button onclick="closeEditModal()" class="text-stone-400 hover:text-black text-sm">✕</button>
+        </div>
+        <form method="POST" action="/admin/products" class="space-y-4 text-xs">
+            <input type="hidden" name="action" value="edit">
+            <input type="hidden" id="edit_product_id" name="product_id">
+
+            <div>
+                <label class="block font-bold text-stone-800 mb-1">상품명 *</label>
+                <input type="text" id="edit_name" name="name" required class="w-full px-3 py-2.5 rounded-lg border border-stone-300 focus:outline-none focus:border-black font-semibold text-xs">
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="block font-bold text-stone-800 mb-1">카테고리</label>
+                    <select id="edit_category" name="category" class="w-full px-3 py-2 rounded-lg border border-stone-300 bg-white font-medium">
+                        <option value="화분 & 토분">화분 & 토분</option>
+                        <option value="인테리어 액자 & 패널">인테리어 액자 & 패널</option>
+                        <option value="도자 화병 & 오브제">도자 화병 & 오브제</option>
+                        <option value="원목 인센스 & 홀더">원목 인센스 & 홀더</option>
+                        <option value="마크라메 & 행거">마크라메 & 행거</option>
+                        <option value="일본 수공예 도자기">일본 수공예 도자기</option>
+                        <option value="다도 & 티웨어">다도 & 티웨어</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block font-bold text-stone-800 mb-1">규격 / 치수</label>
+                    <input type="text" id="edit_dimensions" name="dimensions" placeholder="예: 외경 Ø 12cm x H 21cm" class="w-full px-3 py-2 rounded-lg border border-stone-300 font-mono">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="block font-bold text-stone-800 mb-1">정상 판매가 (원) *</label>
+                    <input type="number" id="edit_price" name="price" required class="w-full px-3 py-2 rounded-lg border border-stone-300 font-bold font-mono">
+                </div>
+                <div>
+                    <label class="block font-bold text-stone-800 mb-1">할인가 (원, 선택)</label>
+                    <input type="number" id="edit_sale_price" name="sale_price" placeholder="할인 없을 시 공란" class="w-full px-3 py-2 rounded-lg border border-stone-300 font-bold font-mono text-amber-700">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="block font-bold text-stone-800 mb-1">뱃지 / 라벨 태그</label>
+                    <input type="text" id="edit_badge" name="badge" placeholder="SIGNATURE, BEST, NEW 등" class="w-full px-3 py-2 rounded-lg border border-stone-300 font-bold">
+                </div>
+                <div>
+                    <label class="block font-bold text-stone-800 mb-1">재고 / 출고 상태</label>
+                    <select id="edit_stock_status" name="stock_status" class="w-full px-3 py-2 rounded-lg border border-stone-300 bg-white font-semibold">
+                        <option value="즉시출고">즉시출고</option>
+                        <option value="주문제작">주문제작</option>
+                        <option value="품절">품절</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Japan Sourcing & Original Site URL -->
+            <div class="p-3.5 bg-rose-50/70 border border-rose-200 rounded-xl space-y-2">
+                <div class="flex items-center justify-between">
+                    <label class="block font-bold text-rose-900 text-xs flex items-center gap-1.5">
+                        <i class="fa-solid fa-plane-departure text-rose-600"></i>
+                        <span>일본 현지 온라인 사이트 원문 링크 (소싱처 URL)</span>
+                    </label>
+                    <a id="btn_visit_japan_modal" href="#" target="_blank" class="text-xs font-bold text-rose-700 hover:text-rose-900 hover:underline flex items-center gap-1">
+                        <span>현지 페이지 새창 열기</span>
+                        <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+                    </a>
+                </div>
+                <div class="grid grid-cols-3 gap-2">
+                    <div class="col-span-2">
+                        <input type="url" id="edit_japan_source_url" name="japan_source_url" placeholder="https://search.rakuten.co.jp/... 또는 공방 소싱 URL" class="w-full px-3 py-2 rounded-lg border border-rose-300 font-mono text-xs bg-white">
+                    </div>
+                    <div>
+                        <input type="text" id="edit_source_site_name" name="source_site_name" placeholder="예: 라쿠텐 재팬, 야후쇼핑" class="w-full px-3 py-2 rounded-lg border border-rose-300 text-xs font-semibold bg-white">
+                    </div>
+                </div>
+                <p class="text-[10px] text-rose-600 leading-normal">
+                    * 1인 대표 운영 시 일본 온라인 사이트에서 실시간 재고를 파악하고 주문/사입할 수 있는 원문 링크입니다.
+                </p>
+            </div>
+
+            <div>
+                <label class="block font-bold text-stone-800 mb-1">이미지 경로 / URL</label>
+                <input type="text" id="edit_image_url" name="image_url" class="w-full px-3 py-2 rounded-lg border border-stone-300 font-mono text-xs">
+            </div>
+
+            <div>
+                <label class="block font-bold text-stone-800 mb-1">작품 상세 설명 및 장인 해설 (상세 DB)</label>
+                <textarea id="edit_description" name="description" rows="4" class="w-full px-3 py-2 rounded-lg border border-stone-300 leading-relaxed font-sans text-xs"></textarea>
+            </div>
+
+            <div class="pt-4 border-t border-stone-200 flex justify-end space-x-2">
+                <button type="button" onclick="closeEditModal()" class="px-4 py-2 border border-stone-300 rounded-lg text-stone-600 font-medium">취소</button>
+                <button type="submit" class="px-6 py-2 bg-black text-white rounded-lg font-bold hover:bg-stone-800 transition">저장 및 실시간 반영</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    const adminCatalog = {
+        {% for prod in products %}
+        "{{ prod.id }}": {
+            "id": {{ prod.id }},
+            "name": {{ prod.name|tojson }},
+            "category": {{ prod.category|tojson }},
+            "dimensions": {{ prod.dimensions|tojson }},
+            "description": {{ prod.description|tojson }},
+            "price": {{ prod.price }},
+            "sale_price": {{ (prod.sale_price or '')|tojson }},
+            "badge": {{ (prod.badge or '')|tojson }},
+            "stock_status": {{ prod.stock_status|tojson }},
+            "image_url": {{ prod.image_url|tojson }},
+            "japan_source_url": {{ (prod.japan_source_url or '')|tojson }},
+            "source_site_name": {{ (prod.source_site_name or '라쿠텐 재팬')|tojson }}
+        }{% if not loop.last %},{% endif %}
+        {% endfor %}
+    };
+
+    function openEditModal(id) {
+        const prod = adminCatalog[id];
+        if (!prod) return;
+
+        document.getElementById('edit_product_id').value = prod.id;
+        document.getElementById('edit_name').value = prod.name || '';
+        document.getElementById('edit_category').value = prod.category || '화분 & 토분';
+        document.getElementById('edit_dimensions').value = prod.dimensions || '';
+        document.getElementById('edit_price').value = prod.price || 0;
+        document.getElementById('edit_sale_price').value = prod.sale_price || '';
+        document.getElementById('edit_badge').value = prod.badge || '';
+        document.getElementById('edit_stock_status').value = prod.stock_status || '즉시출고';
+        document.getElementById('edit_image_url').value = prod.image_url || '';
+        document.getElementById('edit_description').value = prod.description || '';
+        document.getElementById('edit_japan_source_url').value = prod.japan_source_url || '';
+        document.getElementById('edit_source_site_name').value = prod.source_site_name || '라쿠텐 재팬';
+
+        const visitBtn = document.getElementById('btn_visit_japan_modal');
+        if (prod.japan_source_url) {
+            visitBtn.href = prod.japan_source_url;
+            visitBtn.style.display = 'inline-flex';
+        } else {
+            visitBtn.style.display = 'none';
+        }
+
+        document.getElementById('editProductModal').classList.remove('hidden');
+    }
+
+    function closeEditModal() {
+        document.getElementById('editProductModal').classList.add('hidden');
+    }
+
+    // Quick filter for stock status (전체, 즉시출고, 품절)
+    function filterAdminStock(status) {
+        // Update button styles
+        ['All', 'InStock', 'SoldOut'].forEach(t => {
+            const btn = document.getElementById('filterBtn' + t);
+            if (btn) {
+                btn.classList.remove('bg-stone-900', 'text-white', 'shadow-sm');
+                if (t === 'All') btn.className = 'px-3.5 py-1.5 rounded-lg text-xs font-bold border border-stone-200 bg-white text-stone-700 hover:bg-stone-100 transition-all';
+                else if (t === 'InStock') btn.className = 'px-3.5 py-1.5 rounded-lg text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-300 hover:bg-emerald-100 transition-all';
+                else if (t === 'SoldOut') btn.className = 'px-3.5 py-1.5 rounded-lg text-xs font-bold bg-red-50 text-red-800 border border-red-300 hover:bg-red-100 transition-all';
+            }
+        });
+
+        if (status === 'all') {
+            document.getElementById('filterBtnAll').className = 'px-3.5 py-1.5 rounded-lg text-xs font-bold bg-stone-900 text-white transition-all shadow-sm';
+        } else if (status === '즉시출고') {
+            document.getElementById('filterBtnInStock').className = 'px-3.5 py-1.5 rounded-lg text-xs font-bold bg-emerald-700 text-white transition-all shadow-sm';
+        } else if (status === '품절') {
+            document.getElementById('filterBtnSoldOut').className = 'px-3.5 py-1.5 rounded-lg text-xs font-bold bg-red-600 text-white transition-all shadow-sm';
+        }
+
+        const rows = document.querySelectorAll('.product-row');
+        rows.forEach(row => {
+            const rowStock = row.getAttribute('data-stock') || '';
+            if (status === 'all' || rowStock === status) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+</script>
+{% endblock %}

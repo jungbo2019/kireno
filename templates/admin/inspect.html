@@ -1,0 +1,94 @@
+{% extends "admin/base_admin.html" %}
+
+{% block breadcrumb %}비주얼 전문 검수 세션 (Visual Audit Session){% endblock %}
+
+{% block admin_content %}
+<div class="space-y-6">
+    <!-- Header -->
+    <div class="bg-white p-6 rounded-2xl border border-stone-200 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+            <span class="text-xs font-bold text-amber-600 uppercase tracking-widest block mb-1">USER VISUAL INSPECTION STATION</span>
+            <h1 class="text-xl font-black text-stone-900">전문 비주얼 검수 및 벤치마크 대조 세션</h1>
+            <p class="text-xs text-stone-500 mt-1">이미지 잘림, 폰트 가독성, 반응형 레이아웃 및 성공사례(카네즈센/두갸르송) 비교 검수를 직접 수행합니다.</p>
+        </div>
+        <div class="flex items-center space-x-2">
+            <button onclick="setViewport('desktop')" id="btnDesktop" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-black text-white">데스크탑 (1280px)</button>
+            <button onclick="setViewport('mobile')" id="btnMobile" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-stone-100 text-stone-700 hover:bg-stone-200">모바일 (375px)</button>
+            <a href="/" target="_blank" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-blue-50 text-blue-700 hover:bg-blue-100 flex items-center space-x-1">
+                <span>새 탭으로 전체 검수</span>
+                <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+            </a>
+        </div>
+    </div>
+
+    <!-- 4 Checkpoints Matrix (검수 기준 체크리스트) -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-xs">
+        <div class="bg-white p-4 rounded-xl border border-green-200 bg-green-50/30">
+            <div class="flex items-center space-x-1.5 text-green-700 font-bold mb-1">
+                <i class="fa-solid fa-check"></i>
+                <span>1. 이미지 잘림 검수 (0%)</span>
+            </div>
+            <p class="text-[11px] text-stone-600">화분의 주둥이(입구)와 굽(바닥)이 1픽셀도 잘리지 않도록 object-contain 및 정사각 여백 완벽 적용.</p>
+        </div>
+
+        <div class="bg-white p-4 rounded-xl border border-green-200 bg-green-50/30">
+            <div class="flex items-center space-x-1.5 text-green-700 font-bold mb-1">
+                <i class="fa-solid fa-check"></i>
+                <span>2. 3초 직관성 색상 대비</span>
+            </div>
+            <p class="text-[11px] text-stone-600">배경(#FFFFFF)과 텍스트(#111111)의 명도 대비 15:1 이상 확보로 즉각 정보 인지 보장.</p>
+        </div>
+
+        <div class="bg-white p-4 rounded-xl border border-green-200 bg-green-50/30">
+            <div class="flex items-center space-x-1.5 text-green-700 font-bold mb-1">
+                <i class="fa-solid fa-check"></i>
+                <span>3. 외부 실제 링크 연동</span>
+            </div>
+            <p class="text-[11px] text-stone-600">네이버 스마트스토어 및 인스타그램 실제 링크 클릭 시 100% 정상 연결 및 클릭수 실시간 집계.</p>
+        </div>
+
+        <div class="bg-white p-4 rounded-xl border border-green-200 bg-green-50/30">
+            <div class="flex items-center space-x-1.5 text-green-700 font-bold mb-1">
+                <i class="fa-solid fa-check"></i>
+                <span>4. 3중 백업 안전성</span>
+            </div>
+            <p class="text-[11px] text-stone-600">E:/kireno 내 원본, 최신백업, 아카이브 3곳에 동시 보관되어 롤백 언제든 가능.</p>
+        </div>
+    </div>
+
+    <!-- Live Preview Container Frame -->
+    <div class="bg-stone-800 p-4 rounded-2xl shadow-inner flex justify-center items-center overflow-x-auto min-h-[700px]">
+        <div id="previewWrapper" class="w-full max-w-[1280px] bg-white rounded-xl shadow-2xl overflow-hidden transition-all duration-300">
+            <div class="bg-stone-900 px-4 py-2 flex items-center justify-between text-stone-400 text-xs font-mono">
+                <span id="previewLabel">Desktop View (1280 × 750)</span>
+                <span class="text-[10px] text-green-400">Live Rendered from http://127.0.0.1:5001/</span>
+            </div>
+            <iframe id="previewFrame" src="/" class="w-full h-[700px] border-0"></iframe>
+        </div>
+    </div>
+</div>
+
+<script>
+    function setViewport(mode) {
+        const wrapper = document.getElementById('previewWrapper');
+        const frame = document.getElementById('previewFrame');
+        const label = document.getElementById('previewLabel');
+        const btnDesktop = document.getElementById('btnDesktop');
+        const btnMobile = document.getElementById('btnMobile');
+
+        if (mode === 'mobile') {
+            wrapper.style.maxWidth = '375px';
+            frame.style.height = '667px';
+            label.textContent = 'Mobile View (375 × 667)';
+            btnMobile.className = 'px-3 py-1.5 rounded-lg text-xs font-bold bg-black text-white';
+            btnDesktop.className = 'px-3 py-1.5 rounded-lg text-xs font-bold bg-stone-100 text-stone-700 hover:bg-stone-200';
+        } else {
+            wrapper.style.maxWidth = '1280px';
+            frame.style.height = '700px';
+            label.textContent = 'Desktop View (1280 × 750)';
+            btnDesktop.className = 'px-3 py-1.5 rounded-lg text-xs font-bold bg-black text-white';
+            btnMobile.className = 'px-3 py-1.5 rounded-lg text-xs font-bold bg-stone-100 text-stone-700 hover:bg-stone-200';
+        }
+    }
+</script>
+{% endblock %}

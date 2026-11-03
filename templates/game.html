@@ -1,0 +1,1400 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>LUMEN WEAVER (루멘 위버) — 빛과 소리를 직조하는 밤</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Noto+Serif+KR:wght@400;600;700;900&family=Pretendard:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+    }
+    body {
+      margin: 0;
+      padding: 0;
+      background: #03060f;
+      color: #f1f5f9;
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+      overflow: hidden;
+      height: 100dvh;
+      width: 100vw;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .font-serif-kr {
+      font-family: 'Noto Serif KR', serif;
+    }
+    .font-cinzel {
+      font-family: 'Cinzel', 'Noto Serif KR', serif;
+    }
+    #game-shell {
+      position: relative;
+      width: 100%;
+      height: 100dvh;
+      overflow: hidden;
+      background: #030712;
+    }
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      touch-action: none;
+      cursor: none;
+    }
+    .celestial-panel {
+      background: linear-gradient(180deg, rgba(10, 17, 36, 0.84) 0%, rgba(5, 9, 20, 0.90) 100%);
+      backdrop-filter: blur(18px);
+      border: 1px solid rgba(251, 191, 36, 0.25);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), inset 0 0 25px rgba(251, 191, 36, 0.06);
+    }
+    .blessing-card {
+      background: linear-gradient(145deg, rgba(15, 25, 50, 0.92), rgba(8, 13, 28, 0.96));
+      border: 1px solid rgba(125, 211, 252, 0.28);
+      transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .blessing-card:hover {
+      transform: translateY(-5px) scale(1.015);
+      border-color: #fbbf24;
+      box-shadow: 0 15px 35px -8px rgba(251, 191, 36, 0.35);
+    }
+    @keyframes shimmerPulse {
+      0%, 100% { opacity: 0.75; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.03); }
+    }
+    .title-glow {
+      text-shadow: 0 0 35px rgba(251, 191, 36, 0.45), 0 0 70px rgba(56, 189, 248, 0.3);
+      animation: shimmerPulse 4s ease-in-out infinite;
+    }
+  </style>
+</head>
+<body>
+
+<div id="game-shell">
+  <canvas id="lumen-canvas"></canvas>
+
+  <!-- TOP FLOATING CINEMATIC HUD -->
+  <header class="pointer-events-none absolute top-0 left-0 right-0 z-20 p-4 sm:px-8 flex items-start justify-between gap-4">
+    <!-- Left: Sanctuary Core Integrity & Ink Energy -->
+    <div class="pointer-events-auto celestial-panel rounded-2xl px-4 py-3 flex flex-col gap-2 min-w-[230px] sm:min-w-[270px]">
+      <div class="flex items-center justify-between">
+        <span class="text-xs font-serif-kr font-bold text-amber-200/90 tracking-wider">성소 등불 (Sanctuary Light)</span>
+        <span id="hud-hp-text" class="text-xs font-cinzel font-bold text-amber-300">100%</span>
+      </div>
+      <div class="w-full h-2 bg-slate-950 rounded-full overflow-hidden border border-amber-500/30">
+        <div id="hud-hp-bar" class="h-full bg-gradient-to-r from-amber-500 via-yellow-300 to-cyan-300 transition-all duration-300 shadow-[0_0_12px_rgba(251,191,36,0.8)]" style="width: 100%"></div>
+      </div>
+
+      <div class="flex items-center justify-between mt-0.5">
+        <span class="text-[11px] font-serif-kr text-cyan-200/90">빛의 실 장력 (Lumen Ink)</span>
+        <span id="hud-ink-text" class="text-[11px] font-cinzel font-bold text-cyan-300">100 / 100</span>
+      </div>
+      <div class="w-full h-1.5 bg-slate-950 rounded-full overflow-hidden border border-cyan-400/30">
+        <div id="hud-ink-bar" class="h-full bg-gradient-to-r from-teal-400 via-cyan-300 to-indigo-300 transition-all duration-75" style="width: 100%"></div>
+      </div>
+    </div>
+
+    <!-- Center: Chapter / Constellation Resonance Banner -->
+    <div class="flex flex-col items-center text-center pt-1">
+      <div class="px-4 py-1 rounded-full bg-slate-950/75 border border-amber-400/30 backdrop-blur-md mb-1">
+        <span class="text-[11px] font-cinzel tracking-widest text-amber-300" id="hud-chapter">CHAPTER I — 거울 호수의 밤</span>
+      </div>
+      <div id="resonance-banner" class="opacity-0 transition-all duration-300 transform translate-y-1">
+        <span id="resonance-text" class="text-xl sm:text-2xl font-serif-kr font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-white to-cyan-200 drop-shadow-[0_0_18px_rgba(251,191,36,0.85)]">
+          삼각 성좌 봉인!
+        </span>
+      </div>
+    </div>
+
+    <!-- Right: Score, Harmony Level & Audio Controls -->
+    <div class="pointer-events-auto celestial-panel rounded-2xl px-4 py-3 flex flex-col items-end gap-2">
+      <div class="flex items-center gap-3">
+        <div class="text-right">
+          <div class="text-[10px] text-slate-400 font-serif-kr">정화한 밤의 파편</div>
+          <div id="hud-score" class="text-lg font-cinzel font-black text-white tracking-wider">0</div>
+        </div>
+        <div class="h-7 w-px bg-slate-700/80"></div>
+        <button id="btn-audio" onclick="weaver.toggleAudio()" class="px-3 py-1.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/30 border border-amber-400/40 text-xs font-serif-kr font-bold text-amber-200 flex items-center gap-1.5 transition cursor-pointer">
+          <span id="audio-icon">🎹</span>
+          <span id="audio-label">하프·피아노 ON</span>
+        </button>
+      </div>
+      <div class="w-full flex items-center gap-2">
+        <span class="text-[10px] font-cinzel font-bold text-cyan-300 shrink-0">HARMONY LV.<span id="hud-level">1</span></span>
+        <div class="flex-1 h-1.5 bg-slate-950 rounded-full overflow-hidden border border-slate-700">
+          <div id="hud-xp-bar" class="h-full bg-gradient-to-r from-cyan-400 to-amber-300 transition-all duration-200" style="width: 0%"></div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- BOTTOM TACTICAL GUIDE BAR -->
+  <div class="pointer-events-none absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex items-center gap-3 px-5 py-2 rounded-full bg-slate-950/75 border border-slate-700/60 backdrop-blur-md text-xs text-slate-300 whitespace-nowrap">
+    <span class="text-amber-300 font-serif-kr font-bold">✦ 조작법</span>
+    <span>드래그하여 <strong class="text-cyan-300">별(Star Node)</strong>들을 잇고 <strong class="text-amber-300">시작점으로 돌아와 다각형</strong>을 닫으면 내부의 모든 어둠이 정화됩니다</span>
+    <span class="hidden sm:inline text-slate-500">|</span>
+    <span class="hidden sm:inline text-emerald-300">우클릭 / 스페이스바 : 공명 파동 방출</span>
+  </div>
+
+  <!-- TITLE / INTRO MODAL -->
+  <div id="modal-intro" class="absolute inset-0 z-30 bg-[#02050e]/85 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center">
+    <div class="mb-3 px-4 py-1 rounded-full bg-amber-500/10 border border-amber-400/35 text-amber-200 text-xs font-serif-kr tracking-widest">
+      세상에 없던 오리지널 별자리 직조(Constellation Weaving) 감성 액션
+    </div>
+    <h1 class="font-cinzel text-4xl sm:text-6xl font-black tracking-widest text-transparent bg-clip-text bg-gradient-to-b from-amber-100 via-amber-300 to-cyan-300 title-glow mb-2">
+      LUMEN WEAVER
+    </h1>
+    <p class="font-serif-kr text-base sm:text-lg text-cyan-100/90 font-semibold mb-7">
+      《루멘 위버 : 빛과 소리를 직조하는 밤》
+    </p>
+
+    <div class="w-full max-w-lg celestial-panel rounded-3xl p-6 mb-7 text-left space-y-4 text-xs sm:text-sm text-slate-200">
+      <div class="flex items-start gap-3.5">
+        <div class="w-8 h-8 rounded-full bg-amber-400/20 border border-amber-300/50 flex items-center justify-center text-amber-300 font-cinzel font-bold shrink-0">I</div>
+        <div>
+          <strong class="text-amber-200 font-serif-kr text-sm">점을 잇고 도형을 닫아 어둠을 봉인하세요 (Constellation Enclosure)</strong>
+          <p class="text-slate-300/90 text-xs mt-0.5 leading-relaxed">
+            마우스(또는 터치)를 드래그해 밤하늘에 떠 있는 <strong>별(Star Nodes)</strong>들을 연결하세요. 3개 이상의 별을 이어 <strong>삼각형·사각형·별자리 도형을 완성</strong>하면, 그 안에 갇힌 심연의 그림자들이 찬란한 빛과 화음으로 한꺼번에 정화됩니다.
+          </p>
+        </div>
+      </div>
+
+      <div class="flex items-start gap-3.5">
+        <div class="w-8 h-8 rounded-full bg-cyan-400/20 border border-cyan-300/50 flex items-center justify-center text-cyan-300 font-cinzel font-bold shrink-0">II</div>
+        <div>
+          <strong class="text-cyan-200 font-serif-kr text-sm">장력(Ink)과 절단자(Void Cutter)의 치밀한 밸런스</strong>
+          <p class="text-slate-300/90 text-xs mt-0.5 leading-relaxed">
+            실이 너무 길어지면 장력이 소모되며, 붉은 <strong>칼날 나방(Void Cutter)</strong>이 빛의 실을 끊으려 돌진합니다. 실이 끊기기 전에 빠르게 도형을 닫아 역으로 포획하면 <strong>소모된 장력이 100% 회복 + 면적 배율 보너스</strong>가 터집니다.
+          </p>
+        </div>
+      </div>
+
+      <div class="flex items-start gap-3.5">
+        <div class="w-8 h-8 rounded-full bg-indigo-400/20 border border-indigo-300/50 flex items-center justify-center text-indigo-200 font-cinzel font-bold shrink-0">III</div>
+        <div>
+          <strong class="text-indigo-200 font-serif-kr text-sm">당신의 손끝이 연주하는 인터랙티브 피아노 & 하프 교향곡</strong>
+          <p class="text-slate-300/90 text-xs mt-0.5 leading-relaxed">
+            별을 이을 때마다 하프 현이 울리고, 성좌를 완성할 때마다 서정적인 그랜드 피아노 화음과 거울 호수의 수면 파문이 어우러져 한 편의 애니메이션 같은 몰입감을 선사합니다.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <button onclick="weaver.startGame()" class="px-10 py-4 rounded-full bg-gradient-to-r from-amber-400 via-amber-300 to-cyan-300 hover:from-amber-300 hover:to-cyan-200 text-slate-950 font-serif-kr font-black text-base sm:text-lg shadow-[0_0_45px_rgba(251,191,36,0.6)] active:scale-95 transition cursor-pointer">
+      ✦ 첫 번째 별자리 직조 시작하기
+    </button>
+  </div>
+
+  <!-- CONSTELLATION BLESSING (LEVEL UP) MODAL -->
+  <div id="modal-blessing" class="hidden absolute inset-0 z-30 bg-[#02050e]/85 backdrop-blur-lg flex flex-col items-center justify-center p-6">
+    <div class="px-4 py-1 rounded-full bg-amber-400/15 border border-amber-300/40 text-amber-200 text-xs font-cinzel tracking-widest mb-2">
+      ASTRAL HARMONY ASCENSION
+    </div>
+    <h2 class="text-2xl sm:text-3xl font-serif-kr font-black text-white mb-1">밤하늘의 성좌가 공명합니다</h2>
+    <p class="text-xs text-slate-400 mb-6">새로운 별자리 권능을 하나 선택하여 빛의 실을 강화하세요</p>
+
+    <div id="blessing-container" class="w-full max-w-lg flex flex-col gap-3.5"></div>
+  </div>
+
+  <!-- GAME OVER MODAL -->
+  <div id="modal-gameover" class="hidden absolute inset-0 z-40 bg-[#02050e]/90 backdrop-blur-lg flex flex-col items-center justify-center p-6 text-center">
+    <div class="text-xs font-cinzel tracking-widest text-rose-300 mb-2">THE SANCTUARY LIGHT HAS FADED</div>
+    <h2 class="text-3xl font-serif-kr font-black text-white mb-2">성소의 등불이 사그라들었습니다</h2>
+    <p class="text-xs text-slate-400 mb-6">하지만 당신이 수놓은 별자리는 거울 호수 위에 영원히 기록되었습니다</p>
+
+    <div class="w-full max-w-xs celestial-panel rounded-2xl p-5 mb-6 space-y-3 text-sm">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+        <span class="text-slate-400 font-serif-kr">도달한 밤의 장</span>
+        <span id="go-chapter" class="font-cinzel font-bold text-amber-300">CHAPTER I</span>
+      </div>
+      <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+        <span class="text-slate-400 font-serif-kr">완성한 별자리 수</span>
+        <span id="go-constellations" class="font-cinzel font-bold text-cyan-300">0 회</span>
+      </div>
+      <div class="flex justify-between items-center">
+        <span class="text-slate-400 font-serif-kr">최종 정화 점수</span>
+        <span id="go-score" class="font-cinzel font-bold text-white text-base">0</span>
+      </div>
+    </div>
+
+    <button onclick="weaver.startGame()" class="px-9 py-3.5 rounded-full bg-gradient-to-r from-amber-400 to-cyan-300 text-slate-950 font-serif-kr font-black text-sm shadow-[0_0_30px_rgba(251,191,36,0.5)] hover:scale-105 transition cursor-pointer">
+      ✦ 다시 밤하늘 수놓기
+    </button>
+  </div>
+</div>
+
+<script>
+/**
+ * ============================================================================
+ * LUMEN WEAVER (루멘 위버 : 빛과 소리를 직조하는 밤)
+ * 100% Original Constellation-Enclosure Mechanics, Rippling Mirror Lake Shader,
+ * & Debussy/Hisaishi-inspired Interactive Harp & Grand Piano Web Audio Engine.
+ * ============================================================================
+ */
+
+class CelestialSymphonyEngine {
+  constructor() {
+    this.ctx = null;
+    this.enabled = true;
+    this.master = null;
+    this.reverb = null;
+    this.bgmTimer = null;
+    this.barStep = 0;
+
+    // Lydian / Major 9th Dreamy Pentatonic Scales (Joe Hisaishi / Ori Vibe)
+    // Progression: Fmaj9 -> G6 -> Em7 -> Am9
+    this.progressions = [
+      { root: 174.61, scale: [261.63, 293.66, 329.63, 392.00, 440.00, 523.25, 587.33, 659.25, 783.99, 880.00, 1046.50] },
+      { root: 196.00, scale: [293.66, 329.63, 392.00, 440.00, 493.88, 587.33, 659.25, 783.99, 880.00, 987.77, 1174.66] },
+      { root: 164.81, scale: [246.94, 293.66, 329.63, 392.00, 493.88, 587.33, 659.25, 783.99, 987.77, 1174.66, 1318.51] },
+      { root: 220.00, scale: [261.63, 329.63, 392.00, 440.00, 523.25, 659.25, 783.99, 880.00, 1046.50, 1318.51, 1567.98] }
+    ];
+    this.progIdx = 0;
+  }
+
+  init() {
+    if (!this.ctx) {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return;
+      this.ctx = new AudioCtx();
+
+      const comp = this.ctx.createDynamicsCompressor();
+      comp.threshold.setValueAtTime(-14, this.ctx.currentTime);
+      comp.ratio.setValueAtTime(6, this.ctx.currentTime);
+
+      this.master = this.ctx.createGain();
+      this.master.gain.setValueAtTime(0.8, this.ctx.currentTime);
+
+      // Lush Cathedral Stereo Delay Reverb
+      this.reverb = this.ctx.createDelay();
+      this.reverb.delayTime.setValueAtTime(0.28, this.ctx.currentTime);
+      const fb = this.ctx.createGain();
+      fb.gain.setValueAtTime(0.38, this.ctx.currentTime);
+      const lp = this.ctx.createBiquadFilter();
+      lp.type = 'lowpass';
+      lp.frequency.setValueAtTime(1900, this.ctx.currentTime);
+
+      this.reverb.connect(lp);
+      lp.connect(fb);
+      fb.connect(this.reverb);
+      lp.connect(comp);
+
+      comp.connect(this.master);
+      this.master.connect(this.ctx.destination);
+    }
+    if (this.ctx && this.ctx.state === 'suspended') {
+      this.ctx.resume();
+    }
+    if (this.enabled && !this.bgmTimer) {
+      this.startAmbientScore();
+    }
+  }
+
+  startAmbientScore() {
+    if (this.bgmTimer) clearInterval(this.bgmTimer);
+    this.bgmTimer = setInterval(() => {
+      if (!this.enabled || !this.ctx || this.ctx.state !== 'running') return;
+      this.playAmbientStep();
+    }, 420);
+  }
+
+  stopAmbientScore() {
+    if (this.bgmTimer) {
+      clearInterval(this.bgmTimer);
+      this.bgmTimer = null;
+    }
+  }
+
+  playAmbientStep() {
+    const now = this.ctx.currentTime;
+    const step = this.barStep % 8;
+    if (step === 0) {
+      this.progIdx = (this.progIdx + 1) % this.progressions.length;
+      this.playCelloPad(this.progressions[this.progIdx]);
+    }
+    const cur = this.progressions[this.progIdx];
+    // Delicate music-box / harp background notes
+    if (step % 2 === 0) {
+      const note = cur.scale[(step / 2) % 5];
+      this.triggerSoftTone(note, 0.032, 0.9, 'sine');
+    }
+    this.barStep++;
+  }
+
+  playCelloPad(prog) {
+    const now = this.ctx.currentTime;
+    [prog.root, prog.scale[0], prog.scale[2]].forEach((freq, i) => {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      const filter = this.ctx.createBiquadFilter();
+      osc.type = i === 0 ? 'sawtooth' : 'triangle';
+      osc.frequency.setValueAtTime(freq, now);
+
+      filter.type = 'lowpass';
+      filter.frequency.setValueAtTime(420, now);
+
+      gain.gain.setValueAtTime(0.001, now);
+      gain.gain.linearRampToValueAtTime(i === 0 ? 0.045 : 0.03, now + 0.8);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 3.3);
+
+      osc.connect(filter);
+      filter.connect(gain);
+      gain.connect(this.reverb);
+      gain.connect(this.master);
+      osc.start(now);
+      osc.stop(now + 3.4);
+    });
+  }
+
+  triggerSoftTone(freq, vol, dur, type = 'sine', delayOffset = 0) {
+    if (!this.enabled || !this.ctx) return;
+    const now = this.ctx.currentTime + delayOffset;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, now);
+    gain.gain.setValueAtTime(0.001, now);
+    gain.gain.linearRampToValueAtTime(vol, now + 0.015);
+    gain.gain.exponentialRampToValueAtTime(0.0008, now + dur);
+    osc.connect(gain);
+    gain.connect(this.reverb);
+    gain.connect(this.master);
+    osc.start(now);
+    osc.stop(now + dur + 0.02);
+  }
+
+  // Played when connecting a Star Node
+  playStarConnect(nodeIndex = 0) {
+    this.init();
+    if (!this.enabled || !this.ctx) return;
+    const cur = this.progressions[this.progIdx];
+    const freq = cur.scale[nodeIndex % cur.scale.length];
+    this.triggerSoftTone(freq, 0.14, 0.55, 'triangle', 0);
+    this.triggerSoftTone(freq * 2, 0.05, 0.35, 'sine', 0.01);
+  }
+
+  // Played when closing a Constellation Polygon! Grand Arpeggio Chord!
+  playConstellationSeal(verticesCount = 3, capturedEnemies = 1) {
+    this.init();
+    if (!this.enabled || !this.ctx) return;
+    const cur = this.progressions[this.progIdx];
+    const chordIndices = [0, 2, 4, 5, 7, 9, 10];
+    const count = Math.min(7, verticesCount + capturedEnemies);
+
+    for (let i = 0; i < count; i++) {
+      const freq = cur.scale[chordIndices[i % chordIndices.length]];
+      this.triggerSoftTone(freq, 0.15, 1.1, 'triangle', i * 0.055);
+      this.triggerSoftTone(freq * 1.5, 0.04, 0.8, 'sine', i * 0.055 + 0.02);
+    }
+  }
+
+  // Played when thread snaps by a Void Cutter
+  playThreadSnap() {
+    this.init();
+    if (!this.enabled || !this.ctx) return;
+    this.triggerSoftTone(155, 0.18, 0.35, 'sawtooth', 0);
+    this.triggerSoftTone(110, 0.15, 0.45, 'sawtooth', 0.05);
+  }
+}
+
+const BLESSINGS = [
+  {
+    id: 'astral_reservoir',
+    name: '은하수 샘물 (Astral Reservoir)',
+    sub: '최대 장력 +35 & 재생 속도 +30%',
+    desc: '빛의 실을 훨씬 더 길고 거대한 별자리로 직조할 수 있으며, 장력 회복 속도가 크게 빨라집니다.',
+    apply: (w) => {
+      w.stats.maxInk += 35;
+      w.stats.ink = w.stats.maxInk;
+      w.stats.inkRegen *= 1.3;
+    }
+  },
+  {
+    id: 'supernova_seal',
+    name: '창성의 스테인드글라스 (Supernova Seal)',
+    sub: '성좌 봉인 정화력 +45% & 파동 반경 확장',
+    desc: '다각형을 닫았을 때 터져 나오는 성좌의 빛이 더욱 강력해지고, 도형 바깥쪽 주변 그림자까지 함께 정화합니다.',
+    apply: (w) => {
+      w.stats.sealDamage *= 1.45;
+      w.stats.auraRadius += 45;
+    }
+  },
+  {
+    id: 'star_bloom',
+    name: '별무리 개화 (Starlight Bloom)',
+    sub: '밤하늘의 별(Node) +3개 영구 추가 생성',
+    desc: '호수 상공에 연결 가능한 별들이 추가로 피어나 더욱 촘촘하고 다채로운 다각형 직조가 가능해집니다.',
+    apply: (w) => {
+      w.spawnStarNodes(3);
+    }
+  },
+  {
+    id: 'harmonic_shield',
+    name: '거울 호수의 축복 (Mirror Sanctuary)',
+    sub: '성소 등불 내구도 50% 즉시 회복 & 실 절단 저항',
+    desc: '사그라든 성소의 등불을 밝히고, 실을 끊으려는 칼날 나방(Void Cutter)의 이동 속도를 둔화시킵니다.',
+    apply: (w) => {
+      w.stats.hp = Math.min(100, w.stats.hp + 50);
+      w.stats.cutterSlow *= 0.78;
+    }
+  }
+];
+
+class LumenWeaverGame {
+  constructor() {
+    this.canvas = document.getElementById('lumen-canvas');
+    this.ctx = this.canvas.getContext('2d');
+    this.audio = new CelestialSymphonyEngine();
+
+    this.width = window.innerWidth;
+    this.height = window.innerHeight;
+    this.waterLineY = this.height * 0.78;
+    this.time = 0;
+
+    this.state = 'INTRO'; // INTRO, PLAY, BLESSING, GAMEOVER
+    this.pointer = { x: this.width / 2, y: this.height / 2, down: false, trail: [] };
+
+    // Game Balance & Progression State
+    this.stats = {
+      hp: 100,
+      maxInk: 100,
+      ink: 100,
+      inkRegen: 22, // per second
+      sealDamage: 65,
+      auraRadius: 55,
+      cutterSlow: 1.0,
+      level: 1,
+      xp: 0,
+      xpNext: 100,
+      score: 0,
+      constellationsCount: 0,
+      chapter: 1
+    };
+
+    // World Entities
+    this.bgStars = [];
+    this.starNodes = [];
+    this.activeChain = []; // Array of StarNodes currently being woven
+    this.sealedPolygons = []; // Completed glowing constellation shapes fading out
+    this.shadows = []; // Abyssal enemies
+    this.particles = [];
+    this.ripples = [];
+    this.floatingTexts = [];
+    this.spawnTimer = 0;
+    this.stunTimer = 0;
+
+    this.resize();
+    window.addEventListener('resize', () => this.resize());
+    this.initInput();
+    this.initBackgroundStars();
+
+    requestAnimationFrame((t) => this.loop(t));
+  }
+
+  resize() {
+    this.width = window.innerWidth;
+    this.height = window.innerHeight;
+    this.waterLineY = Math.floor(this.height * 0.79);
+    this.canvas.width = this.width * window.devicePixelRatio;
+    this.canvas.height = this.height * window.devicePixelRatio;
+    this.ctx.setTransform(window.devicePixelRatio, 0, 0, window.devicePixelRatio, 0, 0);
+  }
+
+  initBackgroundStars() {
+    this.bgStars = [];
+    for (let i = 0; i < 110; i++) {
+      this.bgStars.push({
+        x: Math.random() * 2000,
+        y: Math.random() * 1000,
+        r: 0.5 + Math.random() * 1.8,
+        twinkleSpeed: 1.2 + Math.random() * 2.5,
+        phase: Math.random() * Math.PI * 2,
+        color: Math.random() < 0.7 ? '#e0f2fe' : '#fef08a'
+      });
+    }
+  }
+
+  initInput() {
+    const updatePos = (e) => {
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      this.pointer.x = clientX;
+      this.pointer.y = clientY;
+    };
+
+    this.canvas.addEventListener('pointerdown', (e) => {
+      if (this.state !== 'PLAY') return;
+      this.audio.init();
+      if (e.button === 2) {
+        this.emitResonancePulse();
+        return;
+      }
+      updatePos(e);
+      this.pointer.down = true;
+      this.activeChain = [];
+      this.checkStarNodeGrab();
+    });
+
+    window.addEventListener('pointermove', (e) => {
+      updatePos(e);
+      this.pointer.trail.push({ x: this.pointer.x, y: this.pointer.y, alpha: 1.0 });
+      if (this.pointer.trail.length > 18) this.pointer.trail.shift();
+
+      if (this.state === 'PLAY' && this.pointer.down && this.stunTimer <= 0) {
+        this.checkStarNodeGrab();
+      }
+    });
+
+    window.addEventListener('pointerup', () => {
+      this.pointer.down = false;
+      this.activeChain = [];
+    });
+
+    window.addEventListener('contextmenu', (e) => e.preventDefault());
+    window.addEventListener('keydown', (e) => {
+      if (e.code === 'Space' && this.state === 'PLAY') {
+        this.emitResonancePulse();
+      }
+    });
+  }
+
+  startGame() {
+    this.audio.init();
+    document.getElementById('modal-intro').classList.add('hidden');
+    document.getElementById('modal-gameover').classList.add('hidden');
+    document.getElementById('modal-blessing').classList.add('hidden');
+
+    this.stats = {
+      hp: 100,
+      maxInk: 100,
+      ink: 100,
+      inkRegen: 24,
+      sealDamage: 70,
+      auraRadius: 60,
+      cutterSlow: 1.0,
+      level: 1,
+      xp: 0,
+      xpNext: 90,
+      score: 0,
+      constellationsCount: 0,
+      chapter: 1
+    };
+
+    this.starNodes = [];
+    this.activeChain = [];
+    this.sealedPolygons = [];
+    this.shadows = [];
+    this.particles = [];
+    this.ripples = [];
+    this.floatingTexts = [];
+    this.stunTimer = 0;
+
+    this.spawnStarNodes(13);
+    this.spawnShadowWave(4);
+    this.state = 'PLAY';
+    this.updateHud();
+  }
+
+  spawnStarNodes(count) {
+    const padX = Math.max(70, this.width * 0.1);
+    const padTop = 95;
+    const padBot = this.waterLineY - 55;
+
+    for (let i = 0; i < count; i++) {
+      // Avoid crowding existing nodes
+      let bestX = padX + Math.random() * (this.width - padX * 2);
+      let bestY = padTop + Math.random() * (padBot - padTop);
+      for (let attempt = 0; attempt < 15; attempt++) {
+        const cx = padX + Math.random() * (this.width - padX * 2);
+        const cy = padTop + Math.random() * (padBot - padTop);
+        const tooClose = this.starNodes.some(n => Math.hypot(n.x - cx, n.y - cy) < 88);
+        if (!tooClose) {
+          bestX = cx;
+          bestY = cy;
+          break;
+        }
+      }
+
+      this.starNodes.push({
+        id: Math.random().toString(36).slice(2),
+        x: bestX,
+        y: bestY,
+        baseX: bestX,
+        baseY: bestY,
+        r: 9,
+        phase: Math.random() * Math.PI * 2,
+        noteIdx: this.starNodes.length,
+        pulse: 0
+      });
+    }
+  }
+
+  checkStarNodeGrab() {
+    if (this.stats.ink <= 2) return;
+
+    for (let i = 0; i < this.starNodes.length; i++) {
+      const node = this.starNodes[i];
+      const dist = Math.hypot(this.pointer.x - node.x, this.pointer.y - node.y);
+
+      if (dist < 34) {
+        // Check if closing the loop (3 or more vertices returning to start node!)
+        if (this.activeChain.length >= 3 && this.activeChain[0] === node) {
+          this.completeConstellationSeal([...this.activeChain]);
+          this.activeChain = [];
+          this.pointer.down = false;
+          return;
+        }
+
+        // Add node if not already in chain
+        if (!this.activeChain.includes(node)) {
+          if (this.activeChain.length > 0) {
+            const prev = this.activeChain[this.activeChain.length - 1];
+            const segLen = Math.hypot(node.x - prev.x, node.y - prev.y);
+            const inkCost = segLen * 0.055;
+            if (this.stats.ink < inkCost) {
+              this.addFloatingText(this.pointer.x, this.pointer.y - 15, '빛의 장력 부족!', '#f43f5e', 13);
+              return;
+            }
+            this.stats.ink = Math.max(0, this.stats.ink - inkCost);
+
+            // Plucking string damages shadows directly on the line!
+            this.damageShadowsAlongSegment(prev.x, prev.y, node.x, node.y);
+          }
+
+          this.activeChain.push(node);
+          node.pulse = 1.0;
+          this.audio.playStarConnect(this.activeChain.length - 1);
+          this.spawnSparkles(node.x, node.y, '#fef08a', 10);
+          this.spawnWaterRipple(node.x, this.waterLineY + (this.waterLineY - node.y) * 0.18, 28);
+          this.updateHud();
+        }
+      }
+    }
+  }
+
+  /**
+   * Core Original Mechanic: Polygon Point-in-Polygon Enclosure & Area Bonus!
+   */
+  completeConstellationSeal(polygonNodes) {
+    this.stats.constellationsCount += 1;
+
+    // Compute centroid & approximate polygon area (Shoelace formula)
+    let area = 0;
+    let cx = 0;
+    let cy = 0;
+    const n = polygonNodes.length;
+    for (let i = 0; i < n; i++) {
+      const p1 = polygonNodes[i];
+      const p2 = polygonNodes[(i + 1) % n];
+      area += (p1.x * p2.y - p2.x * p1.y);
+      cx += p1.x;
+      cy += p1.y;
+    }
+    area = Math.abs(area) * 0.5;
+    cx /= n;
+    cy /= n;
+
+    // Area multiplier rewards bold, wide constellations (1.0x up to 3.5x)
+    const areaMult = Math.min(3.5, 1.0 + area / 38000);
+
+    // Check which shadows are inside or near the sealed constellation
+    let capturedCount = 0;
+    for (let i = this.shadows.length - 1; i >= 0; i--) {
+      const s = this.shadows[i];
+      const inside = this.isPointInPolygon(s.x, s.y, polygonNodes);
+      const distToCenter = Math.hypot(s.x - cx, s.y - cy);
+
+      if (inside || distToCenter < this.stats.auraRadius) {
+        capturedCount++;
+        const dmg = Math.round(this.stats.sealDamage * areaMult * (inside ? 1.35 : 0.75));
+        this.purifyShadow(s, dmg, inside);
+      }
+    }
+
+    // Payback Ink Energy when capturing shadows!
+    const inkRefund = Math.min(this.stats.maxInk, 18 + capturedCount * 22);
+    this.stats.ink = Math.min(this.stats.maxInk, this.stats.ink + inkRefund);
+
+    this.audio.playConstellationSeal(n, capturedCount);
+
+    // Visual Sealed Constellation Afterimage
+    const names = {
+      3: '삼각 성좌 (Triangulum)',
+      4: '사방 성좌 (Pegasus Square)',
+      5: '오각 왕관 성좌 (Corona Borealis)',
+      6: '육각 대성좌 (Hexagram Sanctum)'
+    };
+    const title = names[n] || `${n}성 대성좌 (Grand Astral Seal)`;
+    this.showResonanceBanner(
+      capturedCount > 0
+        ? `${title} — ${capturedCount}기 정화! (×${areaMult.toFixed(1)})`
+        : `${title} 발현!`
+    );
+
+    this.sealedPolygons.push({
+      nodes: polygonNodes.map(pt => ({ x: pt.x, y: pt.y })),
+      cx,
+      cy,
+      alpha: 1.0,
+      color: capturedCount >= 3 ? '#fbbf24' : '#38bdf8'
+    });
+
+    this.spawnSparkles(cx, cy, '#fef08a', 28 + capturedCount * 8);
+    this.spawnWaterRipple(cx, this.waterLineY + 25, 85);
+
+    // Check Harmony Level Up
+    if (this.stats.xp >= this.stats.xpNext) {
+      this.openBlessingModal();
+    }
+    this.updateHud();
+  }
+
+  isPointInPolygon(px, py, verts) {
+    let inside = false;
+    for (let i = 0, j = verts.length - 1; i < verts.length; j = i++) {
+      const xi = verts[i].x, yi = verts[i].y;
+      const xj = verts[j].x, yj = verts[j].y;
+      const intersect = ((yi > py) !== (yj > py)) &&
+        (px < (xj - xi) * (py - yi) / ((yj - yi) || 0.0001) + xi);
+      if (intersect) inside = !inside;
+    }
+    return inside;
+  }
+
+  damageShadowsAlongSegment(x1, y1, x2, y2) {
+    for (let i = this.shadows.length - 1; i >= 0; i--) {
+      const s = this.shadows[i];
+      const dist = this.pointToSegmentDist(s.x, s.y, x1, y1, x2, y2);
+      if (dist < s.r + 12) {
+        // String pluck damage (shielded Bastions resist string plucks and require full enclosure!)
+        const dmg = s.type === 'BASTION' ? 8 : 28;
+        this.purifyShadow(s, dmg, false);
+      }
+    }
+  }
+
+  pointToSegmentDist(px, py, x1, y1, x2, y2) {
+    const l2 = (x2 - x1) ** 2 + (y2 - y1) ** 2;
+    if (l2 === 0) return Math.hypot(px - x1, py - y1);
+    let t = ((px - x1) * (x2 - x1) + (py - y1) * (y2 - y1)) / l2;
+    t = Math.max(0, Math.min(1, t));
+    return Math.hypot(px - (x1 + t * (x2 - x1)), py - (y1 + t * (y2 - y1)));
+  }
+
+  purifyShadow(s, dmg, wasEnclosed) {
+    if (s.type === 'BASTION' && !wasEnclosed) {
+      this.addFloatingText(s.x, s.y - 16, '외피 방어! (도형 안에 가두세요)', '#94a3b8', 11);
+      return;
+    }
+    s.hp -= dmg;
+    s.flash = 1.0;
+    this.addFloatingText(s.x, s.y - 12, `${dmg}`, wasEnclosed ? '#fde047' : '#7dd3fc', wasEnclosed ? 16 : 12);
+    this.spawnSparkles(s.x, s.y, '#38bdf8', 7);
+
+    if (s.hp <= 0) {
+      const idx = this.shadows.indexOf(s);
+      if (idx !== -1) this.shadows.splice(idx, 1);
+      const pts = s.type === 'LEVIATHAN' ? 350 : (s.type === 'BASTION' ? 120 : 50);
+      const xp = s.type === 'LEVIATHAN' ? 85 : (s.type === 'BASTION' ? 32 : 18);
+      this.stats.score += pts;
+      this.stats.xp += xp;
+      this.spawnSparkles(s.x, s.y, '#fbbf24', s.type === 'LEVIATHAN' ? 40 : 18);
+      this.spawnWaterRipple(s.x, this.waterLineY + 20, 45);
+
+      // Gently relocate one StarNode slightly to keep constellation layouts fresh
+      if (Math.random() < 0.35 && this.starNodes.length > 0) {
+        const node = this.starNodes[Math.floor(Math.random() * this.starNodes.length)];
+        if (!this.activeChain.includes(node)) {
+          node.baseX = Math.max(80, Math.min(this.width - 80, node.baseX + (Math.random() - 0.5) * 90));
+          node.baseY = Math.max(100, Math.min(this.waterLineY - 60, node.baseY + (Math.random() - 0.5) * 70));
+        }
+      }
+    }
+  }
+
+  emitResonancePulse() {
+    if (this.stats.ink < 30) return;
+    this.stats.ink -= 30;
+    this.audio.playStarConnect(4);
+    this.spawnSparkles(this.pointer.x, this.pointer.y, '#38bdf8', 22);
+    this.shadows.forEach(s => {
+      const d = Math.hypot(s.x - this.pointer.x, s.y - this.pointer.y);
+      if (d < 150) {
+        const angle = Math.atan2(s.y - this.pointer.y, s.x - this.pointer.x);
+        s.x += Math.cos(angle) * 55;
+        s.y += Math.sin(angle) * 55;
+      }
+    });
+    this.updateHud();
+  }
+
+  spawnShadowWave(count = 3) {
+    const ch = Math.floor(1 + this.stats.score / 800);
+    if (ch > this.stats.chapter) {
+      this.stats.chapter = ch;
+      const titles = [
+        'CHAPTER I — 거울 호수의 밤',
+        'CHAPTER II — 침묵하는 은하의 파동',
+        'CHAPTER III — 그림자 해류의 습격',
+        'CHAPTER IV — 심연의 레비아탄 강림',
+        'CHAPTER V — 영원한 여명의 성좌'
+      ];
+      document.getElementById('hud-chapter').textContent = titles[Math.min(titles.length - 1, ch - 1)];
+    }
+
+    for (let i = 0; i < count; i++) {
+      const side = Math.random() < 0.5 ? -30 : this.width + 30;
+      const y = 110 + Math.random() * (this.waterLineY - 170);
+      const roll = Math.random();
+
+      let type = 'WISP'; // Swarming shadow moth
+      let hp = 45 + this.stats.chapter * 18;
+      let r = 14;
+      let speed = 0.65 + Math.random() * 0.35;
+
+      if (roll < 0.24) {
+        type = 'CUTTER'; // Charges at active thread to snap it!
+        hp = 40 + this.stats.chapter * 15;
+        r = 13;
+        speed = (1.15 + Math.random() * 0.3) * this.stats.cutterSlow;
+      } else if (roll < 0.42 && this.stats.chapter >= 1) {
+        type = 'BASTION'; // Armored shell: must be enclosed inside a polygon!
+        hp = 85 + this.stats.chapter * 28;
+        r = 20;
+        speed = 0.42;
+      } else if (roll < 0.50 && this.stats.chapter >= 2 && !this.shadows.some(s => s.type === 'LEVIATHAN')) {
+        type = 'LEVIATHAN'; // Multi-segment Boss!
+        hp = 260 + this.stats.chapter * 90;
+        r = 28;
+        speed = 0.38;
+      }
+
+      this.shadows.push({
+        x: side,
+        y,
+        vx: side < 0 ? speed : -speed,
+        vy: (Math.random() - 0.5) * 0.4,
+        r,
+        hp,
+        maxHp: hp,
+        type,
+        speed,
+        phase: Math.random() * Math.PI * 2,
+        flash: 0,
+        segments: Array.from({ length: type === 'LEVIATHAN' ? 8 : 4 }, () => ({ x: side, y }))
+      });
+    }
+  }
+
+  openBlessingModal() {
+    this.state = 'BLESSING';
+    this.stats.xp -= this.stats.xpNext;
+    this.stats.level += 1;
+    this.stats.xpNext = Math.round(this.stats.xpNext * 1.35);
+    this.audio.playConstellationSeal(5, 3);
+
+    const container = document.getElementById('blessing-container');
+    container.innerHTML = '';
+    const picks = [...BLESSINGS].sort(() => Math.random() - 0.5).slice(0, 3);
+
+    picks.forEach(b => {
+      const btn = document.createElement('button');
+      btn.className = 'blessing-card w-full p-5 rounded-2xl text-left flex items-start gap-4 cursor-pointer';
+      btn.innerHTML = `
+        <div class="w-12 h-12 rounded-full bg-amber-400/15 border border-amber-300/50 flex items-center justify-center text-amber-200 font-cinzel font-black text-lg shrink-0">
+          ✦
+        </div>
+        <div class="flex-1">
+          <div class="flex items-center justify-between gap-2 mb-1">
+            <span class="font-serif-kr font-black text-base text-white">${b.name}</span>
+            <span class="px-2.5 py-0.5 rounded-full bg-cyan-400/15 border border-cyan-300/40 text-[11px] font-bold text-cyan-200">${b.sub}</span>
+          </div>
+          <p class="text-xs text-slate-300 leading-relaxed">${b.desc}</p>
+        </div>
+      `;
+      btn.onclick = () => {
+        b.apply(this);
+        document.getElementById('modal-blessing').classList.add('hidden');
+        this.state = 'PLAY';
+        this.updateHud();
+      };
+      container.appendChild(btn);
+    });
+
+    document.getElementById('modal-blessing').classList.remove('hidden');
+  }
+
+  showResonanceBanner(msg) {
+    const banner = document.getElementById('resonance-banner');
+    const text = document.getElementById('resonance-text');
+    text.textContent = msg;
+    banner.style.opacity = '1';
+    banner.style.transform = 'translateY(0)';
+    clearTimeout(this.bannerTimeout);
+    this.bannerTimeout = setTimeout(() => {
+      banner.style.opacity = '0';
+      banner.style.transform = 'translateY(4px)';
+    }, 1800);
+  }
+
+  toggleAudio() {
+    this.audio.init();
+    this.audio.enabled = !this.audio.enabled;
+    if (this.audio.enabled) this.audio.startAmbientScore();
+    else this.audio.stopAmbientScore();
+    document.getElementById('audio-label').textContent = this.audio.enabled ? '하프·피아노 ON' : '음소거됨';
+  }
+
+  spawnSparkles(x, y, color, count = 12) {
+    for (let i = 0; i < count; i++) {
+      const ang = Math.random() * Math.PI * 2;
+      const spd = 0.8 + Math.random() * 4.2;
+      this.particles.push({
+        x, y,
+        vx: Math.cos(ang) * spd,
+        vy: Math.sin(ang) * spd - 0.3,
+        r: 1.5 + Math.random() * 2.8,
+        color,
+        alpha: 1.0
+      });
+    }
+  }
+
+  spawnWaterRipple(x, y, maxR = 45) {
+    this.ripples.push({ x, y, r: 4, maxR, alpha: 0.75 });
+  }
+
+  addFloatingText(x, y, text, color = '#fef08a', size = 14) {
+    this.floatingTexts.push({ x, y, text, color, size, alpha: 1.0 });
+  }
+
+  updateHud() {
+    document.getElementById('hud-hp-text').textContent = `${Math.round(this.stats.hp)}%`;
+    document.getElementById('hud-hp-bar').style.width = `${Math.max(0, this.stats.hp)}%`;
+
+    document.getElementById('hud-ink-text').textContent = `${Math.round(this.stats.ink)} / ${this.stats.maxInk}`;
+    document.getElementById('hud-ink-bar').style.width = `${Math.min(100, (this.stats.ink / this.stats.maxInk) * 100)}%`;
+
+    document.getElementById('hud-score').textContent = this.stats.score.toLocaleString();
+    document.getElementById('hud-level').textContent = this.stats.level;
+    document.getElementById('hud-xp-bar').style.width = `${Math.min(100, (this.stats.xp / this.stats.xpNext) * 100)}%`;
+  }
+
+  update(dt) {
+    this.time += dt;
+
+    if (this.state === 'PLAY') {
+      // Regenerate Lumen Ink smoothly
+      this.stats.ink = Math.min(this.stats.maxInk, this.stats.ink + this.stats.inkRegen * dt);
+      if (this.stunTimer > 0) this.stunTimer = Math.max(0, this.stunTimer - dt);
+
+      // Spawn new waves dynamically based on active shadow count (Balanced Pacing)
+      this.spawnTimer += dt;
+      if (this.shadows.length < 3 || this.spawnTimer > 5.2) {
+        this.spawnTimer = 0;
+        const cap = Math.min(11, 5 + this.stats.chapter * 2);
+        if (this.shadows.length < cap) {
+          this.spawnShadowWave(2);
+        }
+      }
+
+      // Gently float StarNodes around their anchor points
+      this.starNodes.forEach(n => {
+        n.x = n.baseX + Math.cos(this.time * 1.1 + n.phase) * 9;
+        n.y = n.baseY + Math.sin(this.time * 1.4 + n.phase) * 7;
+        if (n.pulse > 0) n.pulse = Math.max(0, n.pulse - dt * 2.2);
+      });
+
+      // Update Shadows (Abyssal creatures)
+      const centerTargetX = this.width / 2;
+      const centerTargetY = this.waterLineY - 35;
+
+      for (let i = this.shadows.length - 1; i >= 0; i--) {
+        const s = this.shadows[i];
+        if (s.flash > 0) s.flash = Math.max(0, s.flash - dt * 4);
+
+        // AI Movement: Cutters charge toward the midpoint of player's active thread!
+        let tx = centerTargetX;
+        let ty = centerTargetY;
+        if (s.type === 'CUTTER' && this.activeChain.length >= 2) {
+          const last = this.activeChain[this.activeChain.length - 1];
+          tx = last.x;
+          ty = last.y;
+        } else {
+          tx = this.width * 0.5 + Math.sin(this.time * 0.7 + s.phase) * (this.width * 0.28);
+          ty = this.waterLineY * 0.52 + Math.cos(this.time * 0.5 + s.phase) * (this.waterLineY * 0.25);
+        }
+
+        const ang = Math.atan2(ty - s.y, tx - s.x);
+        s.vx += Math.cos(ang) * 0.04;
+        s.vy += Math.sin(ang) * 0.04;
+        const spd = Math.hypot(s.vx, s.vy);
+        if (spd > s.speed) {
+          s.vx = (s.vx / spd) * s.speed;
+          s.vy = (s.vy / spd) * s.speed;
+        }
+
+        s.x += s.vx;
+        s.y += s.vy;
+
+        // Update trailing ink segments
+        s.segments[0] = { x: s.x, y: s.y };
+        for (let k = 1; k < s.segments.length; k++) {
+          const prev = s.segments[k - 1];
+          const cur = s.segments[k];
+          cur.x += (prev.x - cur.x) * 0.28;
+          cur.y += (prev.y - cur.y) * 0.28;
+        }
+
+        // Check if Void Cutter cuts the player's active thread!
+        if (s.type === 'CUTTER' && this.activeChain.length >= 2) {
+          for (let c = 0; c < this.activeChain.length - 1; c++) {
+            const a = this.activeChain[c];
+            const b = this.activeChain[c + 1];
+            if (this.pointToSegmentDist(s.x, s.y, a.x, a.y, b.x, b.y) < s.r + 4) {
+              this.audio.playThreadSnap();
+              this.spawnSparkles(s.x, s.y, '#f43f5e', 18);
+              this.addFloatingText(s.x, s.y - 14, '빛의 실 절단됨!', '#f43f5e', 14);
+              this.activeChain = [];
+              this.pointer.down = false;
+              this.stunTimer = 0.7;
+              break;
+            }
+          }
+        }
+
+        // Sanctuary Lamp Drain if shadows linger too long or touch the mirror lake
+        this.stats.hp -= dt * (s.type === 'LEVIATHAN' ? 1.4 : 0.32);
+      }
+
+      if (this.stats.hp <= 0) {
+        this.stats.hp = 0;
+        this.triggerGameOver();
+      }
+      this.updateHud();
+    }
+
+    // Fade sealed polygons
+    for (let i = this.sealedPolygons.length - 1; i >= 0; i--) {
+      this.sealedPolygons[i].alpha -= dt * 0.85;
+      if (this.sealedPolygons[i].alpha <= 0) this.sealedPolygons.splice(i, 1);
+    }
+
+    // Update particles, ripples, cursor trail, floating texts
+    for (let i = this.particles.length - 1; i >= 0; i--) {
+      const p = this.particles[i];
+      p.x += p.vx;
+      p.y += p.vy;
+      p.alpha -= dt * 1.4;
+      if (p.alpha <= 0) this.particles.splice(i, 1);
+    }
+
+    for (let i = this.ripples.length - 1; i >= 0; i--) {
+      const rp = this.ripples[i];
+      rp.r += (rp.maxR - rp.r) * 0.08;
+      rp.alpha -= dt * 0.65;
+      if (rp.alpha <= 0) this.ripples.splice(i, 1);
+    }
+
+    for (let i = this.pointer.trail.length - 1; i >= 0; i--) {
+      this.pointer.trail[i].alpha -= dt * 3.5;
+      if (this.pointer.trail[i].alpha <= 0) this.pointer.trail.splice(i, 1);
+    }
+
+    for (let i = this.floatingTexts.length - 1; i >= 0; i--) {
+      const ft = this.floatingTexts[i];
+      ft.y -= 0.9;
+      ft.alpha -= dt * 1.2;
+      if (ft.alpha <= 0) this.floatingTexts.splice(i, 1);
+    }
+  }
+
+  triggerGameOver() {
+    this.state = 'GAMEOVER';
+    document.getElementById('go-chapter').textContent = `CHAPTER ${this.stats.chapter}`;
+    document.getElementById('go-constellations').textContent = `${this.stats.constellationsCount} 회`;
+    document.getElementById('go-score').textContent = this.stats.score.toLocaleString();
+    document.getElementById('modal-gameover').classList.remove('hidden');
+  }
+
+  draw() {
+    const ctx = this.ctx;
+    ctx.clearRect(0, 0, this.width, this.height);
+
+    // 1. Cinematic Night Sky Gradient
+    const skyGrad = ctx.createLinearGradient(0, 0, 0, this.waterLineY);
+    skyGrad.addColorStop(0, '#02040a');
+    skyGrad.addColorStop(0.55, '#071026');
+    skyGrad.addColorStop(1, '#0c1e3e');
+    ctx.fillStyle = skyGrad;
+    ctx.fillRect(0, 0, this.width, this.waterLineY);
+
+    // 2. Flowing Aurora Borealis Ribbons in the Sky
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    for (let band = 0; band < 2; band++) {
+      ctx.beginPath();
+      const baseY = 130 + band * 85;
+      ctx.moveTo(0, baseY);
+      for (let x = 0; x <= this.width; x += 60) {
+        const y = baseY + Math.sin(x * 0.004 + this.time * 0.6 + band * 2) * 38;
+        ctx.lineTo(x, y);
+      }
+      ctx.lineTo(this.width, 0);
+      ctx.lineTo(0, 0);
+      ctx.closePath();
+      const aurGrad = ctx.createLinearGradient(0, baseY - 60, 0, baseY + 60);
+      aurGrad.addColorStop(0, 'rgba(56, 189, 248, 0)');
+      aurGrad.addColorStop(0.5, band === 0 ? 'rgba(45, 212, 191, 0.055)' : 'rgba(129, 140, 248, 0.05)');
+      aurGrad.addColorStop(1, 'rgba(56, 189, 248, 0)');
+      ctx.fillStyle = aurGrad;
+      ctx.fill();
+    }
+    ctx.restore();
+
+    // 3. Twinkling Distant Stars
+    this.bgStars.forEach(s => {
+      const sx = s.x % this.width;
+      const sy = s.y % (this.waterLineY - 20);
+      const alpha = 0.25 + 0.6 * (0.5 + 0.5 * Math.sin(this.time * s.twinkleSpeed + s.phase));
+      ctx.fillStyle = s.color;
+      ctx.globalAlpha = alpha;
+      ctx.beginPath();
+      ctx.arc(sx, sy, s.r, 0, Math.PI * 2);
+      ctx.fill();
+    });
+    ctx.globalAlpha = 1.0;
+
+    // 4. Sealed Constellation Stained-Glass Afterglows
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    this.sealedPolygons.forEach(poly => {
+      ctx.beginPath();
+      poly.nodes.forEach((pt, idx) => {
+        if (idx === 0) ctx.moveTo(pt.x, pt.y);
+        else ctx.lineTo(pt.x, pt.y);
+      });
+      ctx.closePath();
+      ctx.fillStyle = `rgba(251, 191, 36, ${poly.alpha * 0.28})`;
+      ctx.fill();
+      ctx.lineWidth = 3 * poly.alpha;
+      ctx.strokeStyle = `rgba(254, 240, 138, ${poly.alpha})`;
+      ctx.stroke();
+    });
+    ctx.restore();
+
+    // 5. Abyssal Shadows (Organic Ink Leviathans, Cutters & Bastions)
+    this.shadows.forEach(s => {
+      ctx.save();
+      // Draw flowing dark ink tail segments
+      for (let k = s.segments.length - 1; k >= 0; k--) {
+        const seg = s.segments[k];
+        const ratio = 1 - k / s.segments.length;
+        ctx.beginPath();
+        ctx.arc(seg.x, seg.y, s.r * ratio * 0.95, 0, Math.PI * 2);
+        ctx.fillStyle = s.flash > 0.2 ? '#fef08a' : 'rgba(9, 12, 26, 0.92)';
+        ctx.fill();
+      }
+
+      // Outer Aura & Distinct Silhouette by Type
+      let rimColor = '#a855f7';
+      if (s.type === 'CUTTER') rimColor = '#f43f5e';
+      else if (s.type === 'BASTION') rimColor = '#38bdf8';
+      else if (s.type === 'LEVIATHAN') rimColor = '#fbbf24';
+
+      ctx.strokeStyle = s.flash > 0.2 ? '#ffffff' : rimColor;
+      ctx.lineWidth = s.type === 'BASTION' ? 3 : 2;
+      ctx.shadowColor = rimColor;
+      ctx.shadowBlur = 14;
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // Bastion Outer Hexagonal Shield Ring
+      if (s.type === 'BASTION') {
+        ctx.beginPath();
+        for (let h = 0; h < 6; h++) {
+          const ang = this.time + (h * Math.PI) / 3;
+          const hx = s.x + Math.cos(ang) * (s.r + 6);
+          const hy = s.y + Math.sin(ang) * (s.r + 6);
+          if (h === 0) ctx.moveTo(hx, hy);
+          else ctx.lineTo(hx, hy);
+        }
+        ctx.closePath();
+        ctx.strokeStyle = 'rgba(56, 189, 248, 0.65)';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+      }
+
+      // Glowing Core Eye
+      ctx.fillStyle = rimColor;
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, 4, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    });
+
+    // 6. Active Woven Constellation Thread
+    if (this.activeChain.length > 0) {
+      ctx.save();
+      ctx.globalCompositeOperation = 'lighter';
+      ctx.beginPath();
+      this.activeChain.forEach((n, idx) => {
+        if (idx === 0) ctx.moveTo(n.x, n.y);
+        else ctx.lineTo(n.x, n.y);
+      });
+      ctx.lineTo(this.pointer.x, this.pointer.y);
+      ctx.strokeStyle = '#fde047';
+      ctx.lineWidth = 3;
+      ctx.shadowColor = '#facc15';
+      ctx.shadowBlur = 18;
+      ctx.stroke();
+
+      // Highlight First Node when ready to close Polygon (3+ nodes)
+      if (this.activeChain.length >= 3) {
+        const first = this.activeChain[0];
+        ctx.beginPath();
+        ctx.arc(first.x, first.y, 24 + Math.sin(this.time * 8) * 4, 0, Math.PI * 2);
+        ctx.strokeStyle = 'rgba(250, 204, 21, 0.85)';
+        ctx.lineWidth = 2;
+        ctx.setLineDash([5, 5]);
+        ctx.stroke();
+        ctx.setLineDash([]);
+      }
+      ctx.restore();
+    }
+
+    // 7. Interactive Star Nodes (Celestial Anchors)
+    this.starNodes.forEach(n => {
+      const inChain = this.activeChain.includes(n);
+      ctx.save();
+      ctx.globalCompositeOperation = 'lighter';
+      const glowR = (inChain ? 24 : 16) + n.pulse * 14;
+      const grad = ctx.createRadialGradient(n.x, n.y, 1, n.x, n.y, glowR);
+      grad.addColorStop(0, '#ffffff');
+      grad.addColorStop(0.35, inChain ? '#fde047' : '#7dd3fc');
+      grad.addColorStop(1, 'rgba(56, 189, 248, 0)');
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, glowR, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 4-Pointed Star Diamond Flare
+      ctx.strokeStyle = inChain ? '#fef08a' : 'rgba(186, 230, 253, 0.8)';
+      ctx.lineWidth = 1.5;
+      const flare = inChain ? 13 : 8;
+      ctx.beginPath();
+      ctx.moveTo(n.x - flare, n.y);
+      ctx.lineTo(n.x + flare, n.y);
+      ctx.moveTo(n.x, n.y - flare);
+      ctx.lineTo(n.x, n.y + flare);
+      ctx.stroke();
+      ctx.restore();
+    });
+
+    // 8. Mirror Lake Water Surface & Real-time Rippling Reflections!
+    const lakeGrad = ctx.createLinearGradient(0, this.waterLineY, 0, this.height);
+    lakeGrad.addColorStop(0, '#07152e');
+    lakeGrad.addColorStop(0.3, '#040c1d');
+    lakeGrad.addColorStop(1, '#010308');
+    ctx.fillStyle = lakeGrad;
+    ctx.fillRect(0, this.waterLineY, this.width, this.height - this.waterLineY);
+
+    // Horizon Shimmer Line
+    ctx.strokeStyle = 'rgba(125, 211, 252, 0.35)';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(0, this.waterLineY);
+    ctx.lineTo(this.width, this.waterLineY);
+    ctx.stroke();
+
+    // Reflected Star Nodes on the Water with Horizontal Wave Distortion
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    this.starNodes.forEach(n => {
+      const distAbove = this.waterLineY - n.y;
+      const refY = this.waterLineY + distAbove * 0.28;
+      if (refY < this.height) {
+        const waveOffset = Math.sin(this.time * 3 + n.y * 0.05) * 6;
+        ctx.fillStyle = this.activeChain.includes(n)
+          ? 'rgba(253, 224, 71, 0.32)'
+          : 'rgba(125, 211, 252, 0.22)';
+        ctx.beginPath();
+        ctx.ellipse(n.x + waveOffset, refY, 10, 2.5, 0, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    });
+
+    // Expanding Water Ripples on Mirror Lake
+    this.ripples.forEach(rp => {
+      ctx.strokeStyle = `rgba(186, 230, 253, ${rp.alpha * 0.5})`;
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.ellipse(rp.x, rp.y, rp.r, rp.r * 0.26, 0, 0, Math.PI * 2);
+      ctx.stroke();
+    });
+
+    // Sparkle Particles
+    this.particles.forEach(p => {
+      ctx.globalAlpha = Math.max(0, p.alpha);
+      ctx.fillStyle = p.color;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fill();
+    });
+    ctx.globalAlpha = 1.0;
+
+    // Custom Celestial Wisp Cursor & Ribbon
+    if (this.pointer.trail.length > 1) {
+      ctx.beginPath();
+      ctx.moveTo(this.pointer.trail[0].x, this.pointer.trail[0].y);
+      for (let i = 1; i < this.pointer.trail.length; i++) {
+        ctx.lineTo(this.pointer.trail[i].x, this.pointer.trail[i].y);
+      }
+      ctx.strokeStyle = 'rgba(253, 224, 71, 0.45)';
+      ctx.lineWidth = 3;
+      ctx.lineCap = 'round';
+      ctx.stroke();
+    }
+    ctx.fillStyle = '#fef08a';
+    ctx.beginPath();
+    ctx.arc(this.pointer.x, this.pointer.y, 5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+
+    // Floating Purify Numbers
+    this.floatingTexts.forEach(ft => {
+      ctx.save();
+      ctx.globalAlpha = Math.max(0, ft.alpha);
+      ctx.font = `700 ${ft.size}px 'Noto Serif KR', sans-serif`;
+      ctx.fillStyle = ft.color;
+      ctx.textAlign = 'center';
+      ctx.fillText(ft.text, ft.x, ft.y);
+      ctx.restore();
+    });
+  }
+
+  loop(now) {
+    if (!this.lastTime) this.lastTime = now;
+    const dt = Math.min(0.05, (now - this.lastTime) / 1000);
+    this.lastTime = now;
+
+    this.update(dt);
+    this.draw();
+    requestAnimationFrame((t) => this.loop(t));
+  }
+}
+
+let weaver;
+window.addEventListener('DOMContentLoaded', () => {
+  weaver = new LumenWeaverGame();
+});
+</script>
+</body>
+</html>

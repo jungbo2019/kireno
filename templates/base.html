@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{{ settings.brand_name }} | 일본 수공예 도자기 & 재팬디 오브제 공식 쇼룸{% endblock %}</title>
+    <meta name="description" content="{% block meta_description %}{{ settings.seo_description or '일본 교토·시가라키 장인의 수공예 도자기 화분, 재팬디 패브릭 액자, 와비사비 원목 인센스 홀더 공식 쇼룸. 인천세관 정식 수입통관 및 1인 대표 전수 육안검수 보장.' }}{% endblock %}">
+    <meta name="keywords" content="{% block meta_keywords %}{{ settings.seo_keywords or '키레노, KIRENO, 일본 도자기 화분, 시가라키 화분, 괴근식물 화분, 재팬디 인테리어, 패브릭 액자, 원목 인센스 홀더, 달항아리 오브제, 수제 토분' }}{% endblock %}">
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <meta name="author" content="KIRENO 키레노 도예 아뜰리에">
+    <meta name="naver-site-verification" content="{{ settings.naver_verification or 'kireno_naver_search_advisor_ready' }}">
+    <meta name="google-site-verification" content="{{ settings.google_verification or 'kireno_google_search_console_ready' }}">
+
+    <link rel="canonical" href="{% block canonical %}{{ request.base_url }}{% endblock %}">
+    <link rel="icon" type="image/svg+xml" href="/favicon.ico">
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="apple-touch-icon" href="/favicon.ico">
+    <link rel="alternate" type="application/rss+xml" title="KIRENO 키레노 도예 아카이브 RSS" href="/rss.xml">
+
+    <!-- Open Graph / KakaoTalk / Naver Blog / Instagram Sharing -->
+    <meta property="og:type" content="{% block og_type %}website{% endblock %}">
+    <meta property="og:site_name" content="KIRENO 키레노 | 일본 수공예 도자기 아뜰리에">
+    <meta property="og:locale" content="ko_KR">
+    <meta property="og:title" content="{% block og_title %}{{ settings.brand_name }} | 일본 수공예 도자기 & 재팬디 오브제 공식 쇼룸{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}{{ settings.seo_description or '일본 교토·시가라키 장인의 수공예 도자기 화분, 재팬디 패브릭 액자, 와비사비 원목 인센스 홀더 공식 쇼룸. 인천세관 정식 수입통관 및 1인 대표 전수 육안검수 보장.' }}{% endblock %}">
+    <meta property="og:image" content="{% block og_image %}{{ request.host_url.rstrip('/') }}/static/images/products/naver_kireno_13753504555.png{% endblock %}">
+    <meta property="og:url" content="{% block og_url %}{{ request.base_url }}{% endblock %}">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{% block twitter_title %}{{ settings.brand_name }} | 일본 수공예 도자기 & 재팬디 오브제 공식 쇼룸{% endblock %}">
+    <meta name="twitter:description" content="{% block twitter_description %}{{ settings.seo_description or '일본 교토·시가라키 장인의 수공예 도자기 화분, 재팬디 패브릭 액자, 와비사비 원목 인센스 홀더 공식 쇼룸.' }}{% endblock %}">
+    <meta name="twitter:image" content="{% block twitter_image %}{{ request.host_url.rstrip('/') }}/static/images/products/naver_kireno_13753504555.png{% endblock %}">
+
+    <!-- Schema.org Structured Data (Organization & OnlineStore & WebSite) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "OnlineStore",
+          "@id": "{{ request.host_url.rstrip('/') }}/#organization",
+          "name": "KIRENO 키레노",
+          "legalName": "모엔드(MOEND)",
+          "taxID": "{{ settings.biz_reg_num or '740-02-03832' }}",
+          "founder": { "@type": "Person", "name": "{{ settings.ceo_name or '우상준' }}" },
+          "alternateName": "모엔드(MOEND) · 키레노 일본 수공예 도자기 아뜰리에",
+          "url": "{{ request.host_url.rstrip('/') }}/",
+          "logo": "{{ request.host_url.rstrip('/') }}/favicon.ico",
+          "image": "{{ request.host_url.rstrip('/') }}/static/images/products/naver_kireno_13753504555.png",
+          "description": "일본 교토·시가라키 장인의 수공예 도자기 화분, 재팬디 패브릭 액자, 와비사비 원목 인센스 홀더 공식 쇼룸. 인천세관 정식 수입통관 및 1인 대표 전수 육안검수.",
+          "telephone": "{{ settings.contact_phone }}",
+          "email": "{{ settings.contact_email }}",
+          "priceRange": "₩22,000 - ₩172,000",
+          "sameAs": [
+            "{{ settings.smartstore_url or 'https://smartstore.naver.com/kireno' }}",
+            "{{ settings.instagram_url }}"
+          ]
+        },
+        {
+          "@type": "WebSite",
+          "@id": "{{ request.host_url.rstrip('/') }}/#website",
+          "url": "{{ request.host_url.rstrip('/') }}/",
+          "name": "KIRENO 키레노 | 일본 수공예 도자기 & 재팬디 오브제 공식 쇼룸",
+          "publisher": {
+            "@id": "{{ request.host_url.rstrip('/') }}/#organization"
+          },
+          "inLanguage": "ko-KR"
+        }
+      ]
+    }
+    </script>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Noto Serif KR & Pretendard for Authentic Japanese-Inspired Korean Editorial Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+    <script>
+        /* 원래 키레노(KIRENO) 고유의 색상 규칙 및 철칙 100% 준수 */
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        kireno: {
+                            black: '#111111',
+                            charcoal: '#222222',
+                            gray: '#767676',
+                            border: '#EAEAEA',
+                            sand: '#F7F5F2',
+                            clay: '#C4A482',
+                            olive: '#4F6F52',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Pretendard', '-apple-system', 'BlinkMacSystemFont', 'system-ui', 'Roboto', 'sans-serif'],
+                        serif: ['"Noto Serif KR"', 'Georgia', 'serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Pretendard', sans-serif;
+            background-color: #FFFFFF;
+            color: #111111;
+            letter-spacing: -0.02em;
+            overflow-x: hidden;
+        }
+        .smooth-scroll { scroll-behavior: smooth; }
+
+        /* HTML 키네틱 모션 엔진 (절제된 일본 갤러리 감성) */
+        @keyframes marqueeScroll {
+            0% { transform: translateX(0%); }
+            100% { transform: translateX(-50%); }
+        }
+        .kinetic-marquee-track {
+            display: flex;
+            width: max-content;
+            animation: marqueeScroll 36s linear infinite;
+        }
+        .kinetic-marquee-track:hover {
+            animation-play-state: paused;
+        }
+
+        @keyframes floatSlow {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-5px); }
+        }
+        .kinetic-float {
+            animation: floatSlow 4.5s ease-in-out infinite;
+        }
+
+        /* 통일된 키네틱 카드 호버 */
+        .kinetic-card {
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
+        }
+        .kinetic-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 16px 32px -8px rgba(17, 17, 17, 0.08);
+            border-color: #C4A482;
+        }
+
+        /* 네비게이션 하단 키네틱 라인 */
+        .kinetic-link {
+            position: relative;
+        }
+        .kinetic-link::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 100%;
+            height: 1.5px;
+            background-color: #C4A482;
+            transform: scaleX(0);
+            transform-origin: right;
+            transition: transform 0.3s cubic-bezier(0.19, 1, 0.22, 1);
+        }
+        .kinetic-link:hover::after {
+            transform: scaleX(1);
+            transform-origin: left;
+        }
+
+        /* 일본 전통 낙관(도장) 포인트 스타일 */
+        .hanko-stamp {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #C4A482;
+            color: #C4A482;
+            font-family: "Noto Serif KR", serif;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #F7F5F2; }
+        ::-webkit-scrollbar-thumb { background: #C4A482; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #111111; }
+    </style>
+    {% block head %}{% endblock %}
+</head>
+<body class="min-h-screen flex flex-col bg-white text-kireno-black antialiased smooth-scroll pb-16 lg:pb-0">
+
+    <!-- 1. 상단 안내 바 (키레노 고유 블랙 #111111 & 클레이 #C4A482 조화) -->
+    <aside class="bg-kireno-black text-white text-xs font-medium py-2.5 px-4 tracking-tight">
+        <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
+            <div class="flex items-center space-x-2.5">
+                <span class="inline-block w-1.5 h-1.5 rounded-full bg-kireno-clay"></span>
+                <span class="font-serif text-kireno-clay font-semibold">키레노 일본 도예 아뜰리에</span>
+                <span class="hidden md:inline text-kireno-gray">|</span>
+                <span class="hidden md:inline text-stone-300">일본 교토·시가라키 공방 직공수 · 인천세관 정식 통관 · 1인 대표 전수 검수</span>
+            </div>
+            <div class="flex items-center space-x-3 sm:space-x-4 ml-auto">
+                <button onclick="openOrderTrackingModal()" class="text-stone-300 hover:text-kireno-clay font-semibold transition-colors flex items-center space-x-1">
+                    <i class="fa-solid fa-truck-fast text-[10px] text-kireno-clay"></i>
+                    <span>실시간 통관·배송 조회</span>
+                </button>
+                <span class="text-kireno-gray">|</span>
+                <a href="{{ settings.smartstore_url or 'https://smartstore.naver.com/kireno' }}" target="_blank" rel="noopener" class="text-kireno-clay hover:text-white font-semibold transition-colors">
+                    네이버 공식 스토어 ↗
+                </a>
+                <button onclick="openLiveChat()" class="hidden sm:inline underline hover:text-kireno-clay font-semibold transition-colors">
+                    실시간 1:1 도예 상담하기 →
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- 2. 정갈한 일본 갤러리풍 헤더 네비게이션 -->
+    <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-kireno-border">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <!-- 브랜드 로고 -->
+            <a href="/" class="flex items-center space-x-3.5 group shrink-0">
+                <span class="hanko-stamp w-7 h-7 rounded text-xs">器</span>
+                <div class="flex flex-col">
+                    <span class="font-serif text-2xl font-black tracking-[0.15em] text-kireno-black group-hover:text-kireno-clay transition-colors leading-none">
+                        KIRENO
+                    </span>
+                    <span class="text-[10px] tracking-widest text-kireno-gray mt-1 font-medium whitespace-nowrap">
+                        키레노 · 일본 수공예 도자기
+                    </span>
+                </div>
+            </a>
+
+            <!-- 한국어 중심 데스크톱 네비게이션 메뉴 -->
+            <nav class="hidden lg:flex items-center space-x-7 text-sm font-medium text-kireno-charcoal whitespace-nowrap">
+                <a href="/#quick-curator" class="kinetic-link py-1 hover:text-kireno-clay transition-colors">용도별 작품 찾기</a>
+                <a href="/#signature-bento" class="kinetic-link py-1 hover:text-kireno-clay transition-colors">대표 시그니처 6선</a>
+                <a href="/#paired-lookbook" class="kinetic-link py-1 hover:text-kireno-clay transition-colors">공간별 연계 스타일링</a>
+                <a href="/#collection" class="kinetic-link py-1 hover:text-kireno-clay transition-colors">전체 도자기 컬렉션 ({{ products|length if products is defined else 88 }}종)</a>
+                <button onclick="openOrderTrackingModal()" class="kinetic-link py-1 hover:text-kireno-clay transition-colors font-semibold text-kireno-black">통관·배송 조회</button>
+                <a href="/#inquiry" class="kinetic-link py-1 hover:text-kireno-clay transition-colors">맞춤 및 대량 발주</a>
+            </nav>
+
+            <!-- 우측 상담 버튼 및 모바일 햄버거 메뉴 -->
+            <div class="flex items-center space-x-2 shrink-0">
+                <a href="{{ settings.smartstore_url or 'https://smartstore.naver.com/kireno' }}" target="_blank" rel="noopener" class="hidden sm:inline-flex items-center space-x-1.5 bg-kireno-sand hover:bg-stone-200 text-kireno-black border border-kireno-border px-3.5 py-2 rounded-full text-xs font-bold transition-colors shrink-0" title="키레노 네이버 공식 스마트스토어">
+                    <span class="w-2 h-2 rounded-full bg-kireno-olive"></span>
+                    <span>스마트스토어 공식홈 ↗</span>
+                </a>
+                <button onclick="openLiveChat()" class="inline-flex items-center space-x-2 bg-kireno-black text-white px-4 sm:px-5 py-2.5 rounded-full text-xs sm:text-sm font-semibold hover:bg-kireno-charcoal transition-colors shadow-sm whitespace-nowrap shrink-0">
+                    <span class="w-2 h-2 rounded-full bg-kireno-olive"></span>
+                    <span>실시간 1:1 도예 상담</span>
+                </button>
+                <a href="/admin" class="hidden sm:flex w-9 h-9 rounded-full items-center justify-center text-xs text-kireno-gray hover:text-kireno-black transition-colors" title="관리자 관제">
+                    <i class="fa-solid fa-gear"></i>
+                </a>
+                <!-- 모바일 전용 햄버거 메뉴 토글 버튼 -->
+                <button id="mobileMenuBtn" onclick="toggleMobileNav()" class="lg:hidden w-10 h-10 rounded-xl border border-kireno-border bg-kireno-sand flex items-center justify-center text-kireno-black hover:bg-stone-200 transition-colors" aria-label="모바일 전체 메뉴 열기" title="모바일 메뉴">
+                    <i class="fa-solid fa-bars text-base" id="mobileMenuIcon"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- 모바일 전용 네비게이션 드로어 -->
+        <div id="mobileNavDrawer" class="hidden lg:hidden bg-white border-t border-kireno-border px-4 pt-3 pb-5 space-y-2 shadow-lg">
+            <div class="grid grid-cols-2 gap-2 pb-2 border-b border-kireno-border text-xs font-semibold">
+                <a href="/#quick-curator" onclick="closeMobileNav()" class="p-2.5 rounded-lg bg-kireno-sand text-kireno-black hover:bg-stone-200">01. 용도별 작품 찾기</a>
+                <a href="/#signature-bento" onclick="closeMobileNav()" class="p-2.5 rounded-lg bg-kireno-sand text-kireno-black hover:bg-stone-200">02. 대표 시그니처 6선</a>
+                <a href="/#paired-lookbook" onclick="closeMobileNav()" class="p-2.5 rounded-lg bg-kireno-sand text-kireno-black hover:bg-stone-200">03. 공간별 연계 스타일링</a>
+                <a href="/#collection" onclick="closeMobileNav()" class="p-2.5 rounded-lg bg-kireno-sand text-kireno-black hover:bg-stone-200">04. 전체 컬렉션 (88종)</a>
+            </div>
+            <div class="flex flex-col space-y-2 pt-1 text-xs">
+                <button onclick="closeMobileNav(); openOrderTrackingModal();" class="w-full py-2.5 px-3 rounded-lg border border-kireno-border bg-white text-kireno-black font-bold flex items-center justify-between">
+                    <span><i class="fa-solid fa-truck-fast text-kireno-clay mr-1.5"></i>일본 직구 · 인천세관 통관 실시간 조회</span>
+                    <span>조회하기 →</span>
+                </button>
+                <a href="{{ settings.smartstore_url or 'https://smartstore.naver.com/kireno' }}" target="_blank" rel="noopener" class="w-full py-2.5 px-3 rounded-lg bg-kireno-black text-white font-bold flex items-center justify-between">
+                    <span>키레노 네이버 공식 스마트스토어</span>
+                    <span class="text-kireno-clay">바로가기 ↗</span>
+                </a>
+                <a href="/#inquiry" onclick="closeMobileNav()" class="w-full py-2 px-3 text-center text-kireno-gray font-medium hover:text-kireno-black">
+                    맞춤 제작 및 공간 대량 발주 문의 이동
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- 알림 메시지 -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="max-w-7xl mx-auto px-4 mt-4">
+                {% for category, message in messages %}
+                    <div class="p-4 mb-3 text-sm rounded-xl border border-kireno-border bg-kireno-sand text-kireno-black flex justify-between items-center">
+                        <span>{{ message }}</span>
+                        <button onclick="this.parentElement.remove()" class="text-xs font-bold ml-4">✕</button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <!-- 메인 콘텐츠 -->
+    <main class="flex-grow">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- 3. 우측 하단 플로팅 상담 바 (일관된 키레노 컬러) -->
+    <!-- 모바일 전용 하단 고정 전환 바 (본문 가림 방지 + 원클릭 통관·상담·구매) -->
+    <div class="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-kireno-black/95 backdrop-blur-md border-t border-kireno-charcoal px-3 py-2.5 flex items-center justify-between gap-2 shadow-2xl">
+        <button onclick="openOrderTrackingModal()" class="flex-1 py-2.5 px-2 rounded-lg bg-kireno-charcoal border border-stone-700 text-stone-200 text-[11px] font-bold flex items-center justify-center gap-1.5">
+            <i class="fa-solid fa-truck-fast text-kireno-clay text-[10px]"></i>
+            <span>통관·배송조회</span>
+        </button>
+        <button onclick="openLiveChat()" class="flex-1 py-2.5 px-2 rounded-lg bg-kireno-sand text-kireno-black text-[11px] font-bold flex items-center justify-center gap-1.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-kireno-olive"></span>
+            <span>1:1 도예상담</span>
+        </button>
+        <a href="{{ settings.smartstore_url or 'https://smartstore.naver.com/kireno' }}" target="_blank" rel="noopener" class="flex-1 py-2.5 px-2 rounded-lg bg-kireno-clay text-kireno-black text-[11px] font-black flex items-center justify-center gap-1">
+            <span>공식스토어 구매</span>
+            <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i>
+        </a>
+    </div>
+
+    <!-- 데스크톱 전용 우측 하단 플로팅 상담 바 (모바일에서는 숨김 처리하여 본문 가림 100% 방지) -->
+    <div class="hidden lg:flex fixed bottom-6 right-6 z-40 flex-col space-y-3">
+        <button onclick="openLiveChat()" class="relative w-14 h-14 bg-kireno-black text-white rounded-full shadow-xl flex items-center justify-center hover:scale-105 transition-transform border border-kireno-clay group" title="실시간 1:1 도예 상담">
+            <span class="absolute -top-1 -right-1 w-3 h-3 bg-kireno-olive border-2 border-white rounded-full"></span>
+            <i class="fa-solid fa-comments text-lg text-kireno-clay group-hover:text-white transition-colors"></i>
+        </button>
+        <button onclick="openOrderTrackingModal()" class="w-12 h-12 bg-white text-kireno-charcoal rounded-full shadow-md border border-kireno-border flex items-center justify-center hover:bg-kireno-sand transition-colors" title="실시간 통관·배송 조회">
+            <i class="fa-solid fa-truck-fast text-sm text-kireno-clay"></i>
+        </button>
+        <a href="{{ settings.instagram_url }}" target="_blank" rel="noopener" class="w-12 h-12 bg-white text-kireno-charcoal rounded-full shadow-md border border-kireno-border flex items-center justify-center hover:bg-kireno-sand transition-colors" title="인스타그램 방문">
+            <i class="fa-brands fa-instagram text-lg"></i>
+        </a>
+        <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="w-12 h-12 bg-kireno-sand text-kireno-charcoal rounded-full shadow-md border border-kireno-border flex items-center justify-center hover:bg-kireno-black hover:text-white transition-colors" title="맨 위로">
+            <i class="fa-solid fa-arrow-up text-sm"></i>
+        </button>
+    </div>
+
+    <!-- 4. 실시간 1:1 도예 상담 모달 -->
+    <div id="liveChatWidget" class="hidden fixed bottom-24 right-6 z-50 w-96 max-w-[calc(100vw-2rem)] bg-white rounded-2xl shadow-2xl border border-kireno-border overflow-hidden flex flex-col transition-all">
+        <div class="bg-kireno-black text-white p-4 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-8 h-8 rounded-full bg-kireno-charcoal border border-kireno-clay flex items-center justify-center font-serif text-xs font-bold text-kireno-clay">器</div>
+                <div>
+                    <h3 class="font-bold text-xs text-white">키레노 1:1 아뜰리에 실시간 상담</h3>
+                    <p class="text-[10px] text-stone-400">도자기 작품 추천 · 연계 배치 · 규격 및 통관 안내</p>
+                </div>
+            </div>
+            <button onclick="closeLiveChat()" class="text-stone-400 hover:text-white text-sm">✕</button>
+        </div>
+
+        <div id="chatProductContext" class="hidden bg-kireno-sand px-4 py-2 border-b border-kireno-border flex items-center justify-between text-xs">
+            <span class="text-kireno-charcoal font-bold truncate max-w-[240px]" id="chatContextName"></span>
+            <button onclick="clearChatContext()" class="text-kireno-gray hover:text-kireno-black text-[10px] font-bold">해제</button>
+        </div>
+
+        <div id="chatMessages" class="p-4 h-80 overflow-y-auto space-y-3 bg-kireno-sand/60 text-xs">
+            <div class="text-center text-[10px] text-kireno-gray my-2">-- 실시간 아뜰리에 상담창이 연결되었습니다 --</div>
+        </div>
+
+        <form onsubmit="sendChatMessage(event)" class="p-3 bg-white border-t border-kireno-border flex items-center space-x-2">
+            <input type="text" id="chatInput" placeholder="궁금하신 작품명, 어울리는 식물, 공간 추천을 물어보세요..." required class="flex-grow px-3 py-2 text-xs rounded-lg border border-kireno-border focus:outline-none focus:border-kireno-black">
+            <button type="submit" class="bg-kireno-black text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-kireno-charcoal transition-colors flex-shrink-0">
+                전송
+            </button>
+        </form>
+    </div>
+
+    <!-- 4-2. 고객용 실시간 일본 직구 · 인천세관 통관 및 배송 조회 모달 -->
+    <div id="orderTrackingModal" class="hidden fixed inset-0 bg-kireno-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-xl w-full p-6 sm:p-8 shadow-2xl border border-kireno-border relative max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between pb-4 border-b border-kireno-border mb-5">
+                <div class="flex items-center space-x-2.5">
+                    <span class="hanko-stamp w-6 h-6 rounded text-xs">器</span>
+                    <div>
+                        <h3 class="font-serif font-bold text-base text-kireno-black">일본 현지 직구 · 인천세관 통관 실시간 조회</h3>
+                        <p class="text-[11px] text-kireno-gray">일본 공방 발주부터 국제항공(EMS) · 인천세관 통관 · 1인 대표 전수검수 현황을 확인하세요.</p>
+                    </div>
+                </div>
+                <button onclick="closeOrderTrackingModal()" class="text-kireno-gray hover:text-kireno-black text-base font-bold">✕</button>
+            </div>
+
+            <form onsubmit="handleOrderTrackingSearch(event)" class="space-y-3 mb-4">
+                <div class="flex flex-col sm:flex-row gap-2">
+                    <input type="text" id="orderTrackQuery" placeholder="주문번호(예: KRN-20261023-688), 주문자 성함 또는 연락처 입력" required class="flex-grow px-3.5 py-2.5 rounded-xl border border-kireno-border text-xs focus:outline-none focus:border-kireno-black">
+                    <button type="submit" id="orderTrackSubmitBtn" class="bg-kireno-black text-white px-5 py-2.5 rounded-xl text-xs font-bold hover:bg-kireno-charcoal transition-colors shrink-0">
+                        실시간 조회
+                    </button>
+                </div>
+                <div class="flex items-center justify-between text-[11px] text-kireno-gray bg-kireno-sand px-3 py-2 rounded-lg border border-kireno-border">
+                    <span>아직 주문 전이신가요? 샘플 통관 데이터로 9단계 과정을 체험해 보세요.</span>
+                    <button type="button" onclick="fillSampleOrderTrack('KRN-20261023-688')" class="text-kireno-black font-bold underline hover:text-kireno-clay shrink-0 ml-2">
+                        샘플 주문번호 자동입력 →
+                    </button>
+                </div>
+            </form>
+
+            <div id="orderTrackResults" class="space-y-3 text-xs"></div>
+        </div>
+    </div>
+
+    <!-- 4-3. 전자상거래 이용약관 / 개인정보처리방침 / 파손 100% 무상보증 안내 모달 -->
+    <div id="legalPolicyModal" class="hidden fixed inset-0 bg-kireno-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl border border-kireno-border relative max-h-[85vh] overflow-y-auto">
+            <div class="flex items-center justify-between pb-4 border-b border-kireno-border mb-4">
+                <h3 id="legalPolicyTitle" class="font-serif font-bold text-base text-kireno-black">키레노 운영 정책 안내</h3>
+                <button onclick="closePolicyModal()" class="text-kireno-gray hover:text-kireno-black text-base font-bold">✕</button>
+            </div>
+            <div id="legalPolicyBody" class="text-xs text-kireno-charcoal leading-relaxed space-y-3"></div>
+            <div class="mt-6 pt-4 border-t border-kireno-border flex justify-end">
+                <button onclick="closePolicyModal()" class="bg-kireno-black text-white px-5 py-2 rounded-lg text-xs font-bold">확인 및 닫기</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. 푸터 (원래 키레노의 따뜻한 샌드 #F7F5F2 톤 기반 + 전자상거래 법적 필수 고지 완비) -->
+    <footer class="bg-kireno-sand border-t border-kireno-border pt-16 pb-12 text-kireno-charcoal text-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-10 mb-10">
+                <div class="md:col-span-2 space-y-3">
+                    <div class="flex items-center space-x-2.5">
+                        <span class="hanko-stamp w-6 h-6 rounded text-[11px]">器</span>
+                        <span class="font-serif text-xl font-black tracking-widest text-kireno-black">KIRENO 키레노</span>
+                    </div>
+                    <p class="text-kireno-gray text-xs leading-relaxed max-w-md">
+                        {{ settings.notice_text }}
+                    </p>
+                    <div class="flex flex-wrap items-center gap-3 text-kireno-gray text-xs pt-1">
+                        <span><i class="fa-solid fa-phone mr-1 text-kireno-clay"></i> 고객센터: {{ settings.contact_phone }}</span>
+                        <span>•</span>
+                        <span><i class="fa-solid fa-envelope mr-1 text-kireno-clay"></i> 이메일: {{ settings.contact_email }}</span>
+                    </div>
+                </div>
+
+                <div>
+                    <h4 class="font-serif font-bold text-xs text-kireno-black mb-4">아뜰리에 쇼룸 탐색</h4>
+                    <ul class="space-y-2.5 text-xs text-kireno-gray">
+                        <li><a href="/#quick-curator" class="hover:text-kireno-black transition-colors">용도별 맞춤 도자기 찾기</a></li>
+                        <li><a href="/#signature-bento" class="hover:text-kireno-black transition-colors">대표 시그니처 6선</a></li>
+                        <li><a href="/#paired-lookbook" class="hover:text-kireno-black transition-colors">공간별 연계 스타일링</a></li>
+                        <li><a href="/#collection" class="hover:text-kireno-black transition-colors">전체 도자기 컬렉션 ({{ products|length if products is defined else 88 }}종)</a></li>
+                        <li><button onclick="openOrderTrackingModal()" class="hover:text-kireno-black transition-colors font-semibold text-kireno-charcoal">실시간 일본 직구·세관 통관 조회</button></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="font-serif font-bold text-xs text-kireno-black mb-4">공식 채널 및 고객 보증</h4>
+                    <ul class="space-y-2.5 text-xs text-kireno-gray">
+                        <li>
+                            <a href="{{ settings.smartstore_url or 'https://smartstore.naver.com/kireno' }}" target="_blank" rel="noopener" class="inline-flex items-center space-x-2 text-kireno-black font-semibold hover:text-kireno-clay transition-colors">
+                                <span class="w-1.5 h-1.5 rounded-full bg-kireno-olive"></span>
+                                <span>네이버 공식 스마트스토어 ↗</span>
+                            </a>
+                        </li>
+                        <li>
+                            <button onclick="openLiveChat()" class="inline-flex items-center space-x-2 text-kireno-black font-semibold hover:text-kireno-clay transition-colors">
+                                <span class="w-1.5 h-1.5 rounded-full bg-kireno-olive"></span>
+                                <span>실시간 1:1 도예 상담 신청 ↗</span>
+                            </button>
+                        </li>
+                        <li>
+                            <a href="{{ settings.instagram_url }}" target="_blank" rel="noopener" class="inline-flex items-center space-x-2 text-kireno-black font-semibold hover:text-kireno-clay transition-colors">
+                                <span class="w-1.5 h-1.5 rounded-full bg-kireno-clay"></span>
+                                <span>공식 인스타그램 (@kireno.kr) ↗</span>
+                            </a>
+                        </li>
+                        <li class="pt-1 flex flex-wrap gap-2 text-[11px]">
+                            <a href="/sitemap.xml" target="_blank" class="text-kireno-gray hover:text-kireno-black underline">사이트맵(XML)</a>
+                            <span>·</span>
+                            <a href="/rss.xml" target="_blank" class="text-kireno-gray hover:text-kireno-black underline">RSS 피드</a>
+                            <span>·</span>
+                            <a href="/admin" class="text-kireno-gray hover:text-kireno-black"><i class="fa-solid fa-lock text-[9px] mr-0.5"></i>관리자 관제</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 전자상거래 소비자보호법 필수 사업자 정보 및 약관/보증 정책 바 -->
+            <div class="border-t border-kireno-border pt-6 pb-4 text-[11px] text-kireno-gray space-y-2">
+                <div class="flex flex-wrap items-center gap-x-4 gap-y-1 font-semibold text-kireno-charcoal">
+                    <button onclick="openPolicyModal('customs')" class="hover:text-kireno-clay underline">파손 100% 무상보증 및 정식 수입통관 규정</button>
+                    <span>|</span>
+                    <button onclick="openPolicyModal('terms')" class="hover:text-kireno-clay underline">이용약관</button>
+                    <span>|</span>
+                    <button onclick="openPolicyModal('privacy')" class="hover:text-kireno-clay underline font-bold text-kireno-black">개인정보처리방침</button>
+                </div>
+                <p class="leading-relaxed">
+                    상호명: {{ settings.company_name or '모엔드(MOEND)' }} (브랜드: {{ settings.brand_name }}) &nbsp;|&nbsp;
+                    대표자 성명: {{ settings.ceo_name or '우상준' }} &nbsp;|&nbsp;
+                    사업자등록번호: <strong class="text-kireno-black font-mono">{{ settings.biz_reg_num or '740-02-03832' }}</strong> &nbsp;|&nbsp;
+                    통신판매업신고번호: <strong class="text-kireno-black">{{ settings.mail_order_num or '2026-서울구로-1158 호' }}</strong><br>
+                    사업장 및 검수 아뜰리에 소재지: {{ settings.biz_address or '대한민국 서울특별시 구로구 · 일본 교토/시가라키 공방 직공수 아뜰리에' }} &nbsp;|&nbsp;
+                    개인정보보호책임자: {{ settings.ceo_name or '우상준' }} ({{ settings.contact_email }})
+                </p>
+            </div>
+
+            <div class="border-t border-kireno-border pt-6 flex flex-col sm:flex-row justify-between items-center text-xs text-kireno-gray">
+                <p>© {{ current_year }} KIRENO 키레노. 일본 현지 공방 직공수 · 인천세관 정식 수입통관 필증 교부.</p>
+                <p class="mt-2 sm:mt-0 font-serif text-kireno-charcoal">흙과 불, 여백의 미학으로 빚어낸 일본 수공예 도예 아뜰리에</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 1:1 Chat, Mobile Nav, Order Tracking & Legal Policy Scripts -->
+    <script>
+        let currentSessionId = localStorage.getItem('kireno_chat_session');
+        if (!currentSessionId) {
+            currentSessionId = 'sess_' + Math.random().toString(36).substring(2, 10);
+            localStorage.setItem('kireno_chat_session', currentSessionId);
+        }
+        let currentProductContext = '';
+
+        function toggleMobileNav() {
+            const drawer = document.getElementById('mobileNavDrawer');
+            const icon = document.getElementById('mobileMenuIcon');
+            if (drawer.classList.contains('hidden')) {
+                drawer.classList.remove('hidden');
+                icon.className = 'fa-solid fa-xmark text-base';
+            } else {
+                drawer.classList.add('hidden');
+                icon.className = 'fa-solid fa-bars text-base';
+            }
+        }
+
+        function closeMobileNav() {
+            const drawer = document.getElementById('mobileNavDrawer');
+            const icon = document.getElementById('mobileMenuIcon');
+            if (drawer) drawer.classList.add('hidden');
+            if (icon) icon.className = 'fa-solid fa-bars text-base';
+        }
+
+        function openOrderTrackingModal() {
+            document.getElementById('orderTrackingModal').classList.remove('hidden');
+        }
+
+        function closeOrderTrackingModal() {
+            document.getElementById('orderTrackingModal').classList.add('hidden');
+        }
+
+        function fillSampleOrderTrack(sampleCode) {
+            document.getElementById('orderTrackQuery').value = sampleCode;
+            handleOrderTrackingSearch(new Event('submit'));
+        }
+
+        function handleOrderTrackingSearch(e) {
+            if (e && e.preventDefault) e.preventDefault();
+            const q = document.getElementById('orderTrackQuery').value.trim();
+            const container = document.getElementById('orderTrackResults');
+            if (!q) return;
+
+            container.innerHTML = '<div class="p-4 text-center text-kireno-gray">실시간 통관 및 배송 원장을 조회 중입니다...</div>';
+            fetch('/api/order-track?q=' + encodeURIComponent(q))
+                .then(r => r.json())
+                .then(data => {
+                    if (!data.success || !data.orders || data.orders.length === 0) {
+                        container.innerHTML = `<div class="p-4 rounded-xl bg-kireno-sand border border-kireno-border text-kireno-charcoal">${data.message || '내역이 없습니다.'}</div>`;
+                        return;
+                    }
+                    container.innerHTML = data.orders.map(o => `
+                        <div class="p-4 rounded-xl border border-kireno-border bg-kireno-sand/60 space-y-2.5">
+                            <div class="flex items-center justify-between border-b border-kireno-border pb-2">
+                                <span class="font-mono font-bold text-kireno-black">${o.order_number}</span>
+                                <span class="bg-kireno-black text-white px-2.5 py-0.5 rounded-full text-[11px] font-bold">${o.status}</span>
+                            </div>
+                            <div class="font-bold text-sm text-kireno-black">${o.product_name} (수량: ${o.quantity}점)</div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] bg-white p-3 rounded-lg border border-kireno-border">
+                                <div><span class="text-kireno-gray">주문자:</span> <strong class="text-kireno-black">${o.customer_name} (${o.masked_phone})</strong></div>
+                                <div><span class="text-kireno-gray">일본 현지 발주:</span> <strong class="text-kireno-olive">${o.jp_order_status || '발주완료'}</strong></div>
+                                <div><span class="text-kireno-gray">국제 EMS 송장:</span> <strong class="font-mono text-kireno-black">${o.jp_tracking_num || '배정중'}</strong></div>
+                                <div><span class="text-kireno-gray">인천세관 통관:</span> <strong class="text-kireno-black">${o.customs_status || '통관심사'}</strong></div>
+                                <div class="sm:col-span-2"><span class="text-kireno-gray">국내 택배 인계:</span> <strong class="text-kireno-black">${o.shipping_company || '우체국택배'} ${o.tracking_number ? '(' + o.tracking_number + ')' : '(세관 반출 및 1인 전수검수 후 송장 부여)'}</strong></div>
+                            </div>
+                        </div>
+                    `).join('');
+                })
+                .catch(() => {
+                    container.innerHTML = '<div class="p-4 rounded-xl bg-kireno-sand border border-kireno-border text-kireno-charcoal">조회 중 일시적인 통신 오류가 발생했습니다.</div>';
+                });
+        }
+
+        function openPolicyModal(type) {
+            const modal = document.getElementById('legalPolicyModal');
+            const title = document.getElementById('legalPolicyTitle');
+            const body = document.getElementById('legalPolicyBody');
+            if (type === 'customs') {
+                title.textContent = '파손 100% 무상보증 및 일본 직공수 정식 수입통관 규정';
+                body.innerHTML = `
+                    <p><strong>1. 일본 현지 공방 직공수 & 정식 수입통관 원칙</strong><br>키레노의 모든 도자기 화분 및 오브제는 고객 주문 즉시 일본 현지(교토, 시가라키, 라쿠텐 공식 원예관 등)에서 엔화(JPY)로 정식 사입하여 항공 EMS 및 인천세관 정식 수입통관을 거쳐 반입됩니다.</p>
+                    <p><strong>2. 1인 대표 전수 육안 검수 및 에어셀 안전 포장</strong><br>세관 반출 후 키레노 아뜰리에에서 대표가 직접 유약 상태, 미세 균열 여부, 배수구 균형을 100% 전수 육안 검수한 뒤 맞춤 에어셀 완충 포장으로 우체국 택배를 통해 발송합니다.</p>
+                    <p><strong>3. 배송 중 파손 100% 무상 재발송 / 전액 환불 보증</strong><br>도자기 특성상 운송 중 만일의 파손이 발생한 경우, 수령 후 48시간 이내 사진을 첨부하여 1:1 도예 상담창으로 접수해 주시면 조건 없이 100% 무상 재발송 또는 전액 환불을 보증합니다.</p>
+                `;
+            } else if (type === 'terms') {
+                title.textContent = '키레노(KIRENO) 아뜰리에 이용약관';
+                body.innerHTML = `
+                    <p><strong>제1조 (목적)</strong><br>본 약관은 모엔드(MOEND) (대표자: 우상준 / 사업자등록번호: 740-02-03832 / 통신판매업신고번호: 2026-서울구로-1158 호)가 운영하는 브랜드 키레노(KIRENO) 공식 온라인 쇼룸에서 제공하는 일본 수공예 도자기 및 인테리어 오브제 관련 정보, 1:1 도예 상담 및 네이버 공식 스마트스토어 연동 구매 서비스의 이용 조건을 규정합니다.</p>
+                    <p><strong>제2조 (수공예 도자기 고유의 특성 안내)</strong><br>1,250℃~1,280℃ 고온 소성 수공예 도자기의 특성상 가마 내 불길의 위치와 자연재 유약의 흐름에 따라 미세한 철점, 유약의 농담 차이, 빙열(크랙 무늬) 및 ±0.5cm 내외의 치수 편차가 존재하며 이는 수공예 진품 고유의 미학적 특성입니다.</p>
+                    <p><strong>제3조 (결제 및 안전 거래)</strong><br>모든 결제는 네이버 스마트스토어 공식 결제 시스템(네이버페이 안전결제)과 1원 단위까지 100% 동일한 공식 가격으로 투명하게 진행됩니다.</p>
+                `;
+            } else {
+                title.textContent = '개인정보처리방침';
+                body.innerHTML = `
+                    <p><strong>1. 수집하는 개인정보 항목 및 목적</strong><br>키레노는 1:1 도예 상담, 품절 작품 재입고 SMS 알림 신청, 맞춤 대량 발주 문의 및 인천세관 정식 수입통관(개인통관고유부호 확인)을 위해 최소한의 정보(성함, 연락처, 이메일)만을 수집합니다.</p>
+                    <p><strong>2. 보유 및 이용기간</strong><br>수집된 정보는 상담 완료, 재입고 알림 발송 또는 전자상거래법상 보존 의무 기간 종료 시 지체 없이 파기됩니다.</p>
+                    <p><strong>3. 개인정보보호책임자</strong><br>성명: {{ settings.ceo_name or '우상준' }} / 연락처: {{ settings.contact_phone }} / 이메일: {{ settings.contact_email }}</p>
+                `;
+            }
+            modal.classList.remove('hidden');
+        }
+
+        function closePolicyModal() {
+            document.getElementById('legalPolicyModal').classList.add('hidden');
+        }
+
+        function openLiveChat(prodName) {
+            const widget = document.getElementById('liveChatWidget');
+            widget.classList.remove('hidden');
+            if (prodName && !prodName.includes('버튼') && !prodName.includes('상담') && !prodName.includes('신청')) {
+                currentProductContext = prodName;
+                document.getElementById('chatProductContext').classList.remove('hidden');
+                document.getElementById('chatContextName').textContent = '문의 작품: ' + prodName;
+            } else {
+                currentProductContext = '';
+                document.getElementById('chatProductContext').classList.add('hidden');
+            }
+            fetchChatHistory();
+            document.getElementById('chatInput').focus();
+        }
+
+        function closeLiveChat() {
+            document.getElementById('liveChatWidget').classList.add('hidden');
+        }
+
+        function clearChatContext() {
+            currentProductContext = '';
+            document.getElementById('chatProductContext').classList.add('hidden');
+        }
+
+        function fetchChatHistory() {
+            fetch(`/api/chat/history?session_id=${currentSessionId}`)
+                .then(r => r.json())
+                .then(data => {
+                    const container = document.getElementById('chatMessages');
+                    let html = '<div class="text-center text-[10px] text-kireno-gray my-2">-- 실시간 아뜰리에 상담창이 연결되었습니다 --</div>';
+                    data.messages.forEach(msg => {
+                        const isUser = msg.sender === 'user';
+                        html += `
+                            <div class="flex flex-col ${isUser ? 'items-end' : 'items-start'}">
+                                ${msg.product_name ? `<span class="text-[9px] text-kireno-gray mb-0.5">${msg.product_name}</span>` : ''}
+                                <div class="p-2.5 rounded-xl max-w-[82%] leading-relaxed ${isUser ? 'bg-kireno-black text-white rounded-br-none' : 'bg-white border border-kireno-border text-kireno-black rounded-bl-none shadow-xs'}">
+                                    ${msg.message}
+                                </div>
+                                <span class="text-[9px] text-kireno-gray mt-0.5">${(msg.created_at || '').substring(11, 16)}</span>
+                            </div>
+                        `;
+                    });
+                    container.innerHTML = html;
+                    container.scrollTop = container.scrollHeight;
+                })
+                .catch(e => console.log('Chat fetch err:', e));
+        }
+
+        function sendChatMessage(e) {
+            e.preventDefault();
+            const input = document.getElementById('chatInput');
+            const msg = input.value.trim();
+            if (!msg) return;
+
+            fetch('/api/chat/send', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    session_id: currentSessionId,
+                    product_name: currentProductContext,
+                    message: msg
+                })
+            })
+            .then(r => r.json())
+            .then(data => {
+                input.value = '';
+                fetchChatHistory();
+            });
+        }
+
+        setInterval(() => {
+            const widget = document.getElementById('liveChatWidget');
+            if (widget && !widget.classList.contains('hidden')) {
+                fetchChatHistory();
+            }
+        }, 3000);
+    </script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

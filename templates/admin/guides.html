@@ -1,0 +1,918 @@
+{% extends 'admin/base_admin.html' %}
+
+{% block title %}모엔드(MOEND) 1인 대표 판매·통관·사후처리 & 광고 실행 마스터북 | KIRENO{% endblock %}
+{% block breadcrumb %}판매 전 과정 · 사후처리(CS) · 무자본/유료 광고 실전 마스터북{% endblock %}
+
+{% block admin_content %}
+<div class="space-y-8">
+
+    <!-- 1. 상단 마스터북 헤더 & 4대 핵심 섹션 바로가기 탭 -->
+    <div class="bg-[#111111] text-white p-6 sm:p-8 rounded-3xl border border-stone-800 shadow-2xl space-y-6">
+        <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
+            <div>
+                <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-[#C4A482]/20 text-[#C4A482] text-xs font-black tracking-wider mb-2 border border-[#C4A482]/40">
+                    <i class="fa-solid fa-compass text-[#C4A482]"></i>
+                    <span>모엔드(MOEND) · 대표자 우상준 1인 전담 A to Z 실전 지휘소</span>
+                </div>
+                <h1 class="text-2xl sm:text-3xl font-black text-white tracking-tight">
+                    키레노(KIRENO) 판매 과정 · 사후처리 · 광고 실행 마스터북
+                </h1>
+                <p class="text-xs sm:text-sm text-stone-300 mt-1.5 max-w-3xl leading-relaxed">
+                    <strong>① 주문 발생부터 우체국 발송까지의 6단계 판매 과정</strong> ➔ <strong>② 단계별 고객 안내 문자(알림톡) 1클릭 복사</strong> ➔ <strong>③ 파손·품절·통관지연·반품 사후처리 매뉴얼</strong> ➔ <strong>④ 88종 전 작품 기반 광고/키워드/원고 자동 생성기</strong>를 이 화면 하나에서 모두 해결하실 수 있도록 설계했습니다.
+                </p>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-2.5 shrink-0">
+                <button onclick="document.getElementById('newOrderModal').classList.remove('hidden')" class="px-4 py-3 bg-[#C4A482] hover:bg-[#b39270] text-[#111111] rounded-2xl text-xs font-black transition flex items-center gap-2 shadow-lg">
+                    <i class="fa-solid fa-plus text-sm"></i>
+                    <span>+ 신규 주문 수기 등록</span>
+                </button>
+                <a href="/admin/products" class="px-4 py-3 bg-stone-800 hover:bg-stone-700 text-white rounded-2xl text-xs font-bold transition flex items-center gap-2 border border-stone-700">
+                    <i class="fa-solid fa-boxes-stacked text-[#C4A482]"></i>
+                    <span>88종 일본 원문 링크 관리</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- 4대 핵심 영역 빠른 이동 바 -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 pt-4 border-t border-stone-800 text-xs">
+            <a href="#section-sales-process" class="p-3.5 rounded-2xl bg-stone-900 hover:bg-stone-800 border border-stone-700 flex items-center justify-between transition group">
+                <div>
+                    <span class="text-[10px] font-bold text-[#C4A482] block">PART 01 · 판매 및 출고 과정</span>
+                    <span class="font-bold text-white">결제 ➔ 일본사입 ➔ 통관 ➔ 검수발송</span>
+                </div>
+                <i class="fa-solid fa-arrow-down text-stone-400 group-hover:text-[#C4A482]"></i>
+            </a>
+            <a href="#section-sms-templates" class="p-3.5 rounded-2xl bg-stone-900 hover:bg-stone-800 border border-stone-700 flex items-center justify-between transition group">
+                <div>
+                    <span class="text-[10px] font-bold text-emerald-400 block">PART 02 · 고객 해피콜 & 문자</span>
+                    <span class="font-bold text-white">단계별 고객 안내문 1클릭 복사</span>
+                </div>
+                <i class="fa-solid fa-arrow-down text-stone-400 group-hover:text-emerald-400"></i>
+            </a>
+            <a href="#section-aftercare-cs" class="p-3.5 rounded-2xl bg-stone-900 hover:bg-stone-800 border border-stone-700 flex items-center justify-between transition group">
+                <div>
+                    <span class="text-[10px] font-bold text-amber-400 block">PART 03 · 사후처리 & 위기대응</span>
+                    <span class="font-bold text-white">파손 · 현지품절 · 통관지연 · 반품</span>
+                </div>
+                <i class="fa-solid fa-arrow-down text-stone-400 group-hover:text-amber-400"></i>
+            </a>
+            <a href="#section-ad-playbook" class="p-3.5 rounded-2xl bg-[#4F6F52]/30 hover:bg-[#4F6F52]/50 border border-[#4F6F52] flex items-center justify-between transition group">
+                <div>
+                    <span class="text-[10px] font-bold text-emerald-300 block">PART 04 · 광고 & 첫 매출 마스터</span>
+                    <span class="font-bold text-white">무료/유료 광고 실행법 & 카피 생성기</span>
+                </div>
+                <i class="fa-solid fa-bolt text-amber-300"></i>
+            </a>
+        </div>
+    </div>
+
+    <!-- =========================================================================
+         PART 01. 판매부터 발주 · 통관 · 검수 · 발송까지 6단계 실전 행동 매뉴얼
+    ========================================================================== -->
+    <section id="section-sales-process" class="bg-white p-6 sm:p-8 rounded-3xl border border-stone-200 shadow-sm space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-stone-100">
+            <div>
+                <span class="text-xs font-black text-[#C4A482] uppercase tracking-wider block">PART 01 · SALES TO DELIVERY SOP</span>
+                <h2 class="text-xl font-black text-stone-900 mt-0.5">주문 1건 발생 시 대표님이 그대로 따라 하는 6단계 판매·출고 과정</h2>
+            </div>
+            <span class="text-xs font-bold text-stone-500 bg-stone-100 px-3 py-1.5 rounded-full">평균 소요 기간: 주문일로부터 영업일 7~12일</span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 text-xs">
+            <!-- STEP 1 -->
+            <div class="p-5 rounded-2xl border-2 border-stone-200 bg-stone-50/70 space-y-3 flex flex-col justify-between">
+                <div class="space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="px-2.5 py-1 rounded-lg bg-[#111111] text-white font-black text-[11px]">STEP 01 · 당일 (D-Day)</span>
+                        <span class="text-[11px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">네이버 스마트스토어</span>
+                    </div>
+                    <h3 class="font-black text-base text-stone-900">주문 확인 & 개인통관고유부호 점검</h3>
+                    <ul class="space-y-1.5 text-stone-600 leading-relaxed list-disc pl-4">
+                        <li>스마트스토어 판매자센터에서 <strong>신규 주문 상품명, 수량, 수취인 성함, 연락처, 개인통관고유부호(P로 시작하는 13자리)</strong>를 확인합니다.</li>
+                        <li>관세청 유니패스 또는 스마트스토어 통관부호 검증에서 <strong>수취인 이름 + 전화번호 + 통관부호 일치 여부</strong>를 먼저 확인합니다.</li>
+                        <li>일치하면 즉시 <strong>PART 02의 [① 주문접수 & 현지발주 안내 문자]</strong>를 고객에게 발송하여 안심시킵니다.</li>
+                    </ul>
+                </div>
+                <div class="pt-3 border-t border-stone-200 flex items-center justify-between text-[11px] font-bold text-stone-700">
+                    <span>💡 발송기한 유예 설정 필수 (해외배송 14일)</span>
+                    <a href="#section-sms-templates" class="text-blue-700 hover:underline">안내문자 복사 ↓</a>
+                </div>
+            </div>
+
+            <!-- STEP 2 -->
+            <div class="p-5 rounded-2xl border-2 border-stone-200 bg-stone-50/70 space-y-3 flex flex-col justify-between">
+                <div class="space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="px-2.5 py-1 rounded-lg bg-[#111111] text-white font-black text-[11px]">STEP 02 · 당일 (주문 후 3시간 내)</span>
+                        <span class="text-[11px] font-bold text-amber-800 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">일본 현지 사입</span>
+                    </div>
+                    <h3 class="font-black text-base text-stone-900">일본 소싱처 원문 링크 접속 & 엔화 발주</h3>
+                    <ul class="space-y-1.5 text-stone-600 leading-relaxed list-disc pl-4">
+                        <li>관리자 <strong>[상품 관리]</strong> 메뉴에서 해당 작품의 <strong>[일본 원문 소싱처 열기]</strong> 버튼을 클릭합니다.</li>
+                        <li>일본 공방/라쿠텐/야후재팬에서 재고를 확인하고 엔화(JPY) 카드로 결제합니다.</li>
+                        <li>직배송이 안 되는 일본 내수 전용 공방은 <strong>일본 배송대행지(오사카/도쿄 항공특송 센터) 주소</strong>로 수령지를 입력하고, 배대지 신청서에 <strong>도자기 파손주의(정밀검수/재포장) 옵션</strong>을 체크합니다.</li>
+                    </ul>
+                </div>
+                <div class="pt-3 border-t border-stone-200 flex items-center justify-between text-[11px] font-bold text-stone-700">
+                    <span>💡 사입 영수증(인보이스) PDF 저장</span>
+                    <a href="/admin/products" class="text-amber-700 hover:underline">소싱처 링크 열기 →</a>
+                </div>
+            </div>
+
+            <!-- STEP 3 -->
+            <div class="p-5 rounded-2xl border-2 border-stone-200 bg-stone-50/70 space-y-3 flex flex-col justify-between">
+                <div class="space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="px-2.5 py-1 rounded-lg bg-[#111111] text-white font-black text-[11px]">STEP 03 · D+2 ~ D+5일</span>
+                        <span class="text-[11px] font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-200">국제 항공 & 세관통관</span>
+                    </div>
+                    <h3 class="font-black text-base text-stone-900">국제 항공 선적 & 인천세관 정식 수입통관</h3>
+                    <ul class="space-y-1.5 text-stone-600 leading-relaxed list-disc pl-4">
+                        <li>일본 공방 출고 후 항공 특송(EMS/특송사) 송장번호가 나오면 아래 <strong>[주문 진행 추적 수불부]</strong>에 등록합니다.</li>
+                        <li>화물이 인천공항 세관에 도착하면 관세청 유니패스(UNI-PASS)에서 <strong>수입신고 수리 및 세관 반출 여부</strong>를 확인합니다.</li>
+                        <li><strong>주의(식기류 대량 수입 시)</strong>: 화분·액자·인센스홀더·오브제는 일반 통관 대상이며, 입에 닿는 식기류를 정식 사업자 통관할 때는 식약처 수입식품등 수입신고 요건을 확인합니다.</li>
+                    </ul>
+                </div>
+                <div class="pt-3 border-t border-stone-200 flex items-center justify-between text-[11px] font-bold text-stone-700">
+                    <span>💡 세관 통관 완료 시 고객 문자 발송</span>
+                    <a href="#ordersSection" class="text-indigo-700 hover:underline">수불부 이동 ↓</a>
+                </div>
+            </div>
+
+            <!-- STEP 4 -->
+            <div class="p-5 rounded-2xl border-2 border-stone-200 bg-stone-50/70 space-y-3 flex flex-col justify-between">
+                <div class="space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="px-2.5 py-1 rounded-lg bg-[#111111] text-white font-black text-[11px]">STEP 04 · D+6 ~ D+8일</span>
+                        <span class="text-[11px] font-bold text-rose-700 bg-rose-50 px-2 py-0.5 rounded border border-rose-200">대표 1인 전수검수</span>
+                    </div>
+                    <h3 class="font-black text-base text-stone-900">국내 도착 언박싱 & 4대 불량 정밀 육안 검수</h3>
+                    <ul class="space-y-1.5 text-stone-600 leading-relaxed list-disc pl-4">
+                        <li>국내 사무실/작업실에 도착한 도자기를 개봉하고 아래 <strong>4가지 항목을 스마트폰 카메라로 촬영하며 검수</strong>합니다:
+                            <br>① 구연부(입구) 및 굽의 미세 실금(크랙) 유무
+                            <br>② 평평한 테이블에 놓았을 때 바닥 흔들림(수평) 유무
+                            <br>③ 유약 박리(들뜸) 및 주문 색상·치수 일치 여부
+                            <br>④ 화분 배수구 상태 및 액자 프레임 찍힘 유무
+                        </li>
+                        <li><strong>핵심 팁</strong>: 이때 찍은 <strong>실물 검수 사진 2장</strong>을 고객에게 카톡/문자로 보내주면 구매 만족도와 리뷰 작성률이 300% 폭발합니다!</li>
+                    </ul>
+                </div>
+                <div class="pt-3 border-t border-stone-200 flex items-center justify-between text-[11px] font-bold text-stone-700">
+                    <span>💡 검수 사진 = 인스타/스레드 최고 홍보 소재</span>
+                    <span class="text-rose-700">파손율 0% 핵심 단계</span>
+                </div>
+            </div>
+
+            <!-- STEP 5 -->
+            <div class="p-5 rounded-2xl border-2 border-stone-200 bg-stone-50/70 space-y-3 flex flex-col justify-between">
+                <div class="space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="px-2.5 py-1 rounded-lg bg-[#111111] text-white font-black text-[11px]">STEP 05 · 검수 당일</span>
+                        <span class="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">우체국 안전포장</span>
+                    </div>
+                    <h3 class="font-black text-base text-stone-900">에어셀 2중 안전 패킹 & 우체국 택배 발송</h3>
+                    <ul class="space-y-1.5 text-stone-600 leading-relaxed list-disc pl-4">
+                        <li><strong>1차 내부 완충</strong>: 도자기 내부 빈 공간에 종이 완충재를 채우고, 외부를 크라프트 허니콤 페이퍼 + 에어캡(뾱뾱이) 3겹으로 감쌉니다.</li>
+                        <li><strong>2차 외부 박스</strong>: 도자기보다 사방 5cm 이상 여유 있는 <strong>두꺼운 이중골(DW) 강화 박스</strong>에 넣고, 흔들었을 때 소리가 전혀 나지 않도록 에어셀을 채웁니다.</li>
+                        <li>박스 외관에 <strong>[파손주의 / 취급주의]</strong> 스티커를 부착하여 우체국 택배로 발송하고 스마트스토어에 송장번호를 입력합니다.</li>
+                    </ul>
+                </div>
+                <div class="pt-3 border-t border-stone-200 flex items-center justify-between text-[11px] font-bold text-stone-700">
+                    <span>💡 포장 완료 사진 1장 반드시 보관 (보상 입증용)</span>
+                    <a href="#section-sms-templates" class="text-emerald-700 hover:underline">출고문자 복사 ↓</a>
+                </div>
+            </div>
+
+            <!-- STEP 6 -->
+            <div class="p-5 rounded-2xl border-2 border-stone-200 bg-stone-50/70 space-y-3 flex flex-col justify-between">
+                <div class="space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="px-2.5 py-1 rounded-lg bg-[#111111] text-white font-black text-[11px]">STEP 06 · 배송완료 후 D+1일</span>
+                        <span class="text-[11px] font-bold text-purple-700 bg-purple-50 px-2 py-0.5 rounded border border-purple-200">구매확정 & 포토리뷰</span>
+                    </div>
+                    <h3 class="font-black text-base text-stone-900">도자기 길들이기(양호) 안내 & 포토리뷰 유도</h3>
+                    <ul class="space-y-1.5 text-stone-600 leading-relaxed list-disc pl-4">
+                        <li>우체국 택배 배송완료 다음 날, <strong>PART 02의 [④ 도착 확인 & 도자기 관리법/리뷰 요청 문자]</strong>를 보냅니다.</li>
+                        <li>고객이 감동하여 <strong>포토리뷰 작성 및 구매확정</strong>을 누르면 스마트스토어 정산금이 대표님 계좌로 빠르게 입금되고 스토어 검색 순위가 상승합니다.</li>
+                        <li>구매 고객은 아래 <strong>[단골 CRM 원장]</strong>에 자동/수기 등록하여 다음 신상품 입고 시 재구매 쿠폰을 발송합니다.</li>
+                    </ul>
+                </div>
+                <div class="pt-3 border-t border-stone-200 flex items-center justify-between text-[11px] font-bold text-stone-700">
+                    <span>💡 포토리뷰 10건 달성 시 전환율 3배 상승</span>
+                    <a href="#crmSection" class="text-purple-700 hover:underline">단골 CRM 이동 ↓</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =========================================================================
+         PART 02. 단계별 고객 안심 문자(알림톡/톡톡) 1클릭 복사 템플릿 5종
+    ========================================================================== -->
+    <section id="section-sms-templates" class="bg-white p-6 sm:p-8 rounded-3xl border border-stone-200 shadow-sm space-y-5">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-stone-100">
+            <div>
+                <span class="text-xs font-black text-emerald-700 uppercase tracking-wider block">PART 02 · CUSTOMER COMMUNICATION TEMPLATES</span>
+                <h2 class="text-xl font-black text-stone-900 mt-0.5">해외직구 고객의 불안감을 0%로 만드는 단계별 안내 문자 (1클릭 복사)</h2>
+                <p class="text-xs text-stone-500 mt-1">버튼을 누르면 문구가 복사됩니다. 네이버 톡톡이나 문자메시지에 붙여넣어 고객명만 바꿔 보내세요.</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-xs">
+            <!-- 템플릿 1 -->
+            <div class="p-4 rounded-2xl border border-stone-200 bg-stone-50 flex flex-col justify-between space-y-3">
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="font-black text-stone-900">① 주문 직후 (현지 발주 완료 안내)</span>
+                        <span class="text-[10px] bg-blue-100 text-blue-800 font-bold px-2 py-0.5 rounded">결제 당일 발송</span>
+                    </div>
+                    <textarea id="smsTpl1" rows="6" readonly class="w-full bg-white p-3 rounded-xl border border-stone-200 text-[11px] text-stone-700 leading-relaxed resize-none focus:outline-none">[키레노(KIRENO) 도예 아틀리에 주문 및 일본 현지 발주 안내]
+
+안녕하세요, 고객님. 모엔드(키레노) 대표 우상준입니다.
+주문해주신 작품은 오늘 일본 현지 요장(공방)으로 정식 발주가 완료되었습니다.
+
+■ 진행 과정 안내
+1) 일본 현지 출고 및 항공 운송 (약 3~5일)
+2) 인천세관 정식 수입통관 (약 1~2일)
+3) 국내 도착 후 대표 1인 전수 육안검수 및 에어셀 2중 안전포장 ➔ 우체국 택배 발송 (약 1~2일)
+
+세관 통관을 마치고 제 검수대에 작품이 도착하는 즉시 실물 검수 상태와 우체국 송장번호를 다시 안내해 드리겠습니다. 배송 중 만일의 파손 시 100% 무상 재발송/환불을 보증하오니 안심하고 기다려 주세요. 감사합니다.</textarea>
+                </div>
+                <button onclick="copyTextById('smsTpl1', '① 주문 직후 안내 문자')" class="w-full py-2.5 rounded-xl bg-stone-900 hover:bg-black text-white font-bold transition flex items-center justify-center gap-1.5">
+                    <i class="fa-regular fa-copy text-[#C4A482]"></i>
+                    <span>①번 문자 전체 복사하기</span>
+                </button>
+            </div>
+
+            <!-- 템플릿 2 -->
+            <div class="p-4 rounded-2xl border border-stone-200 bg-stone-50 flex flex-col justify-between space-y-3">
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="font-black text-stone-900">② 개인통관고유부호 오류/누락 요청</span>
+                        <span class="text-[10px] bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded">부호 불일치 시</span>
+                    </div>
+                    <textarea id="smsTpl2" rows="6" readonly class="w-full bg-white p-3 rounded-xl border border-stone-200 text-[11px] text-stone-700 leading-relaxed resize-none focus:outline-none">[키레노(KIRENO) 인천세관 정식 통관을 위한 개인통관고유부호 확인 안내]
+
+안녕하세요, 고객님. 키레노 도예 아틀리에입니다.
+주문해주신 일본 수공예 작품의 인천공항 세관 정식 수입신고를 위해, 수취인 성함/연락처와 일치하는 [개인통관고유부호(P로 시작하는 13자리)] 확인이 필요합니다.
+
+번거로우시겠지만 본 문자(또는 네이버 톡톡)로 수취인 본인의 개인통관고유부호를 답장해 주시면, 지체 없이 세관 통관 및 국내 검수 발송을 진행해 드리겠습니다.
+(발급 및 조회: 관세청 개인통관고유부호 모바일 페이지에서 1분 내 확인 가능) 감사합니다.</textarea>
+                </div>
+                <button onclick="copyTextById('smsTpl2', '② 통관부호 요청 문자')" class="w-full py-2.5 rounded-xl bg-stone-900 hover:bg-black text-white font-bold transition flex items-center justify-center gap-1.5">
+                    <i class="fa-regular fa-copy text-[#C4A482]"></i>
+                    <span>②번 문자 전체 복사하기</span>
+                </button>
+            </div>
+
+            <!-- 템플릿 3 -->
+            <div class="p-4 rounded-2xl border border-stone-200 bg-stone-50 flex flex-col justify-between space-y-3">
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="font-black text-stone-900">③ 세관 통관 완료 & 1인 검수 출고 안내</span>
+                        <span class="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded">우체국 발송 시</span>
+                    </div>
+                    <textarea id="smsTpl3" rows="6" readonly class="w-full bg-white p-3 rounded-xl border border-stone-200 text-[11px] text-stone-700 leading-relaxed resize-none focus:outline-none">[키레노(KIRENO) 세관 통관 및 대표 1인 정밀 검수 · 우체국 택배 출고 완료]
+
+안녕하세요, 고객님! 기다려 주셔서 진심으로 감사합니다.
+주문하신 작품이 인천세관 정식 통관을 마치고 국내 아틀리에에 도착하여, 방금 제가 직접 유약 상태·수평·미세 균열 여부를 100% 육안 검수 완료했습니다.
+
+■ 검수 결과: 특이사항 없이 매우 아름다운 유약 결로 양품 확인 완료
+■ 택배사: 우체국 안심택배 (에어셀 2중 안전포장)
+■ 운송장번호: [송장번호 입력] (보통 내일~모레 도착 예정)
+
+받아보시고 혹시라도 배송 중 파손이 있다면 개봉 사진만 보내주시면 100% 무상 교환/환불해 드립니다. 공간에 고요한 여백이 되길 바랍니다!</textarea>
+                </div>
+                <button onclick="copyTextById('smsTpl3', '③ 검수 및 우체국 출고 안내 문자')" class="w-full py-2.5 rounded-xl bg-stone-900 hover:bg-black text-white font-bold transition flex items-center justify-center gap-1.5">
+                    <i class="fa-regular fa-copy text-[#C4A482]"></i>
+                    <span>③번 문자 전체 복사하기</span>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- =========================================================================
+         PART 03. 사후처리(After-Sales) & 4대 위기 상황별 완벽 대응 매뉴얼
+    ========================================================================== -->
+    <section id="section-aftercare-cs" class="bg-white p-6 sm:p-8 rounded-3xl border border-stone-200 shadow-sm space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-stone-100">
+            <div>
+                <span class="text-xs font-black text-rose-600 uppercase tracking-wider block">PART 03 · AFTER-SALES & CRISIS RESOLUTION SOP</span>
+                <h2 class="text-xl font-black text-stone-900 mt-0.5">사후처리(CS) · 파손 · 일본 품절 · 반품 4대 상황별 처리 공식 & 응대 문구</h2>
+                <p class="text-xs text-stone-500 mt-1">문제가 생겼을 때 당황하지 않고 아래 매뉴얼대로만 처리하시면 단 한 건의 분쟁이나 별점 테러도 생기지 않습니다.</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 text-xs">
+            <!-- 사후처리 1: 배송 중 파손 -->
+            <div class="p-5 rounded-2xl border-2 border-rose-200 bg-rose-50/40 space-y-3">
+                <div class="flex items-center justify-between">
+                    <span class="px-2.5 py-1 rounded-lg bg-rose-600 text-white font-black text-[11px]">상황 01 · 배송 중 파손 발생 시</span>
+                    <span class="text-[11px] font-bold text-rose-800">고객 수령 후 24시간 내 접수</span>
+                </div>
+                <h3 class="font-black text-base text-stone-900">100% 무상 재발송/전액 환불 & 택배사 배상 청구 절차</h3>
+                <ol class="space-y-1.5 text-stone-700 leading-relaxed list-decimal pl-4">
+                    <li><strong>고객 우선 안심 조치</strong>: 고객에게 절대 책임을 묻지 말고 즉시 사과 후 <strong>"100% 전액 환불 또는 새 작품 즉시 재발주"</strong> 중 원하시는 방향을 선택하게 합니다.</li>
+                    <li><strong>필수 증빙 사진 3장 확보</strong>: 고객에게 <strong>① 운송장이 보이는 외박스 전체 사진, ② 내부 완충재 포장 상태 사진, ③ 파손된 도자기 사진</strong> 총 3장을 요청합니다.</li>
+                    <li><strong>배대지 / 우체국 손해배상 청구</strong>:
+                        <br>• <strong>국내 입고 시 이미 깨져 있었던 경우</strong>: 개봉 영상/사진으로 일본 판매처 또는 배송대행지 파손보험(100% 보상)을 청구합니다.
+                        <br>• <strong>국내 우체국 배송 중 깨진 경우</strong>: 확보한 사진 3장과 우리가 발송 전 찍어둔 2중 에어셀 포장 사진을 첨부하여 우체국 택배 고객센터에 사고 배상을 접수합니다.</li>
+                </ol>
+                <div class="bg-white p-3 rounded-xl border border-rose-200 space-y-2">
+                    <span class="font-bold text-rose-800 block text-[11px]">📋 파손 접수 시 고객 응대 문구 (클릭 복사)</span>
+                    <textarea id="csTpl1" rows="3" readonly class="w-full text-[11px] text-stone-600 resize-none focus:outline-none">고객님, 소중한 작품이 파손되어 도착하게 해드려 진심으로 죄송합니다. 다치신 곳은 없으신지 가장 걱정됩니다. 키레노는 파손 100% 무상 보증 원칙에 따라 조건 없이 [100% 전액 환불] 또는 [동일 새 작품 무상 재발송]으로 즉시 처리해 드립니다. 택배사 사고 접수를 위해 ①송장이 보이는 박스 사진, ②내부 포장 사진, ③파손 부위 사진만 편하게 보내주시면 오늘 바로 처리해 드리겠습니다.</textarea>
+                    <button onclick="copyTextById('csTpl1', '파손 응대 문구')" class="px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-bold text-[11px]">응대 문구 복사</button>
+                </div>
+            </div>
+
+            <!-- 사후처리 2: 일본 현지 가마 품절 / 통관 지연 -->
+            <div class="p-5 rounded-2xl border-2 border-amber-200 bg-amber-50/40 space-y-3">
+                <div class="flex items-center justify-between">
+                    <span class="px-2.5 py-1 rounded-lg bg-amber-600 text-white font-black text-[11px]">상황 02 · 일본 현지 품절 또는 출고 지연 시</span>
+                    <span class="text-[11px] font-bold text-amber-900">사입 단계 즉시 대응</span>
+                </div>
+                <h3 class="font-black text-base text-stone-900">스마트스토어 페널티 방지 & 유사 상위 작품 대체 제안</h3>
+                <ol class="space-y-1.5 text-stone-700 leading-relaxed list-decimal pl-4">
+                    <li><strong>키레노 DB 즉시 품절 전환</strong>: 관리자 <strong>[상품 관리]</strong>에서 해당 작품의 상태를 즉시 <code>품절</code>로 변경하여 추가 주문을 막습니다.</li>
+                    <li><strong>대체 작품 큐레이션 먼저 제안</strong>: 무작정 "품절이니 취소해주세요"라고 하면 스마트스토어 판매자 귀책 취소 페널티가 발생할 수 있고 매출도 날아갑니다. <strong>동일 치수·비슷한 톤의 즉시출고 가능 작품 2종 사진</strong>을 함께 보내며 전환을 유도합니다.</li>
+                    <li><strong>차액 무료 업그레이드 전략</strong>: 만약 5,000원~10,000원 더 비싼 상위 라인 작품으로 대체 수락 시, <strong>"차액은 키레노가 부담하여 무료 업그레이드 발송해 드리겠습니다"</strong>라고 제안하면 70% 이상 취소 없이 구매를 유지합니다.</li>
+                </ol>
+                <div class="bg-white p-3 rounded-xl border border-amber-200 space-y-2">
+                    <span class="font-bold text-amber-800 block text-[11px]">📋 현지 공방 품절 시 업그레이드 제안 문구 (클릭 복사)</span>
+                    <textarea id="csTpl2" rows="3" readonly class="w-full text-[11px] text-stone-600 resize-none focus:outline-none">고객님, 모엔드(키레노) 대표 우상준입니다. 방금 일본 현지 공방에 발주를 넣는 과정에서, 주문하신 작품이 이번 가마 소성분 완판으로 인해 다음 입고까지 약 3주 이상 소요된다는 연락을 받았습니다. 오래 기다리게 해드릴 수 없어 ①즉시 출고 가능한 상위 등급의 유사 작품(차액 키레노 전액 부담 무료 업그레이드)으로 변경 발송해 드리거나, ②원하실 경우 조건 없는 100% 즉시 환불을 도와드리고자 합니다.</textarea>
+                    <button onclick="copyTextById('csTpl2', '현지 품절 대안 제안 문구')" class="px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-bold text-[11px]">응대 문구 복사</button>
+                </div>
+            </div>
+
+            <!-- 사후처리 3: 수공예 유약 특성(핀홀/철점/빙열) 문의 -->
+            <div class="p-5 rounded-2xl border-2 border-stone-200 bg-stone-50 space-y-3">
+                <div class="flex items-center justify-between">
+                    <span class="px-2.5 py-1 rounded-lg bg-stone-800 text-white font-black text-[11px]">상황 03 · 수공예 도자기 고유 특성 문의 시</span>
+                    <span class="text-[11px] font-bold text-stone-600">불량 오해 해소</span>
+                </div>
+                <h3 class="font-black text-base text-stone-900">유약 흐림 · 철점 · 미세 기공(핀홀) · 빙열에 대한 전문 도예 안내</h3>
+                <p class="text-stone-600 leading-relaxed">
+                    일본 시가라키야키·미노야키 등 전통 고온 소성 수공예 도자기는 공장에서 찍어내는 멜라민 그릇과 달리 <strong>흙 속의 철분이 피어나는 검은 점(철점), 유약이 숨을 쉬며 생기는 미세 기공(핀홀), 유약 두께에 따른 농담 차이</strong>가 자연스럽게 나타납니다. 이는 불량이 아니라 진품 수공예 도자기의 증명임을 정중하고 전문적으로 설명합니다.
+                </p>
+                <div class="bg-white p-3 rounded-xl border border-stone-200 space-y-2">
+                    <span class="font-bold text-stone-800 block text-[11px]">📋 수공예 유약 요변 설명 & 도자기 관리법 문구 (클릭 복사)</span>
+                    <textarea id="csTpl3" rows="3" readonly class="w-full text-[11px] text-stone-600 resize-none focus:outline-none">고객님, 문의주신 표면의 미세한 점(철점)과 유약의 자연스러운 흐름 자국은 1,280℃ 고온 환원 가마에서 천연 광물 유약과 철분 함유 도토가 불길과 만나 생기는 일본 전통 수공예 도자기만의 고유한 '요변(窯變)' 현상입니다. 구조적 균열이 아닌 숨 쉬는 천연 도자기의 자연스러운 결이오니 안심하고 사용하셔도 됩니다.</textarea>
+                    <button onclick="copyTextById('csTpl3', '수공예 유약 설명 문구')" class="px-3 py-1.5 rounded-lg bg-stone-800 hover:bg-black text-white font-bold text-[11px]">응대 문구 복사</button>
+                </div>
+            </div>
+
+            <!-- 사후처리 4: 단순 변심 반품 / 교환 규정 -->
+            <div class="p-5 rounded-2xl border-2 border-stone-200 bg-stone-50 space-y-3">
+                <div class="flex items-center justify-between">
+                    <span class="px-2.5 py-1 rounded-lg bg-stone-800 text-white font-black text-[11px]">상황 04 · 단순 변심 취소 · 반품 요청 시</span>
+                    <span class="text-[11px] font-bold text-stone-600">전자상거래법 기준 처리</span>
+                </div>
+                <h3 class="font-black text-base text-stone-900">발주 단계별 취소 처리 기준 & 국내 쇼룸 재고 전환 전략</h3>
+                <ul class="space-y-1.5 text-stone-700 leading-relaxed list-disc pl-4">
+                    <li><strong>일본 현지 발주 전 취소 요청</strong>: 아무 조건 없이 100% 즉시 무료 취소 승인합니다.</li>
+                    <li><strong>일본 현지 출고 완료 후 ~ 수령 후 7일 이내 단순 변심 반품</strong>: 왕복 국제/국내 물류 실비 차감 후 반품이 가능함을 정중히 안내합니다.</li>
+                    <li><strong>1인 대표 꿀팁 (반품을 기회로 전환)</strong>: 인기 화분이나 액자가 단순 변심으로 반품 회수되어 우리 사무실에 들어오면, 일본으로 다시 돌려보내지 마시고 <strong>우리 쇼룸에 [국내 당일 즉시발송 (내일 도착)] 배지를 달아 재판매</strong>하면 훨씬 더 빨리 팔립니다!</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- =========================================================================
+         PART 04. 광고(Advertising) & 첫 매출 돌파 실행 플레이북 + 88종 카피 생성기
+    ========================================================================== -->
+    <section id="section-ad-playbook" class="bg-gradient-to-br from-[#111111] via-stone-900 to-[#111111] text-white p-6 sm:p-8 rounded-3xl border border-stone-800 shadow-2xl space-y-8">
+        <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 pb-6 border-b border-stone-800">
+            <div>
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#4F6F52] text-white text-xs font-black mb-2">
+                    <i class="fa-solid fa-bullhorn"></i>
+                    <span>PART 04 · ADVERTISING & ZERO-TO-ONE REVENUE PLAYBOOK</span>
+                </span>
+                <h2 class="text-2xl sm:text-3xl font-black text-white">
+                    매출 0원을 깨는 단계별 광고 전략 & 88종 전 작품 마케팅 원고 자동 생성기
+                </h2>
+                <p class="text-xs sm:text-sm text-stone-300 mt-1">
+                    막연하게 광고비를 쓰는 것이 아니라, <strong>1단계 무자본 타겟 침투 ➔ 2단계 네이버 쇼핑 롱테일 키워드 장악 ➔ 3단계 소액(일 5천~1만원) 리타게팅 광고</strong> 순서로 실행합니다.
+                </p>
+            </div>
+        </div>
+
+        <!-- 4-1. 3단계 광고 실행 로드맵 (무자본 -> 검색광고 -> SNS 타겟 광고) -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 text-xs">
+            <!-- 채널 1: 무자본 바이럴 (스레드 / 인스타 / 블로그) -->
+            <div class="p-5 rounded-2xl bg-stone-900/90 border border-stone-700 space-y-3 flex flex-col justify-between">
+                <div class="space-y-2.5">
+                    <div class="flex items-center justify-between">
+                        <span class="px-2.5 py-1 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-black text-[11px]">1순위 · 광고비 0원 (오늘 즉시 실행)</span>
+                        <span class="text-stone-400 font-mono text-[11px]">일 15분 투자</span>
+                    </div>
+                    <h3 class="font-black text-base text-white">스레드(Threads) · 인스타그램 · 블로그 유입 몰이</h3>
+                    <div class="space-y-2 text-stone-300 leading-relaxed">
+                        <p><strong class="text-[#C4A482]">① 스레드(Threads) 운영 공식:</strong> 요즘 3040 식물·다도·인테리어 매니아 유입 1위 채널입니다. 상품 사진 2장과 함께 <em>"일본 도자기 직구하다 깨져서 오는 게 답답해서 직접 통관·검수하는 쇼룸을 열었습니다"</em>라는 창업 스토리를 올리고 댓글 첫 줄에 키레노 쇼룸 주소를 고정하세요.</p>
+                        <p><strong class="text-[#C4A482]">② 네이버 블로그 & 카페 침투:</strong> '괴근식물 분갈이', '파키포디움 화분 추천', '재팬디 거실 액자 인테리어' 주제로 주 3회 글을 올리고 본문 하단에 개별 작품 주소(<code>/product/141</code> 등)를 걸어둡니다.</p>
+                    </div>
+                </div>
+                <div class="pt-3 border-t border-stone-800 text-[11px] text-emerald-400 font-bold">
+                    ✓ 아래 생성기에서 채널별 맞춤 원고가 1초 만에 생성됩니다.
+                </div>
+            </div>
+
+            <!-- 채널 2: 네이버 스마트스토어 SEO & 쇼핑검색광고 -->
+            <div class="p-5 rounded-2xl bg-stone-900/90 border border-stone-700 space-y-3 flex flex-col justify-between">
+                <div class="space-y-2.5">
+                    <div class="flex items-center justify-between">
+                        <span class="px-2.5 py-1 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 font-black text-[11px]">2순위 · 네이버 검색 유입 장악</span>
+                        <span class="text-stone-400 font-mono text-[11px]">구매전환율 최고</span>
+                    </div>
+                    <h3 class="font-black text-base text-white">스마트스토어 롱테일 상품명 개편 & 소액 검색광고</h3>
+                    <div class="space-y-2 text-stone-300 leading-relaxed">
+                        <p><strong class="text-[#C4A482]">① 상품명 공식:</strong> 단순히 <code>BAND 화분</code>이라고 적으면 절대 검색되지 않습니다. <strong>[산지/스타일 + 핵심용도 + 세부타겟 + 소재 + 규격]</strong> 순서로 바꿔야 합니다.<br>
+                        <span class="text-stone-400 text-[11px]">예: 일본 시가라키 수제 도자기 화분 괴근식물 파키포디움 분재 블랙 골드 토분 13cm</span></p>
+                        <p><strong class="text-[#C4A482]">② 네이버 쇼핑검색광고 설정법:</strong> 88개 전체에 광고를 켜지 마시고, 대표 주력 화분 3개 + 패브릭 액자 2개 + 향꽂이 1개(총 6개)만 골라 <strong>하루 예산 5,000원, 클릭당 입찰가(CPC) 90원~150원</strong>으로 '세부 키워드'에만 노출시키면 적은 비용으로 첫 결제가 터집니다.</p>
+                    </div>
+                </div>
+                <div class="pt-3 border-t border-stone-800 text-[11px] text-amber-400 font-bold">
+                    ✓ 아래 TOP 5 황금 키워드 표를 복사해 스마트스토어에 적용하세요.
+                </div>
+            </div>
+
+            <!-- 채널 3: 메타(인스타그램) 쇼룸 랜딩 광고 -->
+            <div class="p-5 rounded-2xl bg-stone-900/90 border border-stone-700 space-y-3 flex flex-col justify-between">
+                <div class="space-y-2.5">
+                    <div class="flex items-center justify-between">
+                        <span class="px-2.5 py-1 rounded bg-pink-500/20 text-pink-300 border border-pink-500/40 font-black text-[11px]">3순위 · 인스타그램 타겟 스폰서 광고</span>
+                        <span class="text-stone-400 font-mono text-[11px]">일 5,000원~10,000원</span>
+                    </div>
+                    <h3 class="font-black text-base text-white">키레노 쇼룸 직결 인스타그램 타겟 세팅 공식</h3>
+                    <div class="space-y-2 text-stone-300 leading-relaxed">
+                        <p><strong class="text-[#C4A482]">① 타겟 오디언스 설정:</strong>
+                        <br>• 연령/지역: 만 28세 ~ 54세 (서울·분당·판교·수도권 및 주요 광역시)
+                        <br>• 상세 관심사: <code>실내식물(Houseplant)</code>, <code>가드닝</code>, <code>도예(Ceramics)</code>, <code>인테리어 디자인</code>, <code>다도(Tea)</code>, <code>인센스</code></p>
+                        <p><strong class="text-[#C4A482]">② 랜딩 주소(도착 URL):</strong> 스마트스토어 대신 <strong>키레노 공식 쇼룸 메인 주소</strong>로 연결하세요. 방금 우리가 개편한 모바일 첫 화면에서 도자기를 구경한 뒤 안심하고 스마트스토어 결제 버튼을 누르게 됩니다.</p>
+                    </div>
+                </div>
+                <div class="pt-3 border-t border-stone-800 text-[11px] text-pink-400 font-bold">
+                    ✓ 첫 화면 이탈 방지 개편이 완료되어 광고 효율이 극대화됩니다.
+                </div>
+            </div>
+        </div>
+
+        <!-- 4-2. 스마트스토어 즉시 적용 가능한 주력 TOP 5 황금 키워드 & 상품명 최적화 표 -->
+        <div class="bg-stone-900/80 p-5 sm:p-6 rounded-2xl border border-stone-800 space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div>
+                    <h3 class="text-base font-black text-[#C4A482]">🔥 가장 빨리 첫 매출을 터뜨릴 주력 효자 작품 TOP 5 — 스마트스토어 황금 상품명 & 검색태그</h3>
+                    <p class="text-xs text-stone-400 mt-0.5">스마트스토어 상품 수정에서 아래 추천 상품명과 태그를 그대로 복사해 반영하시면 경쟁이 적은 진성 구매자 검색에 즉시 노출됩니다.</p>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs border-collapse">
+                    <thead>
+                        <tr class="border-b border-stone-700 text-stone-400">
+                            <th class="py-2.5 px-3">순위 / 작품번호</th>
+                            <th class="py-2.5 px-3">현재 작품명 (판매가)</th>
+                            <th class="py-2.5 px-3">스마트스토어 검색 1페이지 노출용 추천 상품명 (클릭 복사)</th>
+                            <th class="py-2.5 px-3">필수 검색 태그 10선</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-stone-800 text-stone-200">
+                        <tr>
+                            <td class="py-3 px-3 font-mono font-bold text-[#C4A482]">TOP 1 (#141)</td>
+                            <td class="py-3 px-3 font-semibold">BAND 컬렉션 블랙 골드 화분 (93,000원)</td>
+                            <td class="py-3 px-3">
+                                <div class="flex items-center justify-between gap-2 bg-black/50 p-2 rounded-lg border border-stone-700">
+                                    <span id="kwName1" class="font-bold text-white">일본 시가라키 수제 도자기 화분 괴근식물 파키포디움 분재 블랙 골드 토분 BAND</span>
+                                    <button onclick="copyInnerText('kwName1')" class="px-2 py-1 bg-[#C4A482] text-black font-bold rounded text-[10px] shrink-0">복사</button>
+                                </div>
+                            </td>
+                            <td class="py-3 px-3 text-[11px] text-stone-400 font-mono">#괴근식물화분 #시가라키화분 #파키포디움화분 #수제토분 #블랙화분 #분재화분 #아프리카식물화분 #일본화분 #다육이화분 #고급토분</td>
+                        </tr>
+                        <tr>
+                            <td class="py-3 px-3 font-mono font-bold text-[#C4A482]">TOP 2 (#169)</td>
+                            <td class="py-3 px-3 font-semibold">ARC 패브릭 패널 블랙 60CM 액자 (69,000원)</td>
+                            <td class="py-3 px-3">
+                                <div class="flex items-center justify-between gap-2 bg-black/50 p-2 rounded-lg border border-stone-700">
+                                    <span id="kwName2" class="font-bold text-white">재팬디 인테리어 패브릭 액자 거실 복도 침실 대형 블랙 추상화 오브제 패널 60cm ARC</span>
+                                    <button onclick="copyInnerText('kwName2')" class="px-2 py-1 bg-[#C4A482] text-black font-bold rounded text-[10px] shrink-0">복사</button>
+                                </div>
+                            </td>
+                            <td class="py-3 px-3 text-[11px] text-stone-400 font-mono">#패브릭액자 #재팬디인테리어 #거실대형액자 #블랙액자 #와비사비인테리어 #추상화액자 #집들이선물액자 #침실액자 #모던액자 #텍스처액자</td>
+                        </tr>
+                        <tr>
+                            <td class="py-3 px-3 font-mono font-bold text-[#C4A482]">TOP 3 (#183)</td>
+                            <td class="py-3 px-3 font-semibold">버드나무 원목 인센스 홀더 (65,000원)</td>
+                            <td class="py-3 px-3">
+                                <div class="flex items-center justify-between gap-2 bg-black/50 p-2 rounded-lg border border-stone-700">
+                                    <span id="kwName3" class="font-bold text-white">일본 와비사비 천연 버드나무 원목 인센스 홀더 황동 향꽂이 다도 명상 선향 트레이</span>
+                                    <button onclick="copyInnerText('kwName3')" class="px-2 py-1 bg-[#C4A482] text-black font-bold rounded text-[10px] shrink-0">복사</button>
+                                </div>
+                            </td>
+                            <td class="py-3 px-3 text-[11px] text-stone-400 font-mono">#인센스홀더 #원목향꽂이 #선향홀더 #다도용품 #명상소품 #와비사비소품 #황동인센스홀더 #집들이선물추천 #서재인테리어 #일본향꽂이</td>
+                        </tr>
+                        <tr>
+                            <td class="py-3 px-3 font-mono font-bold text-[#C4A482]">TOP 4 (#167)</td>
+                            <td class="py-3 px-3 font-semibold">마크라메 수공예 도자기 화병 (72,000원)</td>
+                            <td class="py-3 px-3">
+                                <div class="flex items-center justify-between gap-2 bg-black/50 p-2 rounded-lg border border-stone-700">
+                                    <span id="kwName4" class="font-bold text-white">일본 재팬디 수공예 도자기 화병 마크라메 오브제 꽃병 거실 테이블 집들이 선물</span>
+                                    <button onclick="copyInnerText('kwName4')" class="px-2 py-1 bg-[#C4A482] text-black font-bold rounded text-[10px] shrink-0">복사</button>
+                                </div>
+                            </td>
+                            <td class="py-3 px-3 text-[11px] text-stone-400 font-mono">#도자기화병 #오브제꽃병 #재팬디소품 #집들이선물화병 #수제화병 #테이블오브제 #인테리어꽃병 #세라믹화병 #일본도자기 #미니멀화병</td>
+                        </tr>
+                        <tr>
+                            <td class="py-3 px-3 font-mono font-bold text-[#C4A482]">TOP 5 (#150)</td>
+                            <td class="py-3 px-3 font-semibold">NSM2 아이보리 다육 화분 9cm (99,000원)</td>
+                            <td class="py-3 px-3">
+                                <div class="flex items-center justify-between gap-2 bg-black/50 p-2 rounded-lg border border-stone-700">
+                                    <span id="kwName5" class="font-bold text-white">일본 수제 다육이 화분 리톱스 코노피툼 아프리카식물 소형 백자 도자기 토분 9cm NSM2</span>
+                                    <button onclick="copyInnerText('kwName5')" class="px-2 py-1 bg-[#C4A482] text-black font-bold rounded text-[10px] shrink-0">복사</button>
+                                </div>
+                            </td>
+                            <td class="py-3 px-3 text-[11px] text-stone-400 font-mono">#리톱스화분 #코노피툼화분 #다육이수제화분 #소형토분 #미니분재화분 #일본수제화분 #아이보리화분 #통기성화분 #식집사선물 #도자화분</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 4-3. 88종 전 작품 연동 × 4대 광고 매체별 원고 1초 자동 생성기 -->
+        <div id="marketingSection" class="bg-black/60 p-6 rounded-2xl border border-stone-700 space-y-5">
+            <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 pb-4 border-b border-stone-800">
+                <div>
+                    <span class="text-xs font-black text-[#C4A482] block mb-0.5">88종 실시간 DB 연동 광고 원고 생성 엔진</span>
+                    <h3 class="text-lg font-black text-white">작품과 홍보 채널만 고르면 오늘 올릴 광고 원고가 즉시 완성됩니다</h3>
+                </div>
+                <div class="flex flex-wrap items-center gap-2.5 w-full lg:w-auto">
+                    <select id="adChannelSelect" onchange="generateRealProductAdCopy()" class="bg-stone-800 border border-stone-600 text-white text-xs px-3 py-2.5 rounded-xl font-bold focus:outline-none focus:border-[#C4A482]">
+                        <option value="threads">① 스레드(Threads) 바이럴 쇼룸 홍보글</option>
+                        <option value="instagram">② 인스타그램 피드 & 릴스 캡션</option>
+                        <option value="blog">③ 네이버 블로그 & 식물/인테리어 카페 정보글</option>
+                        <option value="meta_ad">④ 메타(인스타/페북) 유료 스폰서 광고 문구</option>
+                    </select>
+                    <select id="copyProductSelect" onchange="generateRealProductAdCopy()" class="bg-stone-800 border border-stone-600 text-white text-xs px-3 py-2.5 rounded-xl font-bold max-w-xs truncate focus:outline-none focus:border-[#C4A482]">
+                        {% for p in all_products %}
+                        <option value="{{ p.id }}"
+                                data-name="{{ p.name }}"
+                                data-cat="{{ p.category }}"
+                                data-dim="{{ p.dimensions }}"
+                                data-price="{{ '{:,}'.format(p.price) }}"
+                                data-desc="{{ p.description }}"
+                                data-store="{{ p.smartstore_url or 'https://smartstore.naver.com/kireno' }}">
+                            [#{{ p.id }}] {{ p.name }} ({{ "{:,}".format(p.price) }}원)
+                        </option>
+                        {% endfor %}
+                    </select>
+                    <button onclick="copyGeneratedSnsText()" class="px-4 py-2.5 bg-[#C4A482] hover:bg-[#b39270] text-black rounded-xl text-xs font-black transition flex items-center space-x-1.5 shrink-0">
+                        <i class="fa-solid fa-copy"></i>
+                        <span>원고 전체 복사</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <div class="lg:col-span-8 bg-stone-950 p-4 rounded-xl border border-stone-800">
+                    <div class="flex items-center justify-between pb-2 mb-2 border-b border-stone-800 text-[11px] text-stone-400">
+                        <span id="adChannelTitle" class="font-bold text-[#C4A482]">스레드(Threads) 바이럴 원고 미리보기</span>
+                        <span>수정 가능 · 복사 후 바로 게시하세요</span>
+                    </div>
+                    <textarea id="snsCopyOutput" rows="11" class="w-full bg-transparent text-xs text-stone-100 font-sans leading-relaxed resize-none focus:outline-none border-0 p-1"></textarea>
+                </div>
+
+                <div class="lg:col-span-4 space-y-4 flex flex-col justify-between">
+                    <div class="bg-stone-900 p-4 rounded-xl border border-stone-800 space-y-2">
+                        <span class="text-xs font-bold text-[#C4A482] block">🎯 맞춤 추천 해시태그 (클릭 복사)</span>
+                        <p id="snsHashtags" onclick="copyInnerText('snsHashtags')" class="text-xs text-stone-300 font-mono leading-relaxed cursor-pointer hover:text-white" title="클릭 시 복사됩니다"></p>
+                    </div>
+                    <div class="bg-stone-900 p-4 rounded-xl border border-stone-800 space-y-2 text-xs">
+                        <span class="font-bold text-emerald-400 block">🔗 함께 넣을 랜딩 링크</span>
+                        <div class="text-[11px] text-stone-300 space-y-1 font-mono break-all">
+                            <div>• 쇼룸 메인: <span class="text-white">{{ request.host_url.rstrip('/') }}</span></div>
+                            <div>• 작품 단독주소: <span id="adProductDirectUrl" class="text-[#C4A482]">{{ request.host_url.rstrip('/') }}/product/141</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =========================================================================
+         5. 실시간 주문·통관·우체국 배송 진행 추적 수불부
+    ========================================================================== -->
+    <div id="ordersSection" class="bg-white rounded-3xl border border-stone-200 shadow-sm overflow-hidden">
+        <div class="p-6 border-b border-stone-200 bg-stone-50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+                <h3 class="text-base font-black text-stone-900 flex items-center space-x-2">
+                    <i class="fa-solid fa-receipt text-blue-600"></i>
+                    <span>주문 · 일본발주 · 세관통관 · 우체국배송 실시간 수불부 (총 {{ orders|length }}건)</span>
+                </h3>
+                <p class="text-xs text-stone-500 mt-0.5">진행 단계를 변경하면 고객 쇼룸의 [실시간 통관·배송 조회] 모달에도 100% 동일하게 반영됩니다.</p>
+            </div>
+            <button onclick="document.getElementById('newOrderModal').classList.remove('hidden')" class="px-3.5 py-2 bg-stone-900 text-white rounded-xl text-xs font-bold hover:bg-black transition flex items-center space-x-1.5">
+                <i class="fa-solid fa-plus text-xs"></i>
+                <span>주문서 추가</span>
+            </button>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+                <thead class="bg-stone-50 text-stone-500 font-bold uppercase border-b border-stone-200">
+                    <tr>
+                        <th class="py-3.5 px-4">주문번호</th>
+                        <th class="py-3.5 px-4">고객명 / 연락처 / 통관부호</th>
+                        <th class="py-3.5 px-4">주문 작품</th>
+                        <th class="py-3.5 px-4 text-right">결제금액</th>
+                        <th class="py-3.5 px-4 text-center">일본 발주 상태</th>
+                        <th class="py-3.5 px-4 text-center">세관 통관 상태</th>
+                        <th class="py-3.5 px-4 text-center">진행 단계 변경</th>
+                        <th class="py-3.5 px-4">국내 우체국 송장</th>
+                        <th class="py-3.5 px-4 text-center">사후 케어</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-stone-100 font-medium">
+                    {% for ord in orders %}
+                    <tr class="hover:bg-stone-50/80 transition">
+                        <td class="py-4 px-4 font-mono font-bold text-stone-900">{{ ord.order_number }}</td>
+                        <td class="py-4 px-4">
+                            <span class="font-bold text-stone-900 block">{{ ord.customer_name }}</span>
+                            <span class="text-[11px] text-stone-400 font-mono block">{{ ord.customer_phone }}</span>
+                            <span class="inline-block px-1.5 py-0.5 bg-blue-50 text-blue-800 text-[10px] font-mono font-bold rounded border border-blue-200 mt-0.5">PCCC: {{ ord.pccc|default('P123456789012') }}</span>
+                        </td>
+                        <td class="py-4 px-4 font-semibold text-stone-800">
+                            {{ ord.product_name }} ({{ ord.quantity }}개)
+                            {% if ord.japan_source_url %}
+                            <a href="{{ ord.japan_source_url }}" target="_blank" class="text-[10px] text-blue-600 hover:underline block font-normal">일본 원문 소싱처 열기 ↗</a>
+                            {% endif %}
+                        </td>
+                        <td class="py-4 px-4 text-right font-black text-stone-900">{{ "{:,}".format(ord.total_amount) }}원</td>
+                        <td class="py-4 px-4 text-center">
+                            <span class="px-2 py-0.5 rounded-full bg-stone-100 text-stone-800 text-[11px] font-bold block">{{ ord.jp_order_status|default('일본현지발주완료') }}</span>
+                            <span class="text-[10px] text-stone-400 font-mono block mt-0.5">{{ ord.jp_tracking_num|default('EMS-JP883921KR') }}</span>
+                        </td>
+                        <td class="py-4 px-4 text-center">
+                            <span class="px-2 py-0.5 rounded-full {% if '완료' in ord.customs_status|default('') %}bg-emerald-100 text-emerald-800{% else %}bg-amber-100 text-amber-800{% endif %} text-[11px] font-black">
+                                <i class="fa-solid fa-passport mr-1"></i>{{ ord.customs_status|default('세관통관완료') }}
+                            </span>
+                        </td>
+                        <td class="py-4 px-4 text-center">
+                            <form method="POST" action="/admin/orders/update-status" class="inline">
+                                <input type="hidden" name="order_id" value="{{ ord.id }}">
+                                <select name="status" onchange="this.form.submit()" class="text-xs px-2.5 py-1 rounded-full font-bold cursor-pointer border {% if ord.status == '배송완료' %}bg-emerald-50 text-emerald-800 border-emerald-300{% elif ord.status == '국내우체국배송' or ord.status == '배송중' %}bg-blue-50 text-blue-800 border-blue-300{% elif '통관' in ord.status %}bg-indigo-50 text-indigo-800 border-indigo-300{% elif '발주' in ord.status or '항공' in ord.status %}bg-amber-50 text-amber-800 border-amber-300{% else %}bg-stone-100 text-stone-700 border-stone-300{% endif %}">
+                                    <option value="주문접수" {% if ord.status == '주문접수' %}selected{% endif %}>1. 주문접수</option>
+                                    <option value="일본현지발주" {% if ord.status == '일본현지발주' %}selected{% endif %}>2. 일본현지발주</option>
+                                    <option value="국제항공운송(EMS)" {% if ord.status == '국제항공운송(EMS)' %}selected{% endif %}>3. 국제항공운송(EMS)</option>
+                                    <option value="세관통관심사" {% if ord.status == '세관통관심사' %}selected{% endif %}>4. 세관통관심사</option>
+                                    <option value="세관반출완료" {% if ord.status == '세관반출완료' %}selected{% endif %}>5. 세관반출완료</option>
+                                    <option value="1인검수패킹" {% if ord.status == '1인검수패킹' %}selected{% endif %}>6. 1인검수패킹</option>
+                                    <option value="국내우체국배송" {% if ord.status == '국내우체국배송' or ord.status == '배송중' %}selected{% endif %}>7. 국내우체국배송</option>
+                                    <option value="배송완료" {% if ord.status == '배송완료' %}selected{% endif %}>8. 배송완료</option>
+                                </select>
+                            </form>
+                        </td>
+                        <td class="py-4 px-4 font-mono text-[11px] text-stone-600">
+                            {% if ord.tracking_number %}
+                                <span class="bg-stone-100 px-2 py-0.5 rounded border border-stone-200">{{ ord.tracking_number }}</span>
+                            {% else %}
+                                <span class="text-stone-400">우체국 발송준비</span>
+                            {% endif %}
+                        </td>
+                        <td class="py-4 px-4 text-center">
+                            <button onclick="sendCareGuideSms('{{ ord.customer_name }}', '{{ ord.product_name }}')" class="px-2.5 py-1 bg-stone-100 hover:bg-stone-200 text-stone-800 rounded text-[11px] font-bold border border-stone-200 transition">
+                                <i class="fa-solid fa-paper-plane mr-1"></i>사후안내 복사
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- =========================================================================
+         6. 기존 구매 고객 & VIP 재구매 관리 원장 (CRM)
+    ========================================================================== -->
+    <div id="crmSection" class="bg-white rounded-3xl border border-stone-200 shadow-sm overflow-hidden">
+        <div class="p-6 border-b border-stone-200 bg-stone-50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+                <h3 class="text-base font-black text-stone-900 flex items-center space-x-2">
+                    <i class="fa-solid fa-users text-amber-600"></i>
+                    <span>구매 고객 사후 관리 & 재구매 유도 원장 (CRM)</span>
+                </h3>
+                <p class="text-xs text-stone-500 mt-0.5">한 번 화분이나 액자를 구매한 고객에게 어울리는 연계 작품을 제안하여 재구매율을 높입니다.</p>
+            </div>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+                <thead class="bg-stone-50 text-stone-500 font-bold uppercase border-b border-stone-200">
+                    <tr>
+                        <th class="py-3.5 px-6">고객명 / 연락처</th>
+                        <th class="py-3.5 px-6 text-center">고객 등급</th>
+                        <th class="py-3.5 px-6 text-center">선호 카테고리</th>
+                        <th class="py-3.5 px-6 text-right">누적 주문</th>
+                        <th class="py-3.5 px-6 text-right">총 구매액</th>
+                        <th class="py-3.5 px-6">최근 구매일</th>
+                        <th class="py-3.5 px-6">고객 메모 & 취향</th>
+                        <th class="py-3.5 px-6 text-center">재구매 유도 문자</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-stone-100 font-medium">
+                    {% for c in customers %}
+                    <tr class="hover:bg-amber-50/30 transition">
+                        <td class="py-4 px-6">
+                            <span class="font-bold text-stone-900 block">{{ c.name }}</span>
+                            <span class="text-[11px] text-stone-400 font-mono">{{ c.phone }}</span>
+                        </td>
+                        <td class="py-4 px-6 text-center">
+                            <span class="px-2.5 py-1 rounded-full text-[10px] font-black border {% if c.tier == 'VIP' %}bg-amber-100 text-amber-900 border-amber-300{% elif c.tier == 'B2B파트너' %}bg-purple-100 text-purple-900 border-purple-300{% elif c.tier == 'GOLD' %}bg-yellow-50 text-yellow-800 border-yellow-200{% else %}bg-stone-100 text-stone-600 border-stone-200{% endif %}">
+                                {{ c.tier }}
+                            </span>
+                        </td>
+                        <td class="py-4 px-6 text-center font-semibold text-stone-700">{{ c.preferred_category }}</td>
+                        <td class="py-4 px-6 text-right font-bold text-stone-800">{{ c.total_orders }}회</td>
+                        <td class="py-4 px-6 text-right font-black text-stone-900">{{ "{:,}".format(c.total_spent) }}원</td>
+                        <td class="py-4 px-6 text-[11px] text-stone-500 font-mono">{{ c.last_order_date }}</td>
+                        <td class="py-4 px-6 text-stone-600 text-[11px] max-w-xs truncate">{{ c.notes }}</td>
+                        <td class="py-4 px-6 text-center">
+                            <button onclick="sendVipCustomCoupon('{{ c.name }}', '{{ c.preferred_category }}')" class="px-2.5 py-1.5 bg-stone-900 hover:bg-black text-white text-[10px] font-bold rounded-lg transition">
+                                <i class="fa-solid fa-gift mr-1 text-[#C4A482]"></i>연계작품 추천문 복사
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: 신규 주문 수기 등록 (실제 88종 DB 연동) -->
+<div id="newOrderModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl">
+        <div class="flex justify-between items-center pb-3 border-b border-stone-200 mb-4">
+            <h3 class="font-bold text-sm text-stone-900">신규 주문서 등록 (스마트스토어 / 1:1 상담 건)</h3>
+            <button onclick="document.getElementById('newOrderModal').classList.add('hidden')" class="text-stone-400 hover:text-black">✕</button>
+        </div>
+        <form method="POST" action="/admin/orders/add" class="space-y-3 text-xs">
+            <div>
+                <label class="block text-stone-700 font-bold mb-1">고객 성함</label>
+                <input type="text" name="customer_name" required placeholder="예: 김도연" class="w-full px-3 py-2 rounded-xl border border-stone-300">
+            </div>
+            <div>
+                <label class="block text-stone-700 font-bold mb-1">고객 연락처</label>
+                <input type="tel" name="customer_phone" required placeholder="010-0000-0000" class="w-full px-3 py-2 rounded-xl border border-stone-300 font-mono">
+            </div>
+            <div>
+                <label class="block text-stone-700 font-bold mb-1">개인통관고유부호 (PCCC - 인천세관 통관 필수)</label>
+                <input type="text" name="pccc" value="P123456789012" required placeholder="P로 시작하는 13자리" class="w-full px-3 py-2 rounded-xl border border-stone-300 font-mono uppercase">
+            </div>
+            <div>
+                <label class="block text-stone-700 font-bold mb-1">주문 작품 선택 (88종 공식 카탈로그)</label>
+                <select name="product_id" id="modalOrderProdSelect" onchange="syncModalOrderPrice()" class="w-full px-3 py-2 rounded-xl border border-stone-300 bg-white">
+                    {% for p in all_products %}
+                    <option value="{{ p.id }}" data-price="{{ p.price }}" data-name="{{ p.name }}">
+                        [#{{ p.id }}] {{ p.name }} ({{ "{:,}".format(p.price) }}원)
+                    </option>
+                    {% endfor %}
+                </select>
+                <input type="hidden" name="product_name" id="modalOrderProdName" value="{{ all_products[0].name if all_products else '' }}">
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-stone-700 font-bold mb-1">수량</label>
+                    <input type="number" name="quantity" id="modalOrderQty" value="1" min="1" onchange="syncModalOrderPrice()" class="w-full px-3 py-2 rounded-xl border border-stone-300">
+                </div>
+                <div>
+                    <label class="block text-stone-700 font-bold mb-1">총 결제금액 (원)</label>
+                    <input type="number" name="total_amount" id="modalOrderTotal" value="{{ all_products[0].price if all_products else 93000 }}" class="w-full px-3 py-2 rounded-xl border border-stone-300 font-mono">
+                </div>
+            </div>
+            <div>
+                <label class="block text-stone-700 font-bold mb-1">결제 방식</label>
+                <select name="payment_method" class="w-full px-3 py-2 rounded-xl border border-stone-300 bg-white">
+                    <option value="네이버페이(스마트스토어)">네이버페이(스마트스토어)</option>
+                    <option value="카드결제">카드결제</option>
+                    <option value="무통장입금(계좌)">무통장입금(계좌)</option>
+                </select>
+            </div>
+            <button type="submit" class="w-full bg-black text-white font-bold py-3 rounded-xl hover:bg-stone-800 transition">
+                주문서 등록 및 통관 추적 시작
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- 복사 완료 토스트 알림 -->
+<div id="copyToast" class="hidden fixed bottom-6 right-6 z-50 bg-[#111111] text-white px-5 py-3 rounded-2xl shadow-2xl border border-[#C4A482] text-xs font-bold flex items-center gap-2">
+    <i class="fa-solid fa-circle-check text-[#C4A482]"></i>
+    <span id="copyToastMsg">복사가 완료되었습니다!</span>
+</div>
+
+<script>
+    const HOST_ORIGIN = window.location.origin;
+
+    function showToast(msg) {
+        const t = document.getElementById('copyToast');
+        document.getElementById('copyToastMsg').textContent = msg;
+        t.classList.remove('hidden');
+        setTimeout(() => t.classList.add('hidden'), 2600);
+    }
+
+    function copyTextById(id, label) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        navigator.clipboard.writeText(el.value).then(() => {
+            showToast(`[${label}] 클립보드 복사 완료! 고객에게 바로 붙여넣기 하세요.`);
+        });
+    }
+
+    function copyInnerText(id) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        navigator.clipboard.writeText(el.innerText.trim()).then(() => {
+            showToast(`클립보드 복사 완료: ${el.innerText.trim().slice(0, 28)}...`);
+        });
+    }
+
+    function syncModalOrderPrice() {
+        const sel = document.getElementById('modalOrderProdSelect');
+        const opt = sel.options[sel.selectedIndex];
+        const price = parseInt(opt.getAttribute('data-price') || '0', 10);
+        const qty = parseInt(document.getElementById('modalOrderQty').value || '1', 10);
+        document.getElementById('modalOrderTotal').value = price * qty;
+        document.getElementById('modalOrderProdName').value = opt.getAttribute('data-name') || '';
+    }
+
+    function generateRealProductAdCopy() {
+        const channel = document.getElementById('adChannelSelect').value;
+        const sel = document.getElementById('copyProductSelect');
+        const opt = sel.options[sel.selectedIndex];
+        if (!opt) return;
+
+        const id = opt.value;
+        const name = opt.getAttribute('data-name');
+        const cat = opt.getAttribute('data-cat');
+        const dim = opt.getAttribute('data-dim');
+        const price = opt.getAttribute('data-price');
+        const desc = opt.getAttribute('data-desc');
+        const directUrl = `${HOST_ORIGIN}/product/${id}`;
+
+        document.getElementById('adProductDirectUrl').textContent = directUrl;
+
+        let copy = '';
+        let title = '';
+        let tags = '';
+
+        if (cat.includes('화분')) {
+            tags = '#키레노 #KIRENO #시가라키화분 #괴근식물화분 #파키포디움화분 #수제토분 #일본화분 #분재화분 #식집사 #플랜테리어 #모엔드';
+        } else if (cat.includes('액자')) {
+            tags = '#키레노 #KIRENO #재팬디인테리어 #패브릭액자 #와비사비인테리어 #거실액자 #침실인테리어 #집들이선물 #텍스처아트 #모엔드';
+        } else {
+            tags = '#키레노 #KIRENO #인센스홀더 #도자기화병 #와비사비소품 #다도용품 #명상소품 #재팬디소품 #수제도자기 #모엔드';
+        }
+
+        if (channel === 'threads') {
+            title = '① 스레드(Threads) 바이럴 쇼룸 홍보 원고';
+            copy = `일본 공방 도자기나 화분을 직구하면 왜 깨져서 올까? 너무 답답해서 제가 직접 일본 요장 88종을 고르고, 인천세관 정식 통관 후 제 손으로 굽과 유약을 하나하나 전수 육안검수해서 우체국 택배로 보내는 도예 쇼룸 '키레노(KIRENO)'를 열었습니다.\n\n오늘 소개해 드리는 작품은 [${name}] 입니다.\n• 실측 규격: ${dim}\n• 특징: ${desc}\n• 공식 판매가: ${price}원 (배송 파손 시 100% 무상 재발송 보증)\n\n복잡한 회원가입 없이 쇼룸에서 실물 치수와 어울리는 연계 구성을 감상하시고, 결제는 네이버 스마트스토어 안전결제로 편하게 만나보세요.\n\n👉 작품 상세 및 공식 쇼룸 바로가기:\n${directUrl}`;
+        } else if (channel === 'instagram') {
+            title = '② 인스타그램 피드 & 릴스 캡션 원고';
+            copy = `[흙과 불의 결, 공간에 스며드는 고요한 여백 — KIRENO]\n\n작품명: ${name}\n분류: ${cat} | 실측 규격: ${dim}\n공식 정찰가: ${price}원\n\n${desc}\n\n✦ 모엔드(MOEND) 1인 대표 안심 약속\n01. 일본 교토·시가라키 공방 정품 직공수\n02. 인천세관 정식 수입통관 필증 교부\n03. 대표 1인 유약·균열 전수 육안 검수 후 에어셀 2중 포장\n04. 배송 중 파손 시 100% 무상 재발송/환불 보증\n\n프로필 하단 공식 쇼룸 링크(${HOST_ORIGIN})에서 전체 88종 컬렉션과 네이버 스마트스토어 바로 구매를 만나보세요.\n\n${tags}`;
+        } else if (channel === 'blog') {
+            title = '③ 네이버 블로그 & 카페 정보성 홍보 원고';
+            copy = `[제목 추천] 일본 수공예 ${cat} 추천, ${name} 실측 규격과 통관·검수 과정 정리\n\n안녕하세요, 일본 전통 요장 수공예 도자기 & 재팬디 오브제 아틀리에 키레노(KIRENO, 운영사 모엔드)입니다.\n\n해외직구로 도자기 화분이나 오브제를 구매할 때 가장 걱정되는 부분이 바로 '배송 중 파손'과 '실물 사이즈 차이'입니다. 키레노에서는 모든 작품을 인천세관 정식 통관 후 대표가 직접 1:1 육안 검수를 거쳐 우체국 에어셀 2중 안전포장으로 발송해 드리고 있습니다.\n\n■ 오늘 살펴볼 대표 작품: ${name}\n- 카테고리: ${cat}\n- 실측 치수 및 중량: ${dim}\n- 공식 판매가: ${price}원 (네이버 스마트스토어 동일 정찰가)\n- 작품 해설: ${desc}\n\n특히 이 작품은 단독으로 두어도 아름답지만, 키레노 쇼룸에서 제안하는 패브릭 액자 및 원목 인센스 홀더와 함께 배치했을 때 공간의 여백이 한층 깊어집니다.\n\n회원가입 없이 아래 공식 쇼룸 링크에서 상세 사진과 4종 연계 스타일링을 확인하시고 네이버페이로 안전하게 구매해 보세요!\n\n▶ 작품 단독 페이지 바로가기: ${directUrl}\n▶ 키레노 88종 공식 쇼룸 홈: ${HOST_ORIGIN}`;
+        } else {
+            title = '④ 메타(인스타그램/페이스북) 유료 스폰서 광고 카피';
+            copy = `[일본 전통 공방 직공수 도자기 & 재팬디 오브제 — 키레노 공식 쇼룸]\n\n"${name}" (${price}원)\n규격: ${dim}\n\n✔ 일본 현지 공방 사입 ➔ 인천세관 정식 통관\n✔ 대표 1인 전수 육안 검수 후 우체국 택배 안전 발송\n✔ 배송 중 파손 시 100% 무상 재발송 보증\n✔ 회원가입 없이 쇼룸 감상 후 네이버 스마트스토어 안전결제\n\n지금 공식 쇼룸에서 88종 전체 컬렉션과 공간별 연계 스타일링을 확인하세요.\n👉 ${directUrl}`;
+        }
+
+        document.getElementById('adChannelTitle').textContent = title;
+        document.getElementById('snsCopyOutput').value = copy;
+        document.getElementById('snsHashtags').textContent = tags;
+    }
+
+    function copyGeneratedSnsText() {
+        const text = document.getElementById('snsCopyOutput').value;
+        navigator.clipboard.writeText(text).then(() => {
+            showToast('광고 원고가 클립보드에 복사되었습니다! 스레드/인스타/블로그에 바로 붙여넣으세요.');
+        });
+    }
+
+    function sendCareGuideSms(custName, prodName) {
+        const msg = `[키레노(KIRENO) 도자기 사후 관리 & 포토리뷰 안내]\n\n${custName} 고객님, 받으신 [${prodName}] 작품은 공간에 잘 자리 잡았는지요?\n수공예 도자기는 사용 전 미온수에 가볍게 세척 후 그늘에서 말려주시면 유약의 깊은 색감이 더욱 오래 유지됩니다.\n\n작품이 마음에 드셨다면 스마트스토어에 짧은 포토리뷰 한 줄을 남겨주시면 큰 힘이 됩니다. 다음 작품 소장 시 사용하실 수 있는 단골 감사 혜택을 함께 드리겠습니다. 감사합니다!`;
+        navigator.clipboard.writeText(msg).then(() => {
+            showToast(`${custName}님 전용 [사후 관리 & 포토리뷰 유도 문자]가 복사되었습니다!`);
+        });
+    }
+
+    function sendVipCustomCoupon(custName, prefCat) {
+        const msg = `[키레노(KIRENO) 단골 고객님 전용 연계 작품 큐레이션 안내]\n\n안녕하세요 ${custName} 고객님, 모엔드(키레노) 대표 우상준입니다.\n지난번 소장해주신 작품과 한 공간에 두었을 때 가장 조화로운 [${prefCat}] 신규 통관 완료 작품들이 공식 쇼룸에 업데이트되었습니다.\n\n단골 고객님께만 드리는 맞춤 상담 및 우대 혜택이 준비되어 있으니 편하게 구경 오세요.\n👉 공식 쇼룸: ${HOST_ORIGIN}`;
+        navigator.clipboard.writeText(msg).then(() => {
+            showToast(`${custName}님 전용 [단골 재구매 유도 문자]가 복사되었습니다!`);
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        generateRealProductAdCopy();
+    });
+</script>
+{% endblock %}

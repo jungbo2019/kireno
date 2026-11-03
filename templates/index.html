@@ -1,0 +1,1728 @@
+{% extends "base.html" %}
+
+{% block head %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "name": "KIRENO 키레노 일본 수공예 도자기 & 재팬디 오브제 88종 공식 컬렉션",
+  "numberOfItems": {{ products|length }},
+  "itemListElement": [
+    {% for prod in products[:30] %}
+    {
+      "@type": "ListItem",
+      "position": {{ loop.index }},
+      "url": "{{ request.host_url.rstrip('/') }}/product/{{ prod.id }}",
+      "item": {
+        "@type": "Product",
+        "name": {{ prod.name | tojson }},
+        "image": "{{ request.host_url.rstrip('/') }}{{ prod.image_url }}",
+        "description": {{ prod.description | tojson }},
+        "sku": "KRN-PROD-{{ prod.id }}",
+        "brand": { "@type": "Brand", "name": "KIRENO 키레노" },
+        "offers": {
+          "@type": "Offer",
+          "url": "{{ prod.smartstore_url or (request.host_url.rstrip('/') ~ '/product/' ~ prod.id) }}",
+          "priceCurrency": "KRW",
+          "price": "{{ prod.price }}",
+          "availability": "{% if prod.stock_status == '품절' %}https://schema.org/OutOfStock{% else %}https://schema.org/InStock{% endif %}"
+        }
+      }
+    }{% if not loop.last %},{% endif %}
+    {% endfor %}
+  ]
+}
+</script>
+<style>
+    /* 키레노 고유 색상(#111111, #F7F5F2, #C4A482, #4F6F52) 기반 키네틱 스타일 */
+    .gauge-bar-fill {
+        width: 0%;
+        transition: width 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .hero-stage-transition {
+        transition: opacity 0.3s ease, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* 이미지 호버 시 선명하게 올라오는 묵색(#111111) 키네틱 드로어 */
+    .kinetic-drawer {
+        transform: translateY(100%);
+        transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .group:hover .kinetic-drawer {
+        transform: translateY(0%);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- 0. 상단 키네틱 흐름 배너 (일본 도예 공방 감성 한국어 안내) -->
+<div class="bg-kireno-sand text-kireno-charcoal py-2.5 border-b border-kireno-border overflow-hidden select-none">
+    <div class="kinetic-marquee-track flex items-center space-x-10 text-xs font-medium tracking-wider">
+        <span class="text-kireno-black font-serif font-bold">✦ 키레노 도예 아카이브</span>
+        <span>일본 시가라키 · 교토 수공예 도자기 직공수</span>
+        <span class="text-kireno-clay">·</span>
+        <span>1,280℃ 고온 환원소성 자연 유약</span>
+        <span class="text-kireno-black font-serif font-bold">✦ 정식 세관 수입통관 완료</span>
+        <span>도자 화분 · 재팬디 패브릭 액자 · 와비사비 원목 향꽂이</span>
+        <span class="text-kireno-clay">·</span>
+        <span>1인 대표 전수 육안검수 및 맞춤 에어셀 안전 포장</span>
+        <span class="text-kireno-black font-serif font-bold">✦ 키레노 도예 아카이브</span>
+        <span>일본 시가라키 · 교토 수공예 도자기 직공수</span>
+        <span class="text-kireno-clay">·</span>
+        <span>1,280℃ 고온 환원소성 자연 유약</span>
+        <span class="text-kireno-black font-serif font-bold">✦ 정식 세관 수입통관 완료</span>
+        <span>도자 화분 · 재팬디 패브릭 액자 · 와비사비 원목 향꽂이</span>
+    </div>
+</div>
+
+<!-- 0-1. 홍보 유입 고객 첫 구매 전환용 안심 통관·검수 & 공식 결제 보증 배너 -->
+<section id="promo-trust-banner" class="bg-kireno-black text-white border-b border-kireno-charcoal">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 sm:py-4">
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-2.5 sm:gap-4">
+            <!-- 좌측: 모엔드 공식 운영 및 실시간 통관·검수 상태 -->
+            <div class="flex items-center gap-3">
+                <div class="hidden sm:flex w-10 h-10 rounded-xl bg-kireno-charcoal border border-kireno-clay/60 items-center justify-center shrink-0">
+                    <span class="font-serif text-kireno-clay font-bold text-base">器</span>
+                </div>
+                <div class="space-y-0.5 sm:space-y-1">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-kireno-olive text-white text-[10px] sm:text-[11px] font-bold tracking-tight">
+                            <span class="w-1.5 h-1.5 rounded-full bg-white"></span>
+                            인천세관 정식 통관 · 1인 대표 전수검수
+                        </span>
+                        <span class="text-[10px] sm:text-[11px] text-kireno-clay font-semibold">모엔드(MOEND) 직영 · 파손 100% 무상보증</span>
+                    </div>
+                    <p class="font-serif text-xs sm:text-base font-bold text-white tracking-tight">
+                        회원가입 없이 쇼룸에서 감상 후 <span class="text-kireno-clay underline underline-offset-4">네이버 스마트스토어 안전결제</span>로 안심 구매하세요.
+                    </p>
+                </div>
+            </div>
+
+            <!-- 우측: 3대 안심 보증 배지 & 즉시 이동 버튼 (모바일은 하단 고정 바가 있으므로 데스크톱/태블릿에 표시) -->
+            <div class="hidden sm:flex flex-wrap items-center gap-2 sm:gap-3 lg:shrink-0">
+                <button onclick="openPolicyModal('guarantee')" class="px-3 py-2 rounded-lg bg-kireno-charcoal hover:bg-stone-800 border border-stone-700 text-xs font-semibold text-stone-200 transition-colors flex items-center gap-1.5">
+                    <i class="fa-solid fa-shield-halved text-kireno-clay"></i>
+                    <span>배송 파손 시 100% 무상 보증</span>
+                </button>
+                <button onclick="openOrderTrackingModal()" class="px-3 py-2 rounded-lg bg-kireno-charcoal hover:bg-stone-800 border border-stone-700 text-xs font-semibold text-stone-200 transition-colors flex items-center gap-1.5">
+                    <i class="fa-solid fa-magnifying-glass-location text-kireno-clay"></i>
+                    <span>실시간 통관·검수 조회</span>
+                </button>
+                <a href="{{ settings.smartstore_url or 'https://smartstore.naver.com/kireno' }}" target="_blank" rel="noopener" class="px-4 py-2 rounded-lg bg-kireno-clay hover:bg-[#b59370] text-kireno-black text-xs font-black transition-colors flex items-center gap-1.5 shadow-sm">
+                    <span>네이버 공식 스토어 바로가기</span>
+                    <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 1. 전면 히어로 섹션 (원래 키레노 화이트 & 샌드 톤 + 일본 전통 여백 미학) -->
+<section class="relative bg-white pt-4 pb-12 lg:py-20 border-b border-kireno-border overflow-hidden">
+    <!-- 은은한 배경 한자 워터마크 (일본 공방 분위기) -->
+    <div class="pointer-events-none select-none absolute -top-6 right-6 font-serif text-[130px] lg:text-[200px] font-bold text-kireno-black/[0.025] leading-none">
+        器 · 美
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-12 items-center">
+
+            <!-- 좌측: 한국어 에디토리얼 타이틀 & 용도별 빠른 탐색 (모바일에서는 대표 도자기 사진 바로 아래 배치) -->
+            <div class="lg:col-span-6 space-y-5 order-2 lg:order-1">
+                <div class="inline-flex items-center space-x-2.5 bg-kireno-sand px-3.5 py-1.5 rounded-full text-xs font-semibold text-kireno-charcoal border border-kireno-border">
+                    <span class="w-2 h-2 rounded-full bg-kireno-olive"></span>
+                    <span class="font-serif text-kireno-black font-bold">일본 전통 요장 직공수 도예 쇼룸</span>
+                    <span class="text-kireno-border">|</span>
+                    <span class="text-kireno-gray">전 작품 {{ products|length }}종 공식 아카이브</span>
+                </div>
+
+                <div class="space-y-3">
+                    <p class="font-serif text-base sm:text-lg text-kireno-clay font-semibold tracking-wide">
+                        흙과 불의 결, 공간에 스며드는 고요한 여백
+                    </p>
+                    <h1 class="font-serif text-3xl sm:text-4xl xl:text-[42px] font-black text-kireno-black leading-[1.3] tracking-tight break-keep">
+                        일본 장인의 손길로 빚어낸<br>
+                        수제 도자기와 재팬디 오브제
+                    </h1>
+                </div>
+
+                <p class="text-sm sm:text-base text-kireno-gray leading-relaxed max-w-xl">
+                    시가라키 가마의 자연 유약 화분부터 공간을 차분하게 채우는 패브릭 액자, 천연 원목 인센스 홀더까지.
+                    <strong class="text-kireno-black font-semibold">단독으로도 아름답고 함께 두었을 때 더욱 깊은 조화를 이루는 작품들을 만나보세요.</strong>
+                </p>
+
+                <!-- 용도별 빠른 작품 선택기 (키레노 고유 샌드 & 블랙 컬러 통일) -->
+                <div id="quick-curator" class="bg-kireno-sand p-5 rounded-2xl border border-kireno-border space-y-3.5">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <span class="px-2.5 py-0.5 bg-kireno-black text-white font-bold text-[11px] rounded">맞춤 탐색</span>
+                            <span class="text-xs font-bold text-kireno-black">어떤 공간과 용도의 작품을 찾으시나요?</span>
+                        </div>
+                        <span class="text-[11px] text-kireno-gray hidden sm:inline">선택 시 해당 컬렉션으로 이동</span>
+                    </div>
+
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                        <button onclick="quickCurate('pot')" class="group p-3 rounded-xl border border-kireno-border bg-white hover:bg-kireno-black hover:border-kireno-black hover:text-white transition-all text-left space-y-1">
+                            <div class="flex items-center justify-between">
+                                <span class="font-serif text-xs font-bold text-kireno-clay">01</span>
+                                <i class="fa-solid fa-arrow-right text-[10px] text-kireno-gray group-hover:text-white transition-all"></i>
+                            </div>
+                            <div class="font-bold text-xs text-kireno-black group-hover:text-white">화분 · 토분</div>
+                            <div class="text-[11px] text-kireno-gray group-hover:text-stone-300">다육·괴근·분재 37종</div>
+                        </button>
+
+                        <button onclick="quickCurate('panel')" class="group p-3 rounded-xl border border-kireno-border bg-white hover:bg-kireno-black hover:border-kireno-black hover:text-white transition-all text-left space-y-1">
+                            <div class="flex items-center justify-between">
+                                <span class="font-serif text-xs font-bold text-kireno-clay">02</span>
+                                <i class="fa-solid fa-arrow-right text-[10px] text-kireno-gray group-hover:text-white transition-all"></i>
+                            </div>
+                            <div class="font-bold text-xs text-kireno-black group-hover:text-white">패브릭 액자</div>
+                            <div class="text-[11px] text-kireno-gray group-hover:text-stone-300">벽면 인테리어 35종</div>
+                        </button>
+
+                        <button onclick="quickCurate('incense_vase')" class="group p-3 rounded-xl border border-kireno-border bg-white hover:bg-kireno-black hover:border-kireno-black hover:text-white transition-all text-left space-y-1">
+                            <div class="flex items-center justify-between">
+                                <span class="font-serif text-xs font-bold text-kireno-clay">03</span>
+                                <i class="fa-solid fa-arrow-right text-[10px] text-kireno-gray group-hover:text-white transition-all"></i>
+                            </div>
+                            <div class="font-bold text-xs text-kireno-black group-hover:text-white">화병 · 향꽂이</div>
+                            <div class="text-[11px] text-kireno-gray group-hover:text-stone-300">도자·원목 오브제 16종</div>
+                        </button>
+
+                        <button onclick="quickCurate('gift_under_70k')" class="group p-3 rounded-xl border border-kireno-clay/60 bg-white hover:bg-kireno-black hover:border-kireno-black hover:text-white transition-all text-left space-y-1">
+                            <div class="flex items-center justify-between">
+                                <span class="font-serif text-xs font-bold text-kireno-olive group-hover:text-kireno-clay">04</span>
+                                <span class="text-[10px] font-bold text-kireno-olive group-hover:text-kireno-clay">선물추천</span>
+                            </div>
+                            <div class="font-bold text-xs text-kireno-black group-hover:text-white">집들이 · 다도 선물</div>
+                            <div class="text-[11px] text-kireno-gray group-hover:text-stone-300">4~7만원대 인기작</div>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 대표 이동 버튼 (키레노 블랙 & 샌드 통일) -->
+                <div class="flex flex-wrap items-center gap-3 pt-1">
+                    <a href="#signature-bento" class="bg-kireno-black text-white px-7 py-3.5 rounded-full text-xs sm:text-sm font-bold hover:bg-kireno-charcoal transition-all shadow-sm inline-flex items-center space-x-2">
+                        <span>대표 시그니처 6선 살펴보기</span>
+                        <i class="fa-solid fa-arrow-down text-xs text-kireno-clay"></i>
+                    </a>
+                    <a href="#paired-lookbook" class="bg-kireno-sand text-kireno-black border border-kireno-border px-6 py-3.5 rounded-full text-xs sm:text-sm font-bold hover:border-kireno-black transition-all inline-flex items-center space-x-2">
+                        <span>화분 × 액자 × 향꽂이 연계 스타일링</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- 우측: 인터랙티브 대표 작품 쇼케이스 (모바일 최상단 order-1 배치로 접속 즉시 실물 도자기 노출) -->
+            <div class="lg:col-span-6 order-1 lg:order-2">
+                <div class="relative bg-kireno-sand rounded-2xl p-5 sm:p-7 border border-kireno-border shadow-md">
+                                        <!-- 상단 상태 표시 -->
+                    <div class="flex flex-wrap items-center justify-between gap-1.5 pb-3 mb-3 border-b border-kireno-border">
+                        <div class="flex items-center gap-1.5 whitespace-nowrap">
+                            <span class="hanko-stamp px-2 py-0.5 rounded text-[10px] sm:text-[11px] shrink-0">대표작품</span>
+                            <span id="heroStageNo" class="font-serif text-[11px] sm:text-xs font-bold text-kireno-black shrink-0">제 01선 / 04선</span>
+                            <span id="heroStageCat" class="text-[10px] sm:text-[11px] font-semibold bg-white text-kireno-charcoal px-2 py-0.5 rounded border border-kireno-border shrink-0">화분 &amp; 토분</span>
+                        </div>
+                        <span class="text-[10px] sm:text-[11px] font-semibold text-kireno-olive bg-white px-2 py-0.5 rounded border border-kireno-border whitespace-nowrap shrink-0">
+                            즉시출고 · 세관통관완료
+                        </span>
+                    </div>
+
+                    <!-- 메인 이미지 프레임 -->
+                    <div id="heroStageFrame" class="hero-stage-transition relative aspect-[4/3] rounded-xl bg-white border border-kireno-border flex items-center justify-center p-6 overflow-hidden cursor-pointer group" onclick="openHeroCurrentModal()">
+                        <!-- 좌상단 플로팅 규격 배지 -->
+                        <div class="kinetic-float absolute top-4 left-4 z-20 bg-white/95 backdrop-blur-sm px-3.5 py-2 rounded-xl border border-kireno-border shadow-xs">
+                            <span class="text-[10px] text-kireno-gray font-semibold block">실측 치수 및 중량</span>
+                            <span id="heroStageDim" class="text-xs font-mono font-bold text-kireno-black">Ø 13.5cm × H 14.5cm (중량 약 560g)</span>
+                        </div>
+
+                        <!-- 우하단 플로팅 가격 및 특징 배지 -->
+                        <div class="absolute bottom-4 right-4 z-20 bg-kireno-black/95 text-white px-4 py-2.5 rounded-xl border border-kireno-clay/50 shadow-md">
+                            <span id="heroStageWhy" class="text-[10px] text-kireno-clay font-semibold block">시가라키 흑유 · 골드 라인 수공예</span>
+                            <div class="flex items-baseline gap-2 mt-0.5">
+                                <span id="heroStagePrice" class="text-lg font-black text-white">93,000원</span>
+                                <span class="text-[10px] text-stone-300">상세 보기 →</span>
+                            </div>
+                        </div>
+
+                        <!-- 작품 사진 -->
+                        <img id="heroStageImg" src="/static/images/products/naver_kireno_13753504555.png" alt="BAND 블랙 골드 화분" class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500">
+                    </div>
+
+                    <!-- 작품명 + 즉시 구매 + 연계 작품 바로가기 -->
+                    <div class="mt-5 space-y-3">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                            <div>
+                                <h3 id="heroStageTitle" class="font-bold text-base sm:text-lg text-kireno-black cursor-pointer hover:text-kireno-clay transition-colors" onclick="openHeroCurrentModal()">
+                                    일본 재팬디 수공예 화분 BAND 컬렉션 블랙 골드
+                                </h3>
+                                <p id="heroStageDesc" class="text-xs text-kireno-gray mt-0.5 line-clamp-1">
+                                    매트한 흑유 질감 위에 은은한 골드 밴드 라인을 입혀 괴근식물과 분재의 품격을 높여주는 대표작입니다.
+                                </p>
+                            </div>
+                            <div class="flex items-center gap-2 shrink-0">
+                                <button onclick="openHeroCurrentModal()" class="px-3.5 py-2 bg-white hover:bg-stone-100 text-kireno-black border border-kireno-border text-xs font-bold rounded-lg transition">
+                                    상세 규격
+                                </button>
+                                <a id="heroDirectBuyBtn" href="https://smartstore.naver.com/kireno/products/13753504555" target="_blank" class="px-4 py-2 bg-kireno-black hover:bg-kireno-charcoal text-white text-xs font-bold rounded-lg transition flex items-center gap-1.5">
+                                    <span>바로 구매</span>
+                                    <i class="fa-solid fa-arrow-up-right-from-square text-[9px] text-kireno-clay"></i>
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- 함께 배치하면 좋은 연계 작품 박스 -->
+                        <div id="heroPairedBox" onclick="openHeroPairedModal()" class="p-3 rounded-xl bg-white hover:border-kireno-clay border border-kireno-border flex items-center justify-between cursor-pointer transition-all group">
+                            <div class="flex items-center gap-2.5 truncate">
+                                <span class="px-2 py-0.5 bg-kireno-sand text-kireno-charcoal border border-kireno-border font-bold text-[11px] rounded shrink-0">
+                                    연계 추천 작품
+                                </span>
+                                <span id="heroPairedName" class="text-xs font-semibold text-kireno-charcoal group-hover:text-kireno-black truncate">
+                                    일본 패브릭 패널 블랙 60CM 재팬디 액자 ARC 컬렉션 (69,000원)
+                                </span>
+                            </div>
+                            <span class="text-[11px] font-bold text-kireno-clay group-hover:text-kireno-black shrink-0 ml-2">
+                                함께 보기 →
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- 하단 4종 대표작 전환 탭 -->
+                    <div class="grid grid-cols-4 gap-2.5 mt-4 pt-4 border-t border-kireno-border">
+                        <button onclick="switchHeroSlide(0)" class="hero-thumb active p-2 rounded-xl border-2 border-kireno-black bg-white flex flex-col items-center text-center transition-all">
+                            <img src="/static/images/products/naver_kireno_13753504555.png" alt="BAND 화분" class="w-10 h-10 object-contain mb-1">
+                            <span class="text-[11px] font-bold text-kireno-black truncate w-full">01. 흑유 화분</span>
+                        </button>
+                        <button onclick="switchHeroSlide(1)" class="hero-thumb p-2 rounded-xl border border-kireno-border hover:border-kireno-clay bg-white flex flex-col items-center text-center transition-all">
+                            <img src="/static/images/products/naver_kireno_13778000372.png" alt="ARC 액자" class="w-10 h-10 object-contain mb-1">
+                            <span class="text-[11px] font-medium text-kireno-gray truncate w-full">02. 패브릭 액자</span>
+                        </button>
+                        <button onclick="switchHeroSlide(2)" class="hero-thumb p-2 rounded-xl border border-kireno-border hover:border-kireno-clay bg-white flex flex-col items-center text-center transition-all">
+                            <img src="/static/images/products/naver_kireno_13788766942.jpg" alt="원목 향꽂이" class="w-10 h-10 object-contain mb-1 rounded">
+                            <span class="text-[11px] font-medium text-kireno-gray truncate w-full">03. 원목 향꽂이</span>
+                        </button>
+                        <button onclick="switchHeroSlide(3)" class="hero-thumb p-2 rounded-xl border border-kireno-border hover:border-kireno-clay bg-white flex flex-col items-center text-center transition-all">
+                            <img src="/static/images/products/naver_kireno_13785900496.png" alt="도자 화병" class="w-10 h-10 object-contain mb-1">
+                            <span class="text-[11px] font-medium text-kireno-gray truncate w-full">04. 도자 화병</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- 2. 키레노 대표 시그니처 6선 (일관된 화이트/샌드/블랙 갤러리 카드) -->
+<section id="signature-bento" class="py-20 bg-white border-b border-kireno-border">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col md:flex-row md:items-end justify-between mb-12 pb-6 border-b border-kireno-border gap-4">
+            <div>
+                <span class="text-xs font-serif font-bold tracking-widest text-kireno-clay block mb-1">키레노 대표 선집 · 6선</span>
+                <h2 class="font-serif text-2xl sm:text-3xl font-black text-kireno-black tracking-tight">
+                    가장 많은 사랑을 받는 아틀리에 대표 작품
+                </h2>
+                <p class="text-xs sm:text-sm text-kireno-gray mt-2">
+                    처음 방문하셨다면 분야별로 가장 완성도 높은 6점의 대표 작품과 각 작품에 어울리는 연계 구성을 먼저 만나보세요.
+                </p>
+            </div>
+            <a href="#collection" class="shrink-0 inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-kireno-sand hover:bg-kireno-black hover:text-white text-kireno-charcoal border border-kireno-border text-xs font-bold transition-colors">
+                <span>88종 전체 작품 보기</span>
+                <i class="fa-solid fa-arrow-down text-[10px]"></i>
+            </a>
+        </div>
+
+        <!-- 대표 6선 그리드 (모든 카드 색상 규칙 100% 통일) -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- 대표 1: BAND 화분 (ID 141) -->
+            <div class="kinetic-card bg-white rounded-2xl border border-kireno-border overflow-hidden flex flex-col justify-between group">
+                <div class="p-5 pb-0">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="px-2.5 py-1 rounded bg-kireno-black text-white text-[11px] font-bold">
+                            제 01선 · 수제 도자분 대표작
+                        </span>
+                        <span class="text-xs font-mono text-kireno-gray">Ø 13.5 × H 14.5cm</span>
+                    </div>
+                    <div class="aspect-square rounded-xl bg-kireno-sand/50 border border-kireno-border p-4 flex items-center justify-center relative overflow-hidden cursor-pointer" onclick="openProductDetailModal(141)">
+                        <img src="/static/images/products/naver_kireno_13753504555.png" alt="BAND 블랙 골드" class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500">
+                        <div class="kinetic-drawer absolute inset-x-0 bottom-0 bg-[#111111]/90 backdrop-blur-sm text-white px-4 py-3 flex items-center justify-between text-xs">
+                            <span>상세 치수 및 연계 작품 확인</span>
+                            <span class="text-kireno-clay font-bold">열기 →</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-5 space-y-4">
+                    <div>
+                        <div class="text-[11px] font-semibold text-kireno-clay mb-1">추천 용도: 괴근식물 · 분재 · 거실 플랜테리어</div>
+                        <h3 class="font-bold text-base text-kireno-black cursor-pointer hover:text-kireno-clay transition-colors" onclick="openProductDetailModal(141)">
+                            일본 재팬디 수공예 화분 BAND 컬렉션 블랙 골드
+                        </h3>
+                    </div>
+                    <button onclick="openProductDetailModal(169)" class="w-full py-2 px-3 rounded-lg bg-kireno-sand hover:border-kireno-clay border border-kireno-border text-left flex items-center justify-between text-[11px] transition-colors">
+                        <span class="truncate text-kireno-charcoal"><strong class="text-kireno-black">연계 작품:</strong> ARC 블랙 60CM 재팬디 패브릭 액자</span>
+                        <span class="text-kireno-clay font-bold shrink-0 ml-1">보기 →</span>
+                    </button>
+                    <div class="pt-3 border-t border-kireno-border flex items-center justify-between">
+                        <div>
+                            <span class="text-[10px] text-kireno-gray block">공식 판매가</span>
+                            <span class="text-lg font-black text-kireno-black">93,000원</span>
+                        </div>
+                        <div class="flex gap-1.5">
+                            <button onclick="openProductDetailModal(141)" class="px-3 py-2 rounded-lg bg-kireno-sand hover:bg-stone-200 text-kireno-black border border-kireno-border text-xs font-bold transition">
+                                상세 보기
+                            </button>
+                            <a href="https://smartstore.naver.com/kireno/products/13753504555" target="_blank" class="px-3.5 py-2 rounded-lg bg-kireno-black hover:bg-kireno-charcoal text-white text-xs font-bold transition flex items-center gap-1">
+                                <span>바로 구매</span>
+                                <i class="fa-solid fa-arrow-up-right-from-square text-[9px] text-kireno-clay"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 대표 2: ARC 패브릭 액자 (ID 169) -->
+            <div class="kinetic-card bg-white rounded-2xl border border-kireno-border overflow-hidden flex flex-col justify-between group">
+                <div class="p-5 pb-0">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="px-2.5 py-1 rounded bg-kireno-black text-white text-[11px] font-bold">
+                            제 02선 · 재팬디 패브릭 액자
+                        </span>
+                        <span class="text-xs font-mono text-kireno-gray">60cm × 60cm</span>
+                    </div>
+                    <div class="aspect-square rounded-xl bg-kireno-sand/50 border border-kireno-border p-4 flex items-center justify-center relative overflow-hidden cursor-pointer" onclick="openProductDetailModal(169)">
+                        <img src="/static/images/products/naver_kireno_13778000372.png" alt="ARC 패브릭 패널" class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500">
+                        <div class="kinetic-drawer absolute inset-x-0 bottom-0 bg-[#111111]/90 backdrop-blur-sm text-white px-4 py-3 flex items-center justify-between text-xs">
+                            <span>상세 치수 및 연계 작품 확인</span>
+                            <span class="text-kireno-clay font-bold">열기 →</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-5 space-y-4">
+                    <div>
+                        <div class="text-[11px] font-semibold text-kireno-clay mb-1">추천 용도: 거실·서재 벽면 연출 · 초경량 우드 프레임</div>
+                        <h3 class="font-bold text-base text-kireno-black cursor-pointer hover:text-kireno-clay transition-colors" onclick="openProductDetailModal(169)">
+                            일본 패브릭 패널 블랙 60CM 재팬디 액자 ARC 컬렉션
+                        </h3>
+                    </div>
+                    <button onclick="openProductDetailModal(141)" class="w-full py-2 px-3 rounded-lg bg-kireno-sand hover:border-kireno-clay border border-kireno-border text-left flex items-center justify-between text-[11px] transition-colors">
+                        <span class="truncate text-kireno-charcoal"><strong class="text-kireno-black">연계 작품:</strong> BAND 블랙 골드 수공예 화분</span>
+                        <span class="text-kireno-clay font-bold shrink-0 ml-1">보기 →</span>
+                    </button>
+                    <div class="pt-3 border-t border-kireno-border flex items-center justify-between">
+                        <div>
+                            <span class="text-[10px] text-kireno-gray block">공식 판매가</span>
+                            <span class="text-lg font-black text-kireno-black">69,000원</span>
+                        </div>
+                        <div class="flex gap-1.5">
+                            <button onclick="openProductDetailModal(169)" class="px-3 py-2 rounded-lg bg-kireno-sand hover:bg-stone-200 text-kireno-black border border-kireno-border text-xs font-bold transition">
+                                상세 보기
+                            </button>
+                            <a href="https://smartstore.naver.com/kireno/products/13778000372" target="_blank" class="px-3.5 py-2 rounded-lg bg-kireno-black hover:bg-kireno-charcoal text-white text-xs font-bold transition flex items-center gap-1">
+                                <span>바로 구매</span>
+                                <i class="fa-solid fa-arrow-up-right-from-square text-[9px] text-kireno-clay"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 대표 3: AAMCD 다육 화분 (ID 151) -->
+            <div class="kinetic-card bg-white rounded-2xl border border-kireno-border overflow-hidden flex flex-col justify-between group">
+                <div class="p-5 pb-0">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="px-2.5 py-1 rounded bg-kireno-black text-white text-[11px] font-bold">
+                            제 03선 · 소형 다육 수제분
+                        </span>
+                        <span class="text-xs font-mono text-kireno-gray">Ø 6.5 × H 7cm</span>
+                    </div>
+                    <div class="aspect-square rounded-xl bg-kireno-sand/50 border border-kireno-border p-4 flex items-center justify-center relative overflow-hidden cursor-pointer" onclick="openProductDetailModal(151)">
+                        <img src="/static/images/products/naver_kireno_13786634284.png" alt="AAMCD 다육 화분" class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500">
+                        <div class="kinetic-drawer absolute inset-x-0 bottom-0 bg-[#111111]/90 backdrop-blur-sm text-white px-4 py-3 flex items-center justify-between text-xs">
+                            <span>상세 치수 및 연계 작품 확인</span>
+                            <span class="text-kireno-clay font-bold">열기 →</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-5 space-y-4">
+                    <div>
+                        <div class="text-[11px] font-semibold text-kireno-clay mb-1">추천 용도: 소형 다육식물 · 리톱스 · 책상 위 오브제</div>
+                        <h3 class="font-bold text-base text-kireno-black cursor-pointer hover:text-kireno-clay transition-colors" onclick="openProductDetailModal(151)">
+                            일본 재팬디 다육이 화분 AAMCD 컬렉션 핑크 6.5cm
+                        </h3>
+                    </div>
+                    <button onclick="openProductDetailModal(142)" class="w-full py-2 px-3 rounded-lg bg-kireno-sand hover:border-kireno-clay border border-kireno-border text-left flex items-center justify-between text-[11px] transition-colors">
+                        <span class="truncate text-kireno-charcoal"><strong class="text-kireno-black">연계 작품:</strong> CASCADE 파스텔 멀티 중형 화분</span>
+                        <span class="text-kireno-clay font-bold shrink-0 ml-1">보기 →</span>
+                    </button>
+                    <div class="pt-3 border-t border-kireno-border flex items-center justify-between">
+                        <div>
+                            <span class="text-[10px] text-kireno-gray block">공식 판매가</span>
+                            <span class="text-lg font-black text-kireno-black">48,000원</span>
+                        </div>
+                        <div class="flex gap-1.5">
+                            <button onclick="openProductDetailModal(151)" class="px-3 py-2 rounded-lg bg-kireno-sand hover:bg-stone-200 text-kireno-black border border-kireno-border text-xs font-bold transition">
+                                상세 보기
+                            </button>
+                            <a href="https://smartstore.naver.com/kireno/products/13786634284" target="_blank" class="px-3.5 py-2 rounded-lg bg-kireno-black hover:bg-kireno-charcoal text-white text-xs font-bold transition flex items-center gap-1">
+                                <span>바로 구매</span>
+                                <i class="fa-solid fa-arrow-up-right-from-square text-[9px] text-kireno-clay"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 대표 4: 와비사비 원목 인센스 홀더 (ID 183) -->
+            <div class="kinetic-card bg-white rounded-2xl border border-kireno-border overflow-hidden flex flex-col justify-between group">
+                <div class="p-5 pb-0">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="px-2.5 py-1 rounded bg-kireno-black text-white text-[11px] font-bold">
+                            제 04선 · 와비사비 원목 향꽂이
+                        </span>
+                        <span class="text-xs font-mono text-kireno-gray">L 24.5 × W 4.5cm</span>
+                    </div>
+                    <div class="aspect-square rounded-xl bg-kireno-sand/50 border border-kireno-border p-4 flex items-center justify-center relative overflow-hidden cursor-pointer" onclick="openProductDetailModal(183)">
+                        <img src="/static/images/products/naver_kireno_13788766942.jpg" alt="버드나무 인센스 홀더" class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500">
+                        <div class="kinetic-drawer absolute inset-x-0 bottom-0 bg-[#111111]/90 backdrop-blur-sm text-white px-4 py-3 flex items-center justify-between text-xs">
+                            <span>상세 치수 및 연계 작품 확인</span>
+                            <span class="text-kireno-clay font-bold">열기 →</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-5 space-y-4">
+                    <div>
+                        <div class="text-[11px] font-semibold text-kireno-clay mb-1">추천 용도: 다도실 · 서재 명상 · 황동 2구 홀더 내장</div>
+                        <h3 class="font-bold text-base text-kireno-black cursor-pointer hover:text-kireno-clay transition-colors" onclick="openProductDetailModal(183)">
+                            일본 와비사비 원목 인센스 홀더 향꽂이 버드나무
+                        </h3>
+                    </div>
+                    <button onclick="openProductDetailModal(167)" class="w-full py-2 px-3 rounded-lg bg-kireno-sand hover:border-kireno-clay border border-kireno-border text-left flex items-center justify-between text-[11px] transition-colors">
+                        <span class="truncate text-kireno-charcoal"><strong class="text-kireno-black">연계 작품:</strong> LAGOM 재팬디 마크라메 도자 화병</span>
+                        <span class="text-kireno-clay font-bold shrink-0 ml-1">보기 →</span>
+                    </button>
+                    <div class="pt-3 border-t border-kireno-border flex items-center justify-between">
+                        <div>
+                            <span class="text-[10px] text-kireno-gray block">공식 판매가</span>
+                            <span class="text-lg font-black text-kireno-black">103,000원</span>
+                        </div>
+                        <div class="flex gap-1.5">
+                            <button onclick="openProductDetailModal(183)" class="px-3 py-2 rounded-lg bg-kireno-sand hover:bg-stone-200 text-kireno-black border border-kireno-border text-xs font-bold transition">
+                                상세 보기
+                            </button>
+                            <a href="https://smartstore.naver.com/kireno/products/13788766942" target="_blank" class="px-3.5 py-2 rounded-lg bg-kireno-black hover:bg-kireno-charcoal text-white text-xs font-bold transition flex items-center gap-1">
+                                <span>바로 구매</span>
+                                <i class="fa-solid fa-arrow-up-right-from-square text-[9px] text-kireno-clay"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 대표 5: LAGOM 마크라메 화병 (ID 167) -->
+            <div class="kinetic-card bg-white rounded-2xl border border-kireno-border overflow-hidden flex flex-col justify-between group">
+                <div class="p-5 pb-0">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="px-2.5 py-1 rounded bg-kireno-black text-white text-[11px] font-bold">
+                            제 05선 · 수공예 도자 화병
+                        </span>
+                        <span class="text-xs font-mono text-kireno-gray">Ø 11.0 × H 21.0cm</span>
+                    </div>
+                    <div class="aspect-square rounded-xl bg-kireno-sand/50 border border-kireno-border p-4 flex items-center justify-center relative overflow-hidden cursor-pointer" onclick="openProductDetailModal(167)">
+                        <img src="/static/images/products/naver_kireno_13785900496.png" alt="LAGOM 마크라메 화병" class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500">
+                        <div class="kinetic-drawer absolute inset-x-0 bottom-0 bg-[#111111]/90 backdrop-blur-sm text-white px-4 py-3 flex items-center justify-between text-xs">
+                            <span>상세 치수 및 연계 작품 확인</span>
+                            <span class="text-kireno-clay font-bold">열기 →</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-5 space-y-4">
+                    <div>
+                        <div class="text-[11px] font-semibold text-kireno-clay mb-1">추천 용도: 드라이플라워 · 식탁 및 다도 테이블 오브제</div>
+                        <h3 class="font-bold text-base text-kireno-black cursor-pointer hover:text-kireno-clay transition-colors" onclick="openProductDetailModal(167)">
+                            일본 재팬디 마크라메 화병 LAGOM 컬렉션 브라운
+                        </h3>
+                    </div>
+                    <button onclick="openProductDetailModal(160)" class="w-full py-2 px-3 rounded-lg bg-kireno-sand hover:border-kireno-clay border border-kireno-border text-left flex items-center justify-between text-[11px] transition-colors">
+                        <span class="truncate text-kireno-charcoal"><strong class="text-kireno-black">연계 작품:</strong> LAGOM 마크라메 태피스트리 벽장식</span>
+                        <span class="text-kireno-clay font-bold shrink-0 ml-1">보기 →</span>
+                    </button>
+                    <div class="pt-3 border-t border-kireno-border flex items-center justify-between">
+                        <div>
+                            <span class="text-[10px] text-kireno-gray block">공식 판매가</span>
+                            <span class="text-lg font-black text-kireno-black">45,000원</span>
+                        </div>
+                        <div class="flex gap-1.5">
+                            <button onclick="openProductDetailModal(167)" class="px-3 py-2 rounded-lg bg-kireno-sand hover:bg-stone-200 text-kireno-black border border-kireno-border text-xs font-bold transition">
+                                상세 보기
+                            </button>
+                            <a href="https://smartstore.naver.com/kireno/products/13785900496" target="_blank" class="px-3.5 py-2 rounded-lg bg-kireno-black hover:bg-kireno-charcoal text-white text-xs font-bold transition flex items-center gap-1">
+                                <span>바로 구매</span>
+                                <i class="fa-solid fa-arrow-up-right-from-square text-[9px] text-kireno-clay"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 대표 6: DIP 아이보리 블랙 화분 (ID 144) -->
+            <div class="kinetic-card bg-white rounded-2xl border border-kireno-border overflow-hidden flex flex-col justify-between group">
+                <div class="p-5 pb-0">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="px-2.5 py-1 rounded bg-kireno-black text-white text-[11px] font-bold">
+                            제 06선 · 투톤 유약 수제분
+                        </span>
+                        <span class="text-xs font-mono text-kireno-gray">Ø 13.5 × H 14.5cm</span>
+                    </div>
+                    <div class="aspect-square rounded-xl bg-kireno-sand/50 border border-kireno-border p-4 flex items-center justify-center relative overflow-hidden cursor-pointer" onclick="openProductDetailModal(144)">
+                        <img src="/static/images/products/naver_kireno_13750232716.png" alt="DIP 아이보리 블랙" class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500">
+                        <div class="kinetic-drawer absolute inset-x-0 bottom-0 bg-[#111111]/90 backdrop-blur-sm text-white px-4 py-3 flex items-center justify-between text-xs">
+                            <span>상세 치수 및 연계 작품 확인</span>
+                            <span class="text-kireno-clay font-bold">열기 →</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-5 space-y-4">
+                    <div>
+                        <div class="text-[11px] font-semibold text-kireno-clay mb-1">추천 용도: 자연스러운 유약 흐름 · 중형 관엽식물</div>
+                        <h3 class="font-bold text-base text-kireno-black cursor-pointer hover:text-kireno-clay transition-colors" onclick="openProductDetailModal(144)">
+                            일본 재팬디 수공예 화분 DIP 컬렉션 아이보리 블랙
+                        </h3>
+                    </div>
+                    <button onclick="openProductDetailModal(170)" class="w-full py-2 px-3 rounded-lg bg-kireno-sand hover:border-kireno-clay border border-kireno-border text-left flex items-center justify-between text-[11px] transition-colors">
+                        <span class="truncate text-kireno-charcoal"><strong class="text-kireno-black">연계 작품:</strong> MUTE 베이지 5피스 패브릭 액자 세트</span>
+                        <span class="text-kireno-clay font-bold shrink-0 ml-1">보기 →</span>
+                    </button>
+                    <div class="pt-3 border-t border-kireno-border flex items-center justify-between">
+                        <div>
+                            <span class="text-[10px] text-kireno-gray block">공식 판매가</span>
+                            <span class="text-lg font-black text-kireno-black">93,000원</span>
+                        </div>
+                        <div class="flex gap-1.5">
+                            <button onclick="openProductDetailModal(144)" class="px-3 py-2 rounded-lg bg-kireno-sand hover:bg-stone-200 text-kireno-black border border-kireno-border text-xs font-bold transition">
+                                상세 보기
+                            </button>
+                            <a href="https://smartstore.naver.com/kireno/products/13750232716" target="_blank" class="px-3.5 py-2 rounded-lg bg-kireno-black hover:bg-kireno-charcoal text-white text-xs font-bold transition flex items-center gap-1">
+                                <span>바로 구매</span>
+                                <i class="fa-solid fa-arrow-up-right-from-square text-[9px] text-kireno-clay"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 3. 공간별 3종 연계 스타일링 (원래 키레노의 따뜻한 샌드 #F7F5F2 배경으로 통일감 유지) -->
+<section id="paired-lookbook" class="py-20 bg-kireno-sand border-b border-kireno-border">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col lg:flex-row lg:items-end justify-between mb-10 gap-6">
+            <div>
+                <span class="text-xs font-serif font-bold tracking-widest text-kireno-clay block mb-1">
+                    공간별 연계 구성 · 空間調和
+                </span>
+                <h2 class="font-serif text-2xl sm:text-3xl font-black text-kireno-black tracking-tight">
+                    화분과 벽면, 테이블이 하나로 이어지는 연계 스타일링
+                </h2>
+                <p class="text-xs sm:text-sm text-kireno-gray mt-2 max-w-2xl">
+                    각 작품이 지닌 흙의 질감과 패브릭의 직조감, 원목의 결이 서로 어우러지도록 <strong>[수제 화분 × 패브릭 액자 × 향꽂이/화병]</strong>을 공간 분위기에 맞춰 연결했습니다.
+                </p>
+            </div>
+
+            <!-- 공간 분위기 선택 탭 (키레노 블랙 & 화이트 규칙 준수) -->
+            <div class="flex flex-wrap gap-2">
+                <button onclick="switchMoodSet(0)" class="mood-tab active px-4 py-2.5 rounded-full text-xs font-bold bg-kireno-black text-white border border-kireno-black transition-all">
+                    01. 묵색 &amp; 골드 서재 공간
+                </button>
+                <button onclick="switchMoodSet(1)" class="mood-tab px-4 py-2.5 rounded-full text-xs font-bold bg-white text-kireno-charcoal border border-kireno-border hover:border-kireno-black transition-all">
+                    02. 따뜻한 백자 &amp; 베이지 거실
+                </button>
+                <button onclick="switchMoodSet(2)" class="mood-tab px-4 py-2.5 rounded-full text-xs font-bold bg-white text-kireno-charcoal border border-kireno-border hover:border-kireno-black transition-all">
+                    03. 와비사비 다도 &amp; 명상실
+                </button>
+            </div>
+        </div>
+
+        <!-- 3종 연계 보드 (깔끔한 화이트 배경 카드 & 클레이 포인트) -->
+        <div id="moodBoardContainer" class="bg-white rounded-2xl p-6 sm:p-8 border border-kireno-border shadow-xs">
+            <div class="grid grid-cols-1 lg:grid-cols-11 gap-6 items-center">
+                <!-- 연계 작품 A (화분) -->
+                <div class="lg:col-span-3 bg-kireno-sand/60 rounded-xl p-5 border border-kireno-border hover:border-kireno-clay transition-all cursor-pointer group" onclick="openMoodItem(0)">
+                    <div class="flex items-center justify-between text-[11px] text-kireno-clay font-bold mb-2">
+                        <span id="moodTagA">구성 01 · 중심 도자 화분</span>
+                        <span class="text-kireno-gray group-hover:text-kireno-black">상세 보기 →</span>
+                    </div>
+                    <div class="aspect-square rounded-lg bg-white p-3 mb-3 flex items-center justify-center overflow-hidden border border-kireno-border">
+                        <img id="moodImgA" src="/static/images/products/naver_kireno_13753504555.png" alt="연계 작품 1" class="w-full h-full object-contain group-hover:scale-105 transition-transform">
+                    </div>
+                    <h4 id="moodNameA" class="font-bold text-sm text-kireno-black line-clamp-1">일본 재팬디 수공예 화분 BAND 컬렉션 블랙 골드</h4>
+                    <p id="moodWhyA" class="text-xs text-kireno-gray mt-1">묵직한 흑철유와 골드 림으로 공간의 중심을 잡는 수제분</p>
+                    <div id="moodPriceA" class="text-base font-black text-kireno-black mt-2">93,000원</div>
+                </div>
+
+                <!-- 연결 기호 1 -->
+                <div class="lg:col-span-1 flex flex-col items-center justify-center py-2">
+                    <div class="w-9 h-9 rounded-full bg-kireno-sand border border-kireno-clay text-kireno-clay flex items-center justify-center font-bold text-sm">
+                        +
+                    </div>
+                    <span class="text-[11px] text-kireno-gray font-semibold mt-1 text-center">색감 조화</span>
+                </div>
+
+                <!-- 연계 작품 B (벽면 패브릭 액자) -->
+                <div class="lg:col-span-3 bg-kireno-sand/60 rounded-xl p-5 border border-kireno-border hover:border-kireno-clay transition-all cursor-pointer group" onclick="openMoodItem(1)">
+                    <div class="flex items-center justify-between text-[11px] text-kireno-clay font-bold mb-2">
+                        <span id="moodTagB">구성 02 · 벽면 패브릭 액자</span>
+                        <span class="text-kireno-gray group-hover:text-kireno-black">상세 보기 →</span>
+                    </div>
+                    <div class="aspect-square rounded-lg bg-white p-3 mb-3 flex items-center justify-center overflow-hidden border border-kireno-border">
+                        <img id="moodImgB" src="/static/images/products/naver_kireno_13778000372.png" alt="연계 작품 2" class="w-full h-full object-contain group-hover:scale-105 transition-transform">
+                    </div>
+                    <h4 id="moodNameB" class="font-bold text-sm text-kireno-black line-clamp-1">일본 패브릭 패널 블랙 60CM 재팬디 액자 ARC 컬렉션</h4>
+                    <p id="moodWhyB" class="text-xs text-kireno-gray mt-1">화분의 흑유 질감과 차분한 대칭을 이루는 배경 월아트</p>
+                    <div id="moodPriceB" class="text-base font-black text-kireno-black mt-2">69,000원</div>
+                </div>
+
+                <!-- 연결 기호 2 -->
+                <div class="lg:col-span-1 flex flex-col items-center justify-center py-2">
+                    <div class="w-9 h-9 rounded-full bg-kireno-sand border border-kireno-clay text-kireno-clay flex items-center justify-center font-bold text-sm">
+                        +
+                    </div>
+                    <span class="text-[11px] text-kireno-gray font-semibold mt-1 text-center">여백 완성</span>
+                </div>
+
+                <!-- 연계 작품 C (향꽂이 / 화병) -->
+                <div class="lg:col-span-3 bg-kireno-sand/60 rounded-xl p-5 border border-kireno-border hover:border-kireno-clay transition-all cursor-pointer group" onclick="openMoodItem(2)">
+                    <div class="flex items-center justify-between text-[11px] text-kireno-clay font-bold mb-2">
+                        <span id="moodTagC">구성 03 · 테이블 향꽂이</span>
+                        <span class="text-kireno-gray group-hover:text-kireno-black">상세 보기 →</span>
+                    </div>
+                    <div class="aspect-square rounded-lg bg-white p-3 mb-3 flex items-center justify-center overflow-hidden border border-kireno-border">
+                        <img id="moodImgC" src="/static/images/products/naver_kireno_13790744698.jpg" alt="연계 작품 3" class="w-full h-full object-contain group-hover:scale-105 transition-transform">
+                    </div>
+                    <h4 id="moodNameC" class="font-bold text-sm text-kireno-black line-clamp-1">일본 와비사비 원목 인센스 홀더 향꽂이 회화나무</h4>
+                    <p id="moodWhyC" class="text-xs text-kireno-gray mt-1">황동 2구 홀더가 화분의 골드 선과 어우러지며 깊은 향기를 전달</p>
+                    <div id="moodPriceC" class="text-base font-black text-kireno-black mt-2">205,000원</div>
+                </div>
+            </div>
+
+            <!-- 하단 합계 및 상담 연결 바 -->
+            <div class="mt-6 pt-5 border-t border-kireno-border flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="flex flex-wrap items-center gap-3">
+                    <span class="px-3 py-1 rounded-full bg-kireno-sand border border-kireno-border text-kireno-olive text-xs font-bold">
+                        ✓ 인천세관 정식 통관 및 개별 완충 포장 발송
+                    </span>
+                    <span id="moodTotalText" class="text-xs text-kireno-gray">
+                        3종 연계 구성 합계: <strong class="text-kireno-black text-sm">367,000원</strong>
+                    </span>
+                </div>
+                <button onclick="consultCurrentMoodSet()" class="px-6 py-3 rounded-full bg-kireno-black hover:bg-kireno-charcoal text-white font-bold text-xs transition flex items-center gap-2 shadow-xs">
+                    <i class="fa-solid fa-comments text-kireno-clay"></i>
+                    <span>이 3종 연계 구성으로 1:1 도예 상담하기</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 4. 전체 작품 아카이브 (88종 전 품목 키레노 컬러 일관성 100% 적용) -->
+<section id="collection" class="py-20 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- 섹션 헤더 -->
+        <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 pb-6 border-b border-kireno-border gap-4">
+            <div>
+                <span class="text-xs font-serif font-bold tracking-widest text-kireno-clay block mb-1">키레노 전 작품 도록 · 全作品</span>
+                <h2 class="font-serif text-2xl sm:text-3xl font-black text-kireno-black tracking-tight">
+                    수공예 도자기 및 오브제 전체 컬렉션 (총 <span id="visibleCountBadge">{{ products|length }}</span>종)
+                </h2>
+            </div>
+            <!-- 검색창 -->
+            <div class="relative w-full md:w-72">
+                <input type="text" id="archiveSearchInput" oninput="applyCombinedFilters()" placeholder="작품명, 색상(블랙/베이지), 치수 검색..." class="w-full pl-9 pr-4 py-2.5 rounded-full bg-kireno-sand border border-kireno-border text-xs text-kireno-black focus:outline-none focus:border-kireno-black">
+                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-kireno-gray text-xs"></i>
+            </div>
+        </div>
+
+        <!-- 1열: 카테고리 필터 -->
+        <div class="flex flex-wrap gap-2 mb-4" id="categoryFilter">
+            <button onclick="setCatFilter('all', this)" class="cat-btn active px-4 py-2 rounded-full text-xs font-bold border border-kireno-black bg-kireno-black text-white transition-all">
+                전체 컬렉션 ({{ products|length }})
+            </button>
+            <button onclick="setCatFilter('화분 & 토분', this)" class="cat-btn px-4 py-2 rounded-full text-xs font-bold border border-kireno-border bg-white text-kireno-charcoal hover:border-kireno-black transition-all">
+                화분 &amp; 토분 (37)
+            </button>
+            <button onclick="setCatFilter('인테리어 액자 & 패널', this)" class="cat-btn px-4 py-2 rounded-full text-xs font-bold border border-kireno-border bg-white text-kireno-charcoal hover:border-kireno-black transition-all">
+                인테리어 액자 &amp; 패널 (35)
+            </button>
+            <button onclick="setCatFilter('도자 화병 & 오브제', this)" class="cat-btn px-4 py-2 rounded-full text-xs font-bold border border-kireno-border bg-white text-kireno-charcoal hover:border-kireno-black transition-all">
+                도자 화병 &amp; 오브제 (7)
+            </button>
+            <button onclick="setCatFilter('원목 인센스 & 홀더', this)" class="cat-btn px-4 py-2 rounded-full text-xs font-bold border border-kireno-border bg-white text-kireno-charcoal hover:border-kireno-black transition-all">
+                원목 인센스 &amp; 홀더 (6)
+            </button>
+            <button onclick="setCatFilter('마크라메 & 행거', this)" class="cat-btn px-4 py-2 rounded-full text-xs font-bold border border-kireno-border bg-white text-kireno-charcoal hover:border-kireno-black transition-all">
+                마크라메 &amp; 행거 (3)
+            </button>
+        </div>
+
+        <!-- 2열: 금액대 및 출고 상태 필터 -->
+        <div class="flex flex-wrap items-center gap-2 mb-10 pb-4 border-b border-kireno-border text-xs">
+            <span class="text-[11px] font-bold text-kireno-gray mr-1">조건별 보기:</span>
+            <button onclick="setPriceFilter('all', this)" class="price-btn active px-3 py-1.5 rounded-lg font-bold bg-kireno-black text-white transition-colors">
+                전체 가격대
+            </button>
+            <button onclick="setPriceFilter('under70', this)" class="price-btn px-3 py-1.5 rounded-lg font-medium bg-kireno-sand border border-kireno-border text-kireno-charcoal hover:border-kireno-black transition-colors">
+                7만원 이하 (선물 · 소형 작품)
+            </button>
+            <button onclick="setPriceFilter('70to100', this)" class="price-btn px-3 py-1.5 rounded-lg font-medium bg-kireno-sand border border-kireno-border text-kireno-charcoal hover:border-kireno-black transition-colors">
+                7만원 ~ 10만원 (중형 대표 라인)
+            </button>
+            <button onclick="setPriceFilter('over100', this)" class="price-btn px-3 py-1.5 rounded-lg font-medium bg-kireno-sand border border-kireno-border text-kireno-charcoal hover:border-kireno-black transition-colors">
+                10만원 이상 (대형 · 원목 컬렉션)
+            </button>
+            <button onclick="setPriceFilter('instock', this)" class="price-btn px-3 py-1.5 rounded-lg font-medium bg-kireno-sand border border-kireno-border text-kireno-olive hover:border-kireno-olive transition-colors">
+                즉시출고 가능 작품만
+            </button>
+        </div>
+
+        <!-- 88종 작품 그리드 (절제된 키레노 오리지널 컬러 시스템) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8" id="productsGrid">
+            {% for prod in products %}
+            <div class="product-item kinetic-card bg-white border border-kireno-border rounded-2xl overflow-hidden flex flex-col justify-between"
+                 data-id="{{ prod.id }}"
+                 data-category="{{ prod.category }}"
+                 data-price="{{ prod.price }}"
+                 data-stock="{{ prod.stock_status }}"
+                 data-name="{{ prod.name }}">
+
+                <!-- 작품 이미지 영역 -->
+                <div class="relative bg-white aspect-square w-full flex items-center justify-center p-4 border-b border-kireno-border overflow-hidden group cursor-pointer" onclick="openProductDetailModal({{ prod.id }})">
+                    <!-- 좌상단 배지 -->
+                    <span class="absolute top-3.5 left-3.5 bg-kireno-black text-white text-[10px] font-bold px-2.5 py-1 rounded tracking-wider z-10">
+                        {{ prod.badge or '일본직공수' }}
+                    </span>
+
+                    <!-- 우상단 재고 상태 (키레노 올리브 / 차콜 통일) -->
+                    <span class="absolute top-3.5 right-3.5 text-[11px] font-bold px-2.5 py-0.5 rounded-full z-10 {% if prod.stock_status == '즉시출고' %}bg-kireno-sand text-kireno-olive border border-kireno-olive/30{% elif prod.stock_status == '주문제작' %}bg-kireno-sand text-kireno-clay border border-kireno-clay/40{% else %}bg-kireno-charcoal text-white{% endif %}">
+                        {{ prod.stock_status }}
+                    </span>
+
+                    <!-- 선명한 도자기 원본 이미지 -->
+                    <img src="{{ prod.image_url }}" alt="{{ prod.name }}" loading="lazy" class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500 {% if prod.stock_status == '품절' %}opacity-50 grayscale{% endif %}">
+
+                    {% if prod.stock_status == '품절' %}
+                    <div class="absolute inset-0 bg-kireno-black/30 flex items-center justify-center pointer-events-none">
+                        <span class="bg-kireno-black text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-md">
+                            품절 (재입고 알림 가능)
+                        </span>
+                    </div>
+                    {% else %}
+                    <!-- 호버 시 올라오는 불투명 묵색(#111111/90) 상세 규격 바 (가독성 100% 보장) -->
+                    <div class="kinetic-drawer absolute inset-x-0 bottom-0 bg-[#111111]/90 backdrop-blur-sm text-white px-4 py-3 flex items-center justify-between text-xs">
+                        <div class="truncate pr-2">
+                            <span class="text-kireno-clay font-semibold block text-[10px]">실측 치수 및 연계 구성</span>
+                            <span class="font-mono text-[11px] text-white">{{ prod.dimensions }}</span>
+                        </div>
+                        <span class="bg-white text-kireno-black font-bold px-2.5 py-1 rounded text-[11px] shrink-0">
+                            상세 열기 →
+                        </span>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- 작품 설명 및 하단 버튼 (일관된 키레노 블랙 & 샌드 2버튼 체계) -->
+                <div class="p-6 flex-grow flex flex-col justify-between space-y-4">
+                    <div>
+                        <div class="flex items-center justify-between text-xs text-kireno-gray mb-2">
+                            <span class="font-semibold text-kireno-charcoal bg-kireno-sand px-2.5 py-0.5 rounded text-[11px] border border-kireno-border">{{ prod.category }}</span>
+                            <span class="font-mono text-[11px] text-kireno-gray truncate max-w-[165px]" title="{{ prod.dimensions }}">
+                                {{ prod.dimensions }}
+                            </span>
+                        </div>
+
+                        <h3 class="font-bold text-base text-kireno-black mb-2 leading-snug">
+                            <a href="/product/{{ prod.id }}" onclick="if(!event.ctrlKey && !event.metaKey){ event.preventDefault(); openProductDetailModal({{ prod.id }}); }" class="hover:text-kireno-clay transition-colors block">
+                                {{ prod.name }}
+                            </a>
+                        </h3>
+
+                        <p class="text-xs text-kireno-gray leading-relaxed line-clamp-2">
+                            {{ prod.description }}
+                        </p>
+                    </div>
+
+                    <div class="space-y-3">
+                        <!-- 연계 작품 보기 바 (차분한 샌드 & 클레이 톤) -->
+                        <button type="button" onclick="openProductDetailAndScrollToLinked({{ prod.id }})" class="w-full py-2 px-3 rounded-lg bg-kireno-sand hover:border-kireno-clay border border-kireno-border text-left flex items-center justify-between text-[11px] transition-all group/link">
+                            <span class="text-kireno-charcoal truncate">
+                                <strong class="text-kireno-black">연계 구성:</strong>
+                                {% if prod.category == '화분 & 토분' %}
+                                어울리는 재팬디 액자 및 수제 화분 비교
+                                {% elif prod.category == '인테리어 액자 & 패널' %}
+                                어울리는 수공예 화분 및 화병 매치
+                                {% else %}
+                                함께 두면 조화로운 화분 및 액자 매치
+                                {% endif %}
+                            </span>
+                            <span class="text-kireno-clay font-bold shrink-0 ml-1">보기 →</span>
+                        </button>
+
+                        <!-- 가격 및 통일된 2단 액션 버튼 -->
+                        <div class="pt-3 border-t border-kireno-border flex items-center justify-between">
+                            <div>
+                                <span class="text-[10px] text-kireno-gray block">공식 판매가</span>
+                                <span class="text-lg font-black text-kireno-black">{{ "{:,}".format(prod.price) }}원</span>
+                            </div>
+
+                            <div class="flex items-center space-x-1.5">
+                                <button onclick="openProductDetailModal({{ prod.id }})" class="bg-kireno-sand hover:bg-stone-200 text-kireno-black border border-kireno-border px-3 py-2 rounded-lg text-xs font-bold transition-colors">
+                                    상세 · 연계
+                                </button>
+                                {% if prod.stock_status == '품절' %}
+                                <button onclick="openRestockModal('{{ prod.id }}', '{{ prod.name }}')" class="bg-kireno-charcoal hover:bg-kireno-black text-white px-3.5 py-2 rounded-lg text-xs font-bold transition-colors">
+                                    재입고 알림
+                                </button>
+                                {% else %}
+                                    {% if prod.smartstore_url %}
+                                    <a href="{{ prod.smartstore_url }}" target="_blank" class="bg-kireno-black hover:bg-kireno-charcoal text-white px-3.5 py-2 rounded-lg text-xs font-bold inline-flex items-center space-x-1 transition-colors">
+                                        <span>바로 구매</span>
+                                        <i class="fa-solid fa-arrow-up-right-from-square text-[9px] text-kireno-clay"></i>
+                                    </a>
+                                    {% else %}
+                                    <button onclick="openLiveChat('{{ prod.name }}')" class="bg-kireno-black hover:bg-kireno-charcoal text-white px-3.5 py-2 rounded-lg text-xs font-bold transition-colors">
+                                        구매 상담
+                                    </button>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <!-- 모바일/PC 스크롤 피로도 방지를 위한 단계별 더보기 버튼 -->
+        <div id="loadMoreContainer" class="mt-10 text-center">
+            <button type="button" onclick="expandAllProducts()" class="inline-flex items-center space-x-2.5 px-8 py-4 rounded-full bg-kireno-sand hover:bg-kireno-black text-kireno-black hover:text-white border border-kireno-border font-bold text-xs sm:text-sm transition-all shadow-xs group">
+                <span id="loadMoreBtnText">전체 88종 컬렉션 나머지 작품 모두 펼치기 (+70종)</span>
+                <i class="fa-solid fa-chevron-down text-xs text-kireno-clay group-hover:text-white transition-transform"></i>
+            </button>
+            <p class="text-[11px] text-kireno-gray mt-2">현재 즉시출고 가능한 대표 인기 작품부터 우선 진열되어 있습니다.</p>
+        </div>
+    </div>
+</section>
+
+<!-- 5. 도예 공방 철학 및 관리 가이드 (원래 키레노 샌드 톤) -->
+<section id="guide" class="py-16 bg-kireno-sand border-y border-kireno-border">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center max-w-2xl mx-auto mb-12">
+            <span class="text-xs font-serif font-bold tracking-widest text-kireno-clay block mb-1">키레노 도예 철학 · 匠人精神</span>
+            <h2 class="font-serif text-2xl sm:text-3xl font-black text-kireno-black">일본 현지 직공수부터 1인 정밀 검수까지</h2>
+            <p class="text-xs text-kireno-gray mt-2">외주 없이 대표가 직접 일본 요장에서 작품을 들여오고 인천세관 정식 통관을 거쳐 무결점 작품만 전해드립니다.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-white p-6 rounded-xl border border-kireno-border">
+                <div class="w-10 h-10 rounded-full bg-kireno-sand border border-kireno-border flex items-center justify-center font-serif font-black text-kireno-black text-sm mb-4">01</div>
+                <h3 class="font-bold text-base text-kireno-black mb-1">일본 전통 요장 100% 정품 직공수</h3>
+                <p class="text-xs text-kireno-clay font-semibold mb-2">시가라키야키 · 미노야키 · 교토 공방</p>
+                <p class="text-xs text-kireno-gray leading-relaxed">
+                    가마 안에서 불꽃의 흐름에 따라 자연스럽게 형성되는 유약의 요변과 흙의 숨결은 공산품이 흉내 낼 수 없는 수공예 도자기만의 가치입니다.
+                </p>
+            </div>
+            <div class="bg-white p-6 rounded-xl border border-kireno-border">
+                <div class="w-10 h-10 rounded-full bg-kireno-sand border border-kireno-border flex items-center justify-center font-serif font-black text-kireno-black text-sm mb-4">02</div>
+                <h3 class="font-bold text-base text-kireno-black mb-1">인천세관 정식 수입통관 필증 교부</h3>
+                <p class="text-xs text-kireno-clay font-semibold mb-2">관세청 유니패스 정식 수입신고</p>
+                <p class="text-xs text-kireno-gray leading-relaxed">
+                    일본 현지 발주 후 국제 항공 특송(EMS) 및 인천공항 세관 정식 수입신고를 통해 안전하게 반입되며 모든 통관 과정이 투명하게 관리됩니다.
+                </p>
+            </div>
+            <div class="bg-white p-6 rounded-xl border border-kireno-border">
+                <div class="w-10 h-10 rounded-full bg-kireno-sand border border-kireno-border flex items-center justify-center font-serif font-black text-kireno-black text-sm mb-4">03</div>
+                <h3 class="font-bold text-base text-kireno-black mb-1">1인 대표 육안 검수 및 맞춤 에어셀 포장</h3>
+                <p class="text-xs text-kireno-clay font-semibold mb-2">파손율 0% 보증 · 우체국 안심 택배</p>
+                <p class="text-xs text-kireno-gray leading-relaxed">
+                    국내 도착 즉시 대표가 직접 개봉하여 미세 균열과 유약 상태를 전수 검수한 뒤, 충격 흡수 에어셀로 2중 밀봉하여 우체국 택배로 안전하게 발송합니다.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 6. 맞춤 제작 및 대량 발주 문의 -->
+<section id="inquiry" class="py-20 bg-white">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-10">
+            <span class="text-xs font-serif font-bold tracking-widest text-kireno-clay block mb-1">맞춤 및 단체 발주 · 特別注文</span>
+            <h2 class="font-serif text-2xl sm:text-3xl font-black text-kireno-black">도자기 공간 스타일링 및 대량 발주 문의</h2>
+            <p class="text-xs text-kireno-gray mt-2">티룸·카페 전용 다기 및 화병, 플랜트샵 화분 납품, 기업 VIP 기프트 상담을 환영합니다.</p>
+        </div>
+
+        <div class="bg-kireno-sand p-8 rounded-2xl border border-kireno-border">
+            <form id="inquiryForm" onsubmit="handleInquirySubmit(event)" class="space-y-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-kireno-black mb-1">성함 / 업체명 <span class="text-kireno-clay">*</span></label>
+                        <input type="text" name="name" required placeholder="예: 김민수 (티룸아뜰리에)" class="w-full text-xs px-3.5 py-2.5 rounded-lg bg-white border border-kireno-border focus:outline-none focus:border-kireno-black">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-kireno-black mb-1">연락처 <span class="text-kireno-clay">*</span></label>
+                        <input type="tel" name="phone" required placeholder="010-0000-0000" class="w-full text-xs px-3.5 py-2.5 rounded-lg bg-white border border-kireno-border focus:outline-none focus:border-kireno-black">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-kireno-black mb-1">이메일</label>
+                        <input type="email" name="email" placeholder="example@email.com" class="w-full text-xs px-3.5 py-2.5 rounded-lg bg-white border border-kireno-border focus:outline-none focus:border-kireno-black">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-kireno-black mb-1">문의 구분</label>
+                        <select name="subject" class="w-full text-xs px-3.5 py-2.5 rounded-lg bg-white border border-kireno-border focus:outline-none focus:border-kireno-black">
+                            <option value="공간별 화분+액자 연계 패키지 구매">공간별 화분+액자 연계 패키지 구매</option>
+                            <option value="플랜트샵/카페 수제 화분 대량 납품">플랜트샵/카페 수제 화분 대량 납품</option>
+                            <option value="일본 현지 특정 모델 직구 대행 의뢰">일본 현지 특정 모델 직구 대행 의뢰</option>
+                            <option value="갤러리 전시 및 기타 제휴">갤러리 전시 및 기타 제휴</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-kireno-black mb-1">문의 내용 <span class="text-kireno-clay">*</span></label>
+                    <textarea name="message" rows="4" required placeholder="원하시는 작품명, 수량, 공간 분위기 등을 편하게 남겨주시면 대표가 직접 상세히 안내해 드립니다." class="w-full text-xs p-3.5 rounded-lg bg-white border border-kireno-border focus:outline-none focus:border-kireno-black"></textarea>
+                </div>
+
+                <div id="inquiryAlert" class="hidden text-xs p-3 rounded-lg"></div>
+
+                <button type="submit" id="inquirySubmitBtn" class="w-full bg-kireno-black text-white text-xs font-bold py-3.5 rounded-lg hover:bg-kireno-charcoal transition-colors flex items-center justify-center space-x-2">
+                    <span>문의 접수하기</span>
+                    <i class="fa-solid fa-paper-plane text-xs text-kireno-clay"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+</section>
+
+<!-- =========================================================================
+     작품 상세 규격 및 실시간 연계 작품 모달 (키레노 컬러 일관성 100% 준수)
+========================================================================== -->
+<div id="productDetailModal" class="hidden fixed inset-0 bg-kireno-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
+    <div id="modalInnerCard" class="bg-white rounded-2xl max-w-4xl w-full p-6 sm:p-8 shadow-2xl relative my-6 max-h-[92vh] overflow-y-auto border border-kireno-border">
+        <!-- 닫기 버튼 -->
+        <button onclick="closeProductDetailModal()" class="sticky top-0 float-right z-20 text-kireno-gray hover:text-kireno-black w-9 h-9 rounded-full bg-kireno-sand hover:bg-stone-200 flex items-center justify-center transition-colors">
+            <i class="fa-solid fa-xmark text-base"></i>
+        </button>
+
+        <!-- 상단 2단 작품 상세 영역 -->
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-6 sm:gap-8 items-start clear-both">
+            <!-- 좌측 (5칸): 작품 사진 + 키네틱 공예 특성 게이지 -->
+            <div class="md:col-span-5 space-y-4">
+                <div class="bg-kireno-sand/60 rounded-xl p-5 flex flex-col items-center justify-center relative border border-kireno-border aspect-square overflow-hidden">
+                    <span id="modalProdBadge" class="absolute top-3.5 left-3.5 bg-kireno-black text-white text-[10px] font-bold px-2.5 py-1 rounded tracking-wider z-10">
+                        일본직공수
+                    </span>
+                    <span id="modalProdStock" class="absolute top-3.5 right-3.5 text-[11px] font-bold px-2.5 py-0.5 rounded-full z-10 bg-white text-kireno-olive border border-kireno-olive/30">
+                        즉시출고
+                    </span>
+                    <img id="modalProdImg" src="" alt="Product" class="w-full h-full object-contain transition-transform duration-500 hover:scale-105">
+                </div>
+
+                <!-- 키네틱 작품 특성 지수 (키레노 블랙 · 클레이 · 올리브 컬러 통일) -->
+                <div class="bg-kireno-sand p-4 rounded-xl border border-kireno-border space-y-2.5 text-xs">
+                    <div class="flex items-center justify-between text-[11px] font-bold text-kireno-black">
+                        <span>아틀리에 검수 및 공예 완성도</span>
+                        <span class="text-[10px] text-kireno-gray">1:1 전수검수 기준</span>
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-[11px] mb-1">
+                            <span class="text-kireno-charcoal">수공예 유약 밀도 및 질감</span>
+                            <span class="font-mono font-bold text-kireno-black">98%</span>
+                        </div>
+                        <div class="w-full h-1.5 bg-white border border-kireno-border rounded-full overflow-hidden">
+                            <div id="gaugeBar1" class="gauge-bar-fill h-full bg-kireno-black rounded-full"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-[11px] mb-1">
+                            <span class="text-kireno-charcoal">공간 조화도 및 여백의 미</span>
+                            <span class="font-mono font-bold text-kireno-clay">96%</span>
+                        </div>
+                        <div class="w-full h-1.5 bg-white border border-kireno-border rounded-full overflow-hidden">
+                            <div id="gaugeBar2" class="gauge-bar-fill h-full bg-kireno-clay rounded-full"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-[11px] mb-1">
+                            <span class="text-kireno-charcoal">고온 소성 내구성 및 안전 포장</span>
+                            <span class="font-mono font-bold text-kireno-olive">99%</span>
+                        </div>
+                        <div class="w-full h-1.5 bg-white border border-kireno-border rounded-full overflow-hidden">
+                            <div id="gaugeBar3" class="gauge-bar-fill h-full bg-kireno-olive rounded-full"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 우측 (7칸): 핵심 규격 요약 + 작품 해설 + 구매 버튼 -->
+            <div class="md:col-span-7 flex flex-col justify-between space-y-5">
+                <div>
+                    <div class="flex flex-wrap items-center gap-2 mb-2">
+                        <span id="modalProdCategory" class="text-xs font-bold text-kireno-charcoal bg-kireno-sand px-2.5 py-1 rounded border border-kireno-border">
+                            화분 &amp; 토분
+                        </span>
+                        <span class="text-[11px] text-kireno-olive bg-kireno-sand border border-kireno-olive/30 px-2.5 py-0.5 rounded font-semibold">
+                            인천세관 정식 수입통관 필증
+                        </span>
+                        <a id="modalStandaloneLink" href="/product/1" class="ml-auto text-[11px] font-bold text-kireno-charcoal hover:text-kireno-clay underline flex items-center space-x-1">
+                            <span>단독 상세페이지 열기</span>
+                            <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i>
+                        </a>
+                    </div>
+
+                    <h2 id="modalProdName" class="font-serif text-xl sm:text-2xl font-black text-kireno-black mb-3 leading-snug">
+                        일본 수공예 도자기
+                    </h2>
+
+                    <!-- 공식 판매가 -->
+                    <div class="p-4 bg-kireno-sand rounded-xl border border-kireno-border mb-4 flex items-center justify-between">
+                        <div>
+                            <span class="text-xs text-kireno-charcoal font-bold block">공식 판매가</span>
+                            <span class="text-[11px] text-kireno-gray">네이버 스마트스토어 100% 동일 정찰가</span>
+                        </div>
+                        <span id="modalProdPrice" class="text-2xl sm:text-3xl font-black text-kireno-black">0원</span>
+                    </div>
+
+                    <!-- 핵심 규격 3단 카드 -->
+                    <div class="grid grid-cols-3 gap-2.5 mb-4 text-xs">
+                        <div class="p-3 rounded-xl bg-kireno-sand/60 border border-kireno-border">
+                            <span class="text-[10px] text-kireno-clay font-bold block mb-0.5">추천 공간 및 용도</span>
+                            <span id="modalQuickUse" class="font-bold text-kireno-black text-[11px] leading-tight block">괴근·다육·분재</span>
+                        </div>
+                        <div class="p-3 rounded-xl bg-kireno-sand/60 border border-kireno-border">
+                            <span class="text-[10px] text-kireno-gray font-bold block mb-0.5">실측 규격</span>
+                            <span id="modalProdDimensions" class="font-mono font-bold text-kireno-black text-[11px] leading-tight block">-</span>
+                        </div>
+                        <div class="p-3 rounded-xl bg-kireno-sand/60 border border-kireno-border">
+                            <span class="text-[10px] text-kireno-olive font-bold block mb-0.5">산지 및 검수</span>
+                            <span id="modalProdOrigin" class="font-bold text-kireno-black text-[11px] leading-tight block">일본 현지 직공수</span>
+                        </div>
+                    </div>
+
+                    <!-- 작품 해설 -->
+                    <div class="mb-4">
+                        <h4 class="text-xs font-bold text-kireno-black mb-1.5 flex items-center">
+                            <span class="w-1.5 h-1.5 rounded-full bg-kireno-clay mr-1.5"></span> 작품 스토리 및 조형 해설
+                        </h4>
+                        <p id="modalProdDescription" class="text-xs text-kireno-charcoal leading-relaxed bg-kireno-sand/50 p-4 rounded-xl border border-kireno-border">
+                            -
+                        </p>
+                    </div>
+                </div>
+
+                <!-- 결제 직전 구매 확신을 주는 4단계 안심 통관·검수 & 파손 100% 보증 타임라인 -->
+                <div class="mb-4 p-3.5 rounded-xl bg-kireno-sand border border-kireno-border space-y-2.5">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[11px] font-bold text-kireno-black flex items-center gap-1.5">
+                            <i class="fa-solid fa-shield-check text-kireno-olive"></i>
+                            <span>모엔드(MOEND) 1인 대표 전수검수 · 안심 출고 프로세스</span>
+                        </span>
+                        <span class="text-[10px] font-bold text-kireno-olive bg-white px-2 py-0.5 rounded border border-kireno-olive/30">파손 시 100% 무상보증</span>
+                    </div>
+                    <div class="grid grid-cols-4 gap-1.5 text-center text-[10px]">
+                        <div class="bg-white p-2 rounded-lg border border-kireno-border">
+                            <span class="font-serif font-bold text-kireno-clay block">01. 일본발주</span>
+                            <span class="text-kireno-gray text-[9px]">당일 공방 사입</span>
+                        </div>
+                        <div class="bg-white p-2 rounded-lg border border-kireno-border">
+                            <span class="font-serif font-bold text-kireno-clay block">02. 세관통관</span>
+                            <span class="text-kireno-gray text-[9px]">인천세관 정식신고</span>
+                        </div>
+                        <div class="bg-white p-2 rounded-lg border border-kireno-border">
+                            <span class="font-serif font-bold text-kireno-clay block">03. 대표검수</span>
+                            <span class="text-kireno-gray text-[9px]">유약·굽 육안검수</span>
+                        </div>
+                        <div class="bg-white p-2 rounded-lg border border-kireno-border">
+                            <span class="font-serif font-bold text-kireno-olive block">04. 안전발송</span>
+                            <span class="text-kireno-gray text-[9px]">우체국 에어셀포장</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 구매 및 1:1 상담 버튼 (키레노 블랙 & 샌드 통일) -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-2 border-t border-kireno-border">
+                    <a id="modalProdSmartstoreLink" href="#" target="_blank" class="bg-kireno-black hover:bg-kireno-charcoal text-white font-bold py-3.5 px-4 rounded-xl text-xs flex items-center justify-center space-x-2 transition-colors shadow-xs">
+                        <span>네이버 스마트스토어 바로 구매</span>
+                        <i class="fa-solid fa-arrow-up-right-from-square text-[10px] text-kireno-clay"></i>
+                    </a>
+                    <button id="modalProdChatBtn" onclick="consultFromModal()" class="bg-kireno-sand hover:bg-stone-200 text-kireno-black border border-kireno-border font-bold py-3.5 px-4 rounded-xl text-xs flex items-center justify-center space-x-2 transition-colors">
+                        <i class="fa-solid fa-comment-dots text-kireno-clay"></i>
+                        <span>이 작품 1:1 도예 상담하기</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- =================================================================
+             모달 하단: 함께 배치하면 조화로운 연계 작품 4선 (원클릭 전환)
+        ================================================================== -->
+        <div id="modalLinkedSection" class="mt-8 pt-6 border-t border-kireno-border">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <span class="text-[11px] font-serif font-bold text-kireno-clay block">연계 큐레이션 · 連繫作品</span>
+                    <h3 class="font-bold text-sm sm:text-base text-kireno-black">
+                        이 작품과 함께 배치하면 조화로운 연계 오브제 및 비교 작품
+                    </h3>
+                </div>
+                <span class="text-[11px] text-kireno-gray">선택 시 해당 작품 설명으로 바로 전환됩니다</span>
+            </div>
+
+            <div id="modalRelatedGrid" class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <!-- 자바스크립트에서 자동 렌더링 -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 품절 작품 재입고 알림 모달 -->
+<div id="restockModal" class="hidden fixed inset-0 bg-kireno-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-kireno-border">
+        <div class="flex justify-between items-center pb-3 border-b border-kireno-border mb-4">
+            <h3 class="font-bold text-sm text-kireno-black">일본 현지 재입고 알림 신청</h3>
+            <button onclick="closeRestockModal()" class="text-kireno-gray hover:text-kireno-black">✕</button>
+        </div>
+        <form onsubmit="handleRestockSubmit(event)" class="space-y-3 text-xs">
+            <input type="hidden" id="restockProdId" name="product_id">
+            <div>
+                <label class="block text-kireno-gray mb-1">알림 신청 작품</label>
+                <input type="text" id="restockProdName" name="product_name" readonly class="w-full bg-kireno-sand font-bold px-3 py-2 rounded-lg border border-kireno-border text-kireno-black">
+            </div>
+            <div>
+                <label class="block text-kireno-black font-bold mb-1">휴대폰 번호 (문자 안내)</label>
+                <input type="tel" name="phone" id="restockPhone" required placeholder="010-0000-0000" class="w-full px-3 py-2 rounded-lg border border-kireno-border focus:outline-none focus:border-kireno-black font-semibold">
+                <span class="text-[10px] text-kireno-gray block mt-1">일본 가마 재입고 완료 시 가장 먼저 문자로 안내해 드립니다.</span>
+            </div>
+            <div id="restockAlertMsg" class="hidden p-2.5 rounded-lg text-[11px]"></div>
+            <button type="submit" id="restockBtn" class="w-full bg-kireno-black text-white font-bold py-3 rounded-lg hover:bg-kireno-charcoal transition-colors">
+                재입고 알림 신청 완료
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // --- 1. 전체 88종 작품 데이터 ---
+    const catalogData = {
+        {% for prod in products %}
+        "{{ prod.id }}": {
+            "id": {{ prod.id }},
+            "name": {{ prod.name|tojson }},
+            "category": {{ prod.category|tojson }},
+            "dimensions": {{ prod.dimensions|tojson }},
+            "description": {{ prod.description|tojson }},
+            "price": {{ prod.price }},
+            "badge": {{ (prod.badge or '일본직공수')|tojson }},
+            "stock_status": {{ prod.stock_status|tojson }},
+            "image_url": {{ prod.image_url|tojson }},
+            "smartstore_url": {{ (prod.smartstore_url or '')|tojson }},
+            "origin_region": {{ (prod.origin_region or '일본 현지 요장 직공수')|tojson }}
+        }{% if not loop.last %},{% endif %}
+        {% endfor %}
+    };
+
+    const allProductsList = Object.values(catalogData);
+
+    // --- 2. 전면 히어로 4종 대표작 전환 ---
+    const heroSlides = [
+        {
+            id: 141,
+            no: "제 01선 / 04선",
+            cat: "화분 & 토분",
+            why: "시가라키 흑유 · 골드 라인 수공예",
+            pairedId: 169
+        },
+        {
+            id: 169,
+            no: "제 02선 / 04선",
+            cat: "인테리어 액자 & 패널",
+            why: "여백의 미 · 60CM 대형 패브릭 액자",
+            pairedId: 141
+        },
+        {
+            id: 183,
+            no: "제 03선 / 04선",
+            cat: "원목 인센스 & 홀더",
+            why: "천연 버드나무 · 황동 2구 명상 향꽂이",
+            pairedId: 167
+        },
+        {
+            id: 167,
+            no: "제 04선 / 04선",
+            cat: "도자 화병 & 오브제",
+            why: "수공예 코튼 매듭 · 재팬디 도자 화병",
+            pairedId: 160
+        }
+    ];
+    let currentHeroIdx = 0;
+
+    function switchHeroSlide(idx) {
+        currentHeroIdx = idx;
+        const slide = heroSlides[idx];
+        const prod = catalogData[slide.id] || allProductsList[0];
+        const paired = catalogData[slide.pairedId] || allProductsList[1];
+
+        const frame = document.getElementById('heroStageFrame');
+        frame.style.opacity = '0.4';
+        frame.style.transform = 'scale(0.985)';
+
+        setTimeout(() => {
+            document.getElementById('heroStageNo').textContent = slide.no;
+            document.getElementById('heroStageCat').textContent = prod.category;
+            document.getElementById('heroStageDim').textContent = prod.dimensions;
+            document.getElementById('heroStageWhy').textContent = slide.why;
+            document.getElementById('heroStagePrice').textContent = Number(prod.price).toLocaleString() + '원';
+            document.getElementById('heroStageImg').src = prod.image_url;
+            document.getElementById('heroStageImg').alt = prod.name;
+            document.getElementById('heroStageTitle').textContent = prod.name;
+            document.getElementById('heroStageDesc').textContent = prod.description;
+
+            const directBtn = document.getElementById('heroDirectBuyBtn');
+            if (directBtn && prod.smartstore_url) {
+                directBtn.href = prod.smartstore_url;
+            }
+
+            if (paired) {
+                document.getElementById('heroPairedName').textContent = `${paired.name} (${Number(paired.price).toLocaleString()}원)`;
+            }
+
+            frame.style.opacity = '1';
+            frame.style.transform = 'scale(1)';
+        }, 150);
+
+        document.querySelectorAll('.hero-thumb').forEach((btn, i) => {
+            if (i === idx) {
+                btn.className = 'hero-thumb active p-2 rounded-xl border-2 border-kireno-black bg-white flex flex-col items-center text-center transition-all';
+            } else {
+                btn.className = 'hero-thumb p-2 rounded-xl border border-kireno-border hover:border-kireno-clay bg-white flex flex-col items-center text-center transition-all';
+            }
+        });
+    }
+
+    function openHeroCurrentModal() {
+        const slide = heroSlides[currentHeroIdx];
+        openProductDetailModal(slide.id);
+    }
+
+    function openHeroPairedModal() {
+        const slide = heroSlides[currentHeroIdx];
+        openProductDetailModal(slide.pairedId);
+    }
+
+    // --- 3. 용도별 및 가격대별 필터링 ---
+    let activeCat = 'all';
+    let activePrice = 'all';
+
+    function quickCurate(mode) {
+        const colSection = document.getElementById('collection');
+        if (mode === 'pot') {
+            setCatFilterByName('화분 & 토분');
+            setPriceFilterByName('all');
+        } else if (mode === 'panel') {
+            setCatFilterByName('인테리어 액자 & 패널');
+            setPriceFilterByName('all');
+        } else if (mode === 'incense_vase') {
+            setCatFilterByName('도자 화병 & 오브제');
+            setPriceFilterByName('all');
+        } else if (mode === 'gift_under_70k') {
+            setCatFilterByName('all');
+            setPriceFilterByName('under70');
+        }
+        colSection.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function setCatFilterByName(catName) {
+        activeCat = catName;
+        document.querySelectorAll('.cat-btn').forEach(btn => {
+            const txt = btn.textContent || '';
+            const match = (catName === 'all' && txt.includes('전체')) || (catName !== 'all' && txt.includes(catName));
+            if (match) {
+                btn.className = 'cat-btn active px-4 py-2 rounded-full text-xs font-bold border border-kireno-black bg-kireno-black text-white transition-all';
+            } else {
+                btn.className = 'cat-btn px-4 py-2 rounded-full text-xs font-bold border border-kireno-border bg-white text-kireno-charcoal hover:border-kireno-black transition-all';
+            }
+        });
+        applyCombinedFilters();
+    }
+
+    function setPriceFilterByName(priceMode) {
+        activePrice = priceMode;
+        document.querySelectorAll('.price-btn').forEach(btn => {
+            btn.className = 'price-btn px-3 py-1.5 rounded-lg font-medium bg-kireno-sand border border-kireno-border text-kireno-charcoal hover:border-kireno-black transition-colors';
+        });
+        applyCombinedFilters();
+    }
+
+    function setCatFilter(cat, btnEl) {
+        activeCat = cat;
+        document.querySelectorAll('.cat-btn').forEach(btn => {
+            btn.className = 'cat-btn px-4 py-2 rounded-full text-xs font-bold border border-kireno-border bg-white text-kireno-charcoal hover:border-kireno-black transition-all';
+        });
+        if (btnEl) {
+            btnEl.className = 'cat-btn active px-4 py-2 rounded-full text-xs font-bold border border-kireno-black bg-kireno-black text-white transition-all';
+        }
+        applyCombinedFilters();
+    }
+
+    function setPriceFilter(priceMode, btnEl) {
+        activePrice = priceMode;
+        document.querySelectorAll('.price-btn').forEach(btn => {
+            btn.className = 'price-btn px-3 py-1.5 rounded-lg font-medium bg-kireno-sand border border-kireno-border text-kireno-charcoal hover:border-kireno-black transition-colors';
+        });
+        if (btnEl) {
+            btnEl.className = 'price-btn active px-3 py-1.5 rounded-lg font-bold bg-kireno-black text-white transition-colors';
+        }
+        applyCombinedFilters();
+    }
+
+    let isAllExpanded = false;
+    const INITIAL_DISPLAY_LIMIT = 18;
+
+    function expandAllProducts() {
+        isAllExpanded = true;
+        applyCombinedFilters();
+    }
+
+    function applyCombinedFilters() {
+        const query = (document.getElementById('archiveSearchInput').value || '').trim().toLowerCase();
+        const items = document.querySelectorAll('.product-item');
+        let matchedCount = 0;
+        const isFiltered = (activeCat !== 'all' || activePrice !== 'all' || query.length > 0 || isAllExpanded);
+
+        items.forEach(item => {
+            const itemCat = item.getAttribute('data-category') || '';
+            const itemPrice = parseInt(item.getAttribute('data-price') || '0', 10);
+            const itemStock = item.getAttribute('data-stock') || '';
+            const itemName = (item.getAttribute('data-name') || '').toLowerCase();
+
+            let catOk = (activeCat === 'all' || itemCat.includes(activeCat) || activeCat.includes(itemCat));
+            let priceOk = true;
+            if (activePrice === 'under70') priceOk = (itemPrice <= 70000);
+            else if (activePrice === '70to100') priceOk = (itemPrice >= 70000 && itemPrice <= 100000);
+            else if (activePrice === 'over100') priceOk = (itemPrice > 100000);
+            else if (activePrice === 'instock') priceOk = (itemStock === '즉시출고');
+
+            let searchOk = (!query || itemName.includes(query) || itemCat.toLowerCase().includes(query));
+
+            if (catOk && priceOk && searchOk) {
+                matchedCount++;
+                if (isFiltered || matchedCount <= INITIAL_DISPLAY_LIMIT) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
+            } else {
+                item.style.display = 'none';
+            }
+        });
+
+        const badge = document.getElementById('visibleCountBadge');
+        if (badge) badge.textContent = matchedCount;
+
+        const loadMoreBox = document.getElementById('loadMoreContainer');
+        if (loadMoreBox) {
+            if (!isFiltered && matchedCount > INITIAL_DISPLAY_LIMIT) {
+                loadMoreBox.style.display = 'block';
+                const btnTxt = document.getElementById('loadMoreBtnText');
+                if (btnTxt) btnTxt.textContent = `전체 ${matchedCount}종 컬렉션 나머지 작품 모두 펼치기 (+${matchedCount - INITIAL_DISPLAY_LIMIT}종)`;
+            } else {
+                loadMoreBox.style.display = 'none';
+            }
+        }
+    }
+    document.addEventListener('DOMContentLoaded', () => { applyCombinedFilters(); });
+
+    // --- 4. 공간별 3종 연계 스타일링 전환 ---
+    const moodSets = [
+        {
+            title: "01. 묵색 & 골드 서재 공간",
+            items: [
+                { id: 141, tag: "구성 01 · 중심 도자 화분", why: "묵직한 흑철유와 골드 림으로 공간의 중심을 잡는 수제분" },
+                { id: 169, tag: "구성 02 · 벽면 패브릭 액자", why: "화분의 흑유 질감과 차분한 대칭을 이루는 60CM 대형 패널" },
+                { id: 182, tag: "구성 03 · 테이블 원목 향꽂이", why: "황동 2구 홀더가 화분의 골드 선과 어우러지며 깊은 향기를 전달" }
+            ]
+        },
+        {
+            title: "02. 따뜻한 백자 & 베이지 거실",
+            items: [
+                { id: 142, tag: "구성 01 · 파스텔 포인트 화분", why: "부드러운 자연 유약 그라데이션으로 거실을 밝히는 수제분" },
+                { id: 170, tag: "구성 02 · 베이지 5피스 액자", why: "따스한 베이지 직조감 5피스 구성으로 넓은 거실 벽면을 연출" },
+                { id: 168, tag: "구성 03 · 아이보리 마크라메 화병", why: "수공예 코튼 매듭과 백자 톤이 조화로운 테이블 오브제" }
+            ]
+        },
+        {
+            title: "03. 와비사비 다도 & 명상실",
+            items: [
+                { id: 150, tag: "구성 01 · NSM2 아이보리 다육분", why: "정갈한 9cm 소형 분형으로 다탁 위 이끼·분재 연출에 적합" },
+                { id: 160, tag: "구성 02 · 마크라메 벽장식", why: "천연 원목 봉과 수공예 매듭이 주는 차분한 다실 분위기" },
+                { id: 183, tag: "구성 03 · 버드나무 원목 향꽂이", why: "자연목 그대로의 유려한 결을 살린 와비사비 인센스 홀더" }
+            ]
+        }
+    ];
+    let currentMoodIdx = 0;
+
+    function switchMoodSet(idx) {
+        currentMoodIdx = idx;
+        const set = moodSets[idx];
+        const letters = ['A', 'B', 'C'];
+        let total = 0;
+
+        set.items.forEach((slot, i) => {
+            const p = catalogData[slot.id] || allProductsList[i];
+            const L = letters[i];
+            document.getElementById('moodTag' + L).textContent = slot.tag;
+            document.getElementById('moodImg' + L).src = p.image_url;
+            document.getElementById('moodName' + L).textContent = p.name;
+            document.getElementById('moodWhy' + L).textContent = slot.why;
+            document.getElementById('moodPrice' + L).textContent = Number(p.price).toLocaleString() + '원';
+            total += Number(p.price);
+        });
+
+        document.getElementById('moodTotalText').innerHTML = `3종 연계 구성 합계: <strong class="text-kireno-black text-sm">${total.toLocaleString()}원</strong>`;
+
+        document.querySelectorAll('.mood-tab').forEach((btn, i) => {
+            if (i === idx) {
+                btn.className = 'mood-tab active px-4 py-2.5 rounded-full text-xs font-bold bg-kireno-black text-white border border-kireno-black transition-all';
+            } else {
+                btn.className = 'mood-tab px-4 py-2.5 rounded-full text-xs font-bold bg-white text-kireno-charcoal border border-kireno-border hover:border-kireno-black transition-all';
+            }
+        });
+    }
+
+    function openMoodItem(slotIdx) {
+        const slot = moodSets[currentMoodIdx].items[slotIdx];
+        if (slot) openProductDetailModal(slot.id);
+    }
+
+    function consultCurrentMoodSet() {
+        const set = moodSets[currentMoodIdx];
+        const names = set.items.map(s => (catalogData[s.id] ? catalogData[s.id].name : '')).join(' + ');
+        openLiveChat(`${set.title} 패키지 (${names})`);
+    }
+
+    // --- 5. 작품 상세 모달 및 실시간 4종 연계 작품 추천 ---
+    let currentModalProduct = null;
+
+    function getRecommendedUseByCategory(cat, price) {
+        if (cat.includes('화분')) {
+            return price < 60000 ? '소형 다육·리톱스·책상 오브제' : '괴근식물·중형 관엽·분재';
+        } else if (cat.includes('액자')) {
+            return '거실·침실·서재 벽면 연출';
+        } else if (cat.includes('인센스')) {
+            return '다도실·침실 명상 및 방향';
+        } else if (cat.includes('화병')) {
+            return '다이닝 테이블·선반 오브제';
+        }
+        return '재팬디 공간 포인트 연출';
+    }
+
+    function computeInterconnectedProducts(p) {
+        const crossCat = allProductsList.filter(item => item.id !== p.id && item.category !== p.category && item.stock_status === '즉시출고');
+        const sameCat = allProductsList.filter(item => item.id !== p.id && item.category === p.category && item.stock_status === '즉시출고');
+
+        const seed = p.id;
+        const partner1 = crossCat[seed % crossCat.length] || allProductsList[0];
+        const partner2 = crossCat[(seed + 7) % crossCat.length] || allProductsList[1];
+        const sibling1 = sameCat[seed % sameCat.length] || allProductsList[2];
+        const sibling2 = sameCat[(seed + 3) % sameCat.length] || allProductsList[3];
+
+        return [
+            { prod: partner1, relation: '연계 배치 추천 01' },
+            { prod: partner2, relation: '연계 배치 추천 02' },
+            { prod: sibling1, relation: '동일 분류 인기작' },
+            { prod: sibling2, relation: '함께 비교할 작품' }
+        ];
+    }
+
+    function openProductDetailModal(id) {
+        const p = catalogData[id];
+        if (!p) return;
+        currentModalProduct = p;
+
+        document.getElementById('modalProdImg').src = p.image_url;
+        document.getElementById('modalProdImg').alt = p.name;
+        document.getElementById('modalProdBadge').textContent = p.badge || '일본직공수';
+
+        const stockEl = document.getElementById('modalProdStock');
+        stockEl.textContent = p.stock_status;
+        if (p.stock_status === '즉시출고') {
+            stockEl.className = 'absolute top-3.5 right-3.5 text-[11px] font-bold px-2.5 py-0.5 rounded-full z-10 bg-white text-kireno-olive border border-kireno-olive/30';
+        } else {
+            stockEl.className = 'absolute top-3.5 right-3.5 text-[11px] font-bold px-3 py-1 rounded-full z-10 bg-kireno-charcoal text-white';
+        }
+
+        document.getElementById('modalProdCategory').textContent = p.category;
+        document.getElementById('modalProdName').textContent = p.name;
+        const standaloneEl = document.getElementById('modalStandaloneLink');
+        if (standaloneEl) standaloneEl.href = '/product/' + p.id;
+        document.getElementById('modalProdPrice').textContent = Number(p.price).toLocaleString() + '원';
+        document.getElementById('modalQuickUse').textContent = getRecommendedUseByCategory(p.category, p.price);
+        document.getElementById('modalProdDimensions').textContent = p.dimensions;
+        document.getElementById('modalProdOrigin').textContent = p.origin_region;
+        document.getElementById('modalProdDescription').textContent = p.description;
+
+        const storeLink = document.getElementById('modalProdSmartstoreLink');
+        if (p.stock_status === '품절') {
+            storeLink.style.display = 'flex';
+            storeLink.removeAttribute('href');
+            storeLink.removeAttribute('target');
+            storeLink.className = 'bg-kireno-charcoal hover:bg-kireno-black text-white font-bold py-3.5 px-4 rounded-xl text-xs flex items-center justify-center space-x-2 transition-colors cursor-pointer';
+            storeLink.innerHTML = '<i class="fa-regular fa-bell text-kireno-clay"></i><span>품절 (다음 일본 가마 입고 알림 신청)</span>';
+            storeLink.onclick = function(e) {
+                e.preventDefault();
+                closeProductDetailModal();
+                openRestockModal(p.id, p.name);
+            };
+        } else if (p.smartstore_url) {
+            storeLink.style.display = 'flex';
+            storeLink.href = p.smartstore_url;
+            storeLink.target = '_blank';
+            storeLink.className = 'bg-kireno-black hover:bg-kireno-charcoal text-white font-bold py-3.5 px-4 rounded-xl text-xs flex items-center justify-center space-x-2 transition-colors shadow-xs';
+            storeLink.innerHTML = '<span>네이버 스마트스토어 바로 구매</span><i class="fa-solid fa-arrow-up-right-from-square text-[10px] text-kireno-clay"></i>';
+            storeLink.onclick = null;
+        } else {
+            storeLink.style.display = 'none';
+        }
+
+        const relatedList = computeInterconnectedProducts(p);
+        const relGrid = document.getElementById('modalRelatedGrid');
+        relGrid.innerHTML = relatedList.map(entry => {
+            const rp = entry.prod;
+            return `
+                <div onclick="openProductDetailModal(${rp.id})" class="group cursor-pointer rounded-xl border border-kireno-border hover:border-kireno-clay bg-kireno-sand/50 hover:bg-white p-3 transition-all flex flex-col justify-between">
+                    <div>
+                        <span class="inline-block text-[10px] font-bold text-kireno-charcoal bg-white border border-kireno-border px-2 py-0.5 rounded mb-2">
+                            ${entry.relation}
+                        </span>
+                        <div class="aspect-square rounded-lg bg-white p-2 mb-2 flex items-center justify-center overflow-hidden border border-kireno-border">
+                            <img src="${rp.image_url}" alt="${rp.name}" class="w-full h-full object-contain group-hover:scale-105 transition-transform">
+                        </div>
+                        <div class="text-[10px] text-kireno-gray">${rp.category}</div>
+                        <h5 class="font-bold text-xs text-kireno-black line-clamp-1 group-hover:text-kireno-clay">${rp.name}</h5>
+                    </div>
+                    <div class="mt-2 pt-2 border-t border-kireno-border flex items-center justify-between">
+                        <span class="font-black text-xs text-kireno-black">${Number(rp.price).toLocaleString()}원</span>
+                        <span class="text-[10px] font-bold text-kireno-clay group-hover:text-kireno-black">보기 →</span>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        document.getElementById('productDetailModal').classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+
+        document.getElementById('gaugeBar1').style.width = '0%';
+        document.getElementById('gaugeBar2').style.width = '0%';
+        document.getElementById('gaugeBar3').style.width = '0%';
+        setTimeout(() => {
+            document.getElementById('gaugeBar1').style.width = '98%';
+            document.getElementById('gaugeBar2').style.width = '96%';
+            document.getElementById('gaugeBar3').style.width = '99%';
+        }, 80);
+    }
+
+    function openProductDetailAndScrollToLinked(id) {
+        openProductDetailModal(id);
+        setTimeout(() => {
+            const linkedSec = document.getElementById('modalLinkedSection');
+            if (linkedSec) linkedSec.scrollIntoView({ behavior: 'smooth' });
+        }, 200);
+    }
+
+    function closeProductDetailModal() {
+        document.getElementById('productDetailModal').classList.add('hidden');
+        document.body.style.overflow = 'auto';
+    }
+
+    function consultFromModal() {
+        if (!currentModalProduct) return;
+        const name = currentModalProduct.name;
+        closeProductDetailModal();
+        openLiveChat(name);
+    }
+
+    document.getElementById('productDetailModal').addEventListener('click', function(e) {
+        if (e.target === this) closeProductDetailModal();
+    });
+
+    // --- 6. 문의 및 재입고 알림 처리 ---
+    function handleInquirySubmit(e) {
+        e.preventDefault();
+        const form = document.getElementById('inquiryForm');
+        const alertBox = document.getElementById('inquiryAlert');
+        const btn = document.getElementById('inquirySubmitBtn');
+
+        btn.disabled = true;
+        btn.innerHTML = '<span>접수 중...</span>';
+
+        fetch('/api/inquiry', { method: 'POST', body: new FormData(form) })
+            .then(res => res.json())
+            .then(data => {
+                alertBox.classList.remove('hidden');
+                alertBox.className = 'text-xs p-3 rounded-lg bg-white border border-kireno-border text-kireno-black font-semibold';
+                alertBox.textContent = data.message;
+                if (data.success) form.reset();
+            })
+            .catch(() => {
+                alertBox.classList.remove('hidden');
+                alertBox.className = 'text-xs p-3 rounded-lg bg-white border border-kireno-border text-kireno-charcoal';
+                alertBox.textContent = '통신 오류가 발생했습니다.';
+            })
+            .finally(() => {
+                btn.disabled = false;
+                btn.innerHTML = '<span>문의 접수하기</span><i class="fa-solid fa-paper-plane text-xs text-kireno-clay"></i>';
+            });
+    }
+
+    function openRestockModal(id, name) {
+        document.getElementById('restockProdId').value = id;
+        document.getElementById('restockProdName').value = name;
+        document.getElementById('restockAlertMsg').classList.add('hidden');
+        document.getElementById('restockModal').classList.remove('hidden');
+    }
+
+    function closeRestockModal() {
+        document.getElementById('restockModal').classList.add('hidden');
+    }
+
+    function handleRestockSubmit(e) {
+        e.preventDefault();
+        const prodId = document.getElementById('restockProdId').value;
+        const prodName = document.getElementById('restockProdName').value;
+        const phone = document.getElementById('restockPhone').value;
+        const msgBox = document.getElementById('restockAlertMsg');
+        const btn = document.getElementById('restockBtn');
+
+        btn.disabled = true;
+        const formData = new FormData();
+        formData.append('product_id', prodId);
+        formData.append('product_name', prodName);
+        formData.append('phone', phone);
+
+        fetch('/api/restock-alert', { method: 'POST', body: formData })
+            .then(res => res.json())
+            .then(data => {
+                msgBox.classList.remove('hidden');
+                msgBox.className = 'p-2.5 rounded-lg text-[11px] bg-kireno-sand border border-kireno-border text-kireno-black font-semibold';
+                msgBox.textContent = data.message;
+                if (data.success) setTimeout(() => closeRestockModal(), 2000);
+            })
+            .catch(() => {
+                msgBox.classList.remove('hidden');
+                msgBox.textContent = '오류가 발생했습니다.';
+            })
+            .finally(() => btn.disabled = false);
+    }
+</script>
+{% endblock %}

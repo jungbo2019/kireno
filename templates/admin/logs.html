@@ -1,0 +1,120 @@
+{% extends "admin/base_admin.html" %}
+
+{% block breadcrumb %}보안 및 시스템 로그{% endblock %}
+
+{% block admin_content %}
+<div class="space-y-6">
+
+    <!-- Security Center Status & Password Change -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- 1. Security Status Overview -->
+        <div class="bg-white p-6 rounded-2xl border border-stone-200 shadow-sm space-y-4 md:col-span-2">
+            <div class="flex items-center justify-between pb-3 border-b border-stone-100">
+                <div class="flex items-center space-x-2">
+                    <span class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <h3 class="font-black text-sm text-stone-900">시스템 5대 보안 방벽 가동 상태</h3>
+                </div>
+                <span class="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-black">
+                    모든 보안 수칙 준수
+                </span>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs">
+                <div class="p-3 bg-stone-50 rounded-xl border border-stone-200">
+                    <span class="text-stone-400 block text-[10px] font-bold">인증 보안</span>
+                    <span class="font-bold text-stone-900 block mt-0.5">HTTPOnly + SameSite</span>
+                    <span class="text-[10px] text-emerald-600 font-semibold block mt-0.5">XSS 탈취 차단</span>
+                </div>
+                <div class="p-3 bg-stone-50 rounded-xl border border-stone-200">
+                    <span class="text-stone-400 block text-[10px] font-bold">무차별 대입 방어</span>
+                    <span class="font-bold text-stone-900 block mt-0.5">IP 자동 잠금 (5회 실패)</span>
+                    <span class="text-[10px] text-emerald-600 font-semibold block mt-0.5">15분간 즉시 차단</span>
+                </div>
+                <div class="p-3 bg-stone-50 rounded-xl border border-stone-200">
+                    <span class="text-stone-400 block text-[10px] font-bold">HTTP 보안 헤더</span>
+                    <span class="font-bold text-stone-900 block mt-0.5">X-Frame-Options</span>
+                    <span class="text-[10px] text-emerald-600 font-semibold block mt-0.5">클릭재킹 방지</span>
+                </div>
+                <div class="p-3 bg-stone-50 rounded-xl border border-stone-200">
+                    <span class="text-stone-400 block text-[10px] font-bold">API 공격 방어</span>
+                    <span class="font-bold text-stone-900 block mt-0.5">IP Rate Limiter</span>
+                    <span class="text-[10px] text-emerald-600 font-semibold block mt-0.5">DOS/스팸 60회/분 차단</span>
+                </div>
+                <div class="p-3 bg-stone-50 rounded-xl border border-stone-200">
+                    <span class="text-stone-400 block text-[10px] font-bold">입력값 검증</span>
+                    <span class="font-bold text-stone-900 block mt-0.5">HTML 이스케이프</span>
+                    <span class="text-[10px] text-emerald-600 font-semibold block mt-0.5">스크립트 주입 무력화</span>
+                </div>
+                <div class="p-3 bg-stone-50 rounded-xl border border-stone-200">
+                    <span class="text-stone-400 block text-[10px] font-bold">SQL 인젝션</span>
+                    <span class="font-bold text-stone-900 block mt-0.5">Parameterized Query</span>
+                    <span class="text-[10px] text-emerald-600 font-semibold block mt-0.5">100% 매개변수 바인딩</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. Admin Password Change Card -->
+        <div class="bg-white p-6 rounded-2xl border border-stone-200 shadow-sm space-y-3">
+            <div class="flex items-center space-x-2 pb-2 border-b border-stone-100">
+                <i class="fa-solid fa-key text-amber-500 text-sm"></i>
+                <h3 class="font-black text-sm text-stone-900">관리자 비밀번호 안전 변경</h3>
+            </div>
+            <form method="POST" action="/admin/change-password" class="space-y-2.5 text-xs">
+                <div>
+                    <label class="block text-stone-600 font-bold mb-1">현재 비밀번호</label>
+                    <input type="password" name="current_password" required placeholder="현재 비밀번호 입력" class="w-full px-3 py-2 rounded-xl border border-stone-300">
+                </div>
+                <div>
+                    <label class="block text-stone-600 font-bold mb-1">새 비밀번호 (8자 이상)</label>
+                    <input type="password" name="new_password" required minlength="8" placeholder="새 비밀번호 입력" class="w-full px-3 py-2 rounded-xl border border-stone-300">
+                </div>
+                <div>
+                    <label class="block text-stone-600 font-bold mb-1">새 비밀번호 확인</label>
+                    <input type="password" name="confirm_password" required minlength="8" placeholder="새 비밀번호 다시 입력" class="w-full px-3 py-2 rounded-xl border border-stone-300">
+                </div>
+                <button type="submit" class="w-full bg-stone-900 hover:bg-black text-white font-bold py-2.5 rounded-xl transition text-xs shadow-sm mt-1">
+                    비밀번호 변경 적용
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div>
+        <h2 class="text-lg font-bold text-stone-900">시스템 실시간 감사 및 이벤트 로그</h2>
+        <p class="text-xs text-stone-500">방문, 외부 스토어 전환 클릭, 관리자 수정 등의 기록이 실시간으로 안전하게 기록됩니다.</p>
+    </div>
+
+    <div class="bg-white rounded-xl border border-stone-200 shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+                <thead class="bg-stone-50 text-stone-500 font-bold border-b border-stone-200">
+                    <tr>
+                        <th class="px-6 py-3.5">시간</th>
+                        <th class="px-6 py-3.5">이벤트 유형</th>
+                        <th class="px-6 py-3.5">상세 내용</th>
+                        <th class="px-6 py-3.5">접속 IP</th>
+                        <th class="px-6 py-3.5">응답 지연</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-stone-100 font-mono">
+                    {% for log in logs %}
+                    <tr class="hover:bg-stone-50">
+                        <td class="px-6 py-3 text-stone-500">{{ log.created_at }}</td>
+                        <td class="px-6 py-3 font-bold text-stone-900">{{ log.event_type }}</td>
+                        <td class="px-6 py-3 font-sans text-stone-700">{{ log.message }}</td>
+                        <td class="px-6 py-3 text-stone-500">{{ log.ip_address }}</td>
+                        <td class="px-6 py-3 text-stone-500">{{ log.latency_ms }}ms</td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" class="px-6 py-8 text-center text-stone-400 font-sans">
+                            기록된 로그가 없습니다.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

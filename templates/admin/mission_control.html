@@ -1,0 +1,183 @@
+{% extends "admin/base_admin.html" %}
+
+{% block breadcrumb %}실시간 관제센터 (Mission Control){% endblock %}
+
+{% block admin_content %}
+<div class="space-y-6">
+    <!-- Live Header Indicator -->
+    <div class="bg-black text-white p-6 rounded-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+            <div class="flex items-center space-x-2 text-xs text-green-400 font-mono mb-1">
+                <span class="w-2.5 h-2.5 rounded-full bg-green-500 animate-pulse"></span>
+                <span>SYSTEM LIVE TELEMETRY STREAMING</span>
+            </div>
+            <h1 class="text-xl font-black">AI & 플랫폼 실시간 통합 관제센터</h1>
+            <p class="text-xs text-stone-400 mt-1">도자기 쇼룸 서버, 24시간 제미나이 AI 어드바이저 및 터미널 CLI 에이전트 통합 관제</p>
+        </div>
+        <div class="flex items-center space-x-3">
+            <span class="text-xs bg-stone-800 text-stone-300 px-3 py-1.5 rounded-lg font-mono" id="liveClock">--:--:--</span>
+            <a href="/admin/inspect" class="bg-white text-black text-xs font-bold px-4 py-2 rounded-lg hover:bg-stone-200 transition-colors">
+                비주얼 전문 검수 세션 열기 →
+            </a>
+        </div>
+    </div>
+
+    <!-- Live Metrics Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="bg-white p-5 rounded-xl border border-stone-200 shadow-sm">
+            <span class="text-xs text-stone-500 font-semibold block mb-1">현재 공정 단계</span>
+            <span class="text-sm font-black text-stone-900 block" id="phaseText">도자기(Ceramics) 전면 개편 & CLI 툴체인 가동</span>
+            <div class="w-full bg-stone-100 rounded-full h-2 mt-3 overflow-hidden">
+                <div class="bg-black h-2 rounded-full" id="progressBar" style="width: 100%"></div>
+            </div>
+            <span class="text-[11px] text-stone-500 mt-1 block text-right font-mono" id="progressVal">100% 완료</span>
+        </div>
+
+        <div class="bg-white p-5 rounded-xl border border-stone-200 shadow-sm">
+            <span class="text-xs text-stone-500 font-semibold block mb-1">3중 백업 동기화 상태</span>
+            <div class="flex items-center space-x-1.5 text-xs font-bold text-green-600 mb-2">
+                <i class="fa-solid fa-circle-check"></i>
+                <span id="backupStatus">3중 동기화 완료</span>
+            </div>
+            <div class="text-[11px] text-stone-400 space-y-0.5 font-mono">
+                <div>• 1_original (실시간 원본)</div>
+                <div>• 2_backup_latest (미러본)</div>
+                <div>• 3_backup_archive (누적본)</div>
+            </div>
+        </div>
+
+        <div class="bg-white p-5 rounded-xl border border-stone-200 shadow-sm">
+            <span class="text-xs text-stone-500 font-semibold block mb-1">서버 자원 (CPU / RAM)</span>
+            <div class="flex items-baseline space-x-2">
+                <span class="text-2xl font-black text-stone-900" id="cpuVal">{{ cpu_usage }}%</span>
+                <span class="text-xs text-stone-400 font-mono">CPU</span>
+            </div>
+            <div class="text-xs text-stone-600 mt-2 font-mono">
+                RAM 점유: <span id="memVal" class="font-bold">{{ mem_pct }}%</span>
+            </div>
+        </div>
+
+        <div class="bg-white p-5 rounded-xl border border-stone-200 shadow-sm">
+            <span class="text-xs text-stone-500 font-semibold block mb-1">도자기 상품 & AI 컨시어지</span>
+            <div class="text-xs space-y-1 text-stone-700 font-medium mt-1">
+                <div class="flex items-center justify-between">
+                    <span>수제 도자기 라인업</span>
+                    <span class="font-bold text-black">12종</span>
+                </div>
+                <div class="flex items-center justify-between">
+                    <span>제미나이 AI 상담 엔진</span>
+                    <span class="font-bold text-green-600">24시간 LIVE</span>
+                </div>
+                <div class="flex items-center justify-between">
+                    <span>터미널 CLI 도구</span>
+                    <span class="font-bold text-blue-600">kireno_cli.py</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Terminal Web CLI Interactive Runner (Option 3 Implementation) -->
+    <div class="bg-stone-900 text-white rounded-2xl p-6 shadow-xl border border-stone-800">
+        <div class="flex items-center justify-between pb-4 border-b border-stone-800 mb-4">
+            <div class="flex items-center space-x-2 text-xs font-mono">
+                <span class="w-3 h-3 rounded-full bg-red-500 inline-block"></span>
+                <span class="w-3 h-3 rounded-full bg-yellow-500 inline-block"></span>
+                <span class="w-3 h-3 rounded-full bg-green-500 inline-block"></span>
+                <span class="text-stone-400 ml-2">TERMINAL CLI AGENT CONSOLE (Option 2 & 3 통합 가동)</span>
+            </div>
+            <div class="flex space-x-2 text-xs">
+                <button onclick="runCliBtn('status')" class="px-2.5 py-1 bg-stone-800 hover:bg-stone-700 rounded text-stone-300 font-mono">cli status</button>
+                <button onclick="runCliBtn('products')" class="px-2.5 py-1 bg-stone-800 hover:bg-stone-700 rounded text-stone-300 font-mono">cli products</button>
+                <button onclick="runCliBtn('backup')" class="px-2.5 py-1 bg-stone-800 hover:bg-stone-700 rounded text-stone-300 font-mono">cli backup</button>
+                <button onclick="runCliBtn('gemini')" class="px-2.5 py-1 bg-stone-800 hover:bg-stone-700 rounded text-stone-300 font-mono text-yellow-400">cli gemini (AI검수)</button>
+            </div>
+        </div>
+        <pre id="cliOutputTerminal" class="bg-black/60 p-4 rounded-xl text-xs font-mono text-green-400 overflow-x-auto min-h-[140px] max-h-[220px] whitespace-pre-wrap leading-relaxed">[KIRENO CLI AGENT READY] - 상단 버튼을 클릭하거나 터미널 명령어를 실행하면 실시간 결과가 이곳에 출력됩니다.</pre>
+    </div>
+
+    <!-- Live Event Stream Table -->
+    <div class="bg-white rounded-xl border border-stone-200 shadow-sm overflow-hidden">
+        <div class="px-6 py-4 border-b border-stone-200 flex justify-between items-center bg-stone-50">
+            <div class="flex items-center space-x-2">
+                <span class="w-2 h-2 rounded-full bg-green-500 animate-ping"></span>
+                <h3 class="font-bold text-xs text-stone-900 uppercase tracking-wider">실시간 시스템 감사 로그 (2초 자동 갱신)</h3>
+            </div>
+            <span class="text-[11px] text-stone-400 font-mono">Active Target: http://127.0.0.1:5001</span>
+        </div>
+        <div class="overflow-x-auto max-h-80 overflow-y-auto">
+            <table class="w-full text-left text-xs font-mono">
+                <thead class="bg-stone-100 text-stone-500 font-bold sticky top-0">
+                    <tr>
+                        <th class="px-6 py-2.5">타임스탬프</th>
+                        <th class="px-6 py-2.5">이벤트 타입</th>
+                        <th class="px-6 py-2.5">상세 내용</th>
+                        <th class="px-6 py-2.5">지연시간</th>
+                    </tr>
+                </thead>
+                <tbody id="liveLogsBody" class="divide-y divide-stone-100">
+                    {% for log in recent_logs %}
+                    <tr class="hover:bg-stone-50">
+                        <td class="px-6 py-2 text-stone-500">{{ log.created_at }}</td>
+                        <td class="px-6 py-2 font-bold text-stone-900 font-sans">{{ log.event_type }}</td>
+                        <td class="px-6 py-2 text-stone-700 font-sans">{{ log.message }}</td>
+                        <td class="px-6 py-2 text-stone-500">{{ log.latency_ms }}ms</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    function updateClock() {
+        const now = new Date();
+        document.getElementById('liveClock').textContent = now.toTimeString().split(' ')[0];
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    function runCliBtn(command) {
+        const outBox = document.getElementById('cliOutputTerminal');
+        outBox.textContent = `> 실행 중: python kireno_cli.py ${command} ...`;
+
+        fetch('/api/mission-control/run-cli', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ cmd: command })
+        })
+        .then(r => r.json())
+        .then(data => {
+            outBox.textContent = data.output;
+        })
+        .catch(err => {
+            outBox.textContent = '실행 오류: ' + err;
+        });
+    }
+
+    function pollLiveData() {
+        fetch('/api/mission-control/live-data')
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('cpuVal').textContent = data.cpu + '%';
+                document.getElementById('memVal').textContent = data.mem + '%';
+                
+                const tbody = document.getElementById('liveLogsBody');
+                let rowsHtml = '';
+                data.logs.forEach(log => {
+                    rowsHtml += `
+                        <tr class="hover:bg-stone-50">
+                            <td class="px-6 py-2 text-stone-500">${log.created_at}</td>
+                            <td class="px-6 py-2 font-bold text-stone-900 font-sans">${log.event_type}</td>
+                            <td class="px-6 py-2 text-stone-700 font-sans">${log.message}</td>
+                            <td class="px-6 py-2 text-stone-500">${log.latency_ms || 0}ms</td>
+                        </tr>
+                    `;
+                });
+                tbody.innerHTML = rowsHtml;
+            })
+            .catch(err => console.log('Poll err:', err));
+    }
+    setInterval(pollLiveData, 2000);
+</script>
+{% endblock %}
